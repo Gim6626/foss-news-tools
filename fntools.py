@@ -177,33 +177,64 @@ class DigestRecordCategory(Enum):
     OTHER = 'other'
 
 
+DIGEST_RECORD_CATEGORY_RU_MAPPING = {
+    'news': 'Новости',
+    'articles': 'Статьи',
+    'releases': 'Релизы'
+}
+
+
 DIGEST_RECORD_CATEGORY_VALUES = [category.value for category in DigestRecordCategory]
 
 
-class DigestRecordSubCategory(Enum):
-    EVENTS = 'Мероприятия'
-    INTROS = 'Внедрения'
-    OPENING = 'Открытие кода и данных'
-    NEWS = 'Новости FOSS организаций'
-    DIY = 'DIY'
-    LAW = 'Юридические вопросы'
-    KnD = 'Ядро и дистрибутивы'
-    SYSTEM = 'Системное'
-    SPECIAL = 'Специальное'
-    MULTIMEDIA = 'Мультимедиа'
-    SECURITY = 'Безопасность'
-    DEVOPS = 'DevOps'
-    DATA_SCIENCE = 'Data Science'
-    WEB = 'Web'
-    DEV = 'Для разработчиков'
-    MANAGEMENT = 'Менеджмент'
-    USER = 'Пользовательское'
-    GAMES = 'Игры'
-    HARDWARE = 'Железо'
-    MISC = 'Разное'
+class DigestRecordSubcategory(Enum):
+    EVENTS = 'events'
+    INTROS = 'intros'
+    OPENING = 'opening'
+    NEWS = 'news'
+    DIY = 'diy'
+    LAW = 'law'
+    KnD = 'knd'
+    SYSTEM = 'system'
+    SPECIAL = 'special'
+    MULTIMEDIA = 'multimedia'
+    SECURITY = 'security'
+    DEVOPS = 'devops'
+    DATA_SCIENCE = 'data_science'
+    WEB = 'web'
+    DEV = 'dev'
+    MANAGEMENT = 'management'
+    USER = 'user'
+    GAMES = 'games'
+    HARDWARE = 'hardware'
+    MISC = 'misc'
 
 
-DIGEST_RECORD_SHORTS_SUBCATEGORY_VALUES = [category.value for category in DigestRecordSubCategory]
+DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
+    'events': 'Мероприятия',
+    'intros': 'Внедрения',
+    'opening': 'Открытие кода и данных',
+    'news': 'Новости FOSS организаций',
+    'diy': 'DIY',
+    'law': 'Юридические вопросы',
+    'knd': 'Ядро и дистрибутивы',
+    'system': 'Системное',
+    'special': 'Специальное',
+    'multimedia': 'Мультимедиа',
+    'security': 'Безопасность',
+    'devops': 'DevOps',
+    'data_science': 'Data Science',
+    'web': 'Web',
+    'dev': 'Для разработчиков',
+    'management': 'Менеджмент',
+    'user': 'Пользовательское',
+    'games': 'Игры',
+    'hardware': 'Железо',
+    'misc': 'Разное',
+}
+
+
+DIGEST_RECORD_SUBCATEGORY_VALUES = [category.value for category in DigestRecordSubcategory]
 
 
 class DigestRecord:
@@ -253,6 +284,8 @@ class DigestRecordsCollection:
         self._filtered_records = []
         self._host = None
         self._port = None
+        self._user = None
+        self._password = None
         self._token = None
 
     def __str__(self):
@@ -276,44 +309,129 @@ class DigestRecordsCollection:
             logger.info(f'Saving results to "{yaml_path}"')
             yaml.safe_dump(records_plain, fout)
 
-    def load_from_server(self, yaml_config_path: str):
-        records_objects: List[DigestRecord] = []
-        logger.info(f'Loading gathering server connect data from config "{yaml_config_path}"')
-        with open(yaml_config_path, 'r') as fin:
+    def _login(self):
+        logger.info('Logging in')
+        result = requests.post(f'http://{self._host}:{self._port}/api/v1/token/',
+                               data={'username': self._user, 'password': self._password})
+        if result.status_code != 200:
+            raise Exception(f'Invalid response code from FNGS login - {result.status_code}: {result.content.decode("utf-8")}')
+        result_data = json.loads(result.content)
+        self._token = result_data['access']
+        logger.info('Logged in')
+
+    def _load_config(self, config_path):
+        logger.info(f'Loading gathering server connect data from config "{config_path}"')
+        with open(config_path, 'r') as fin:
             config_data = yaml.safe_load(fin)
-            # pprint(config_data)
             self._host = config_data['host']
             self._port = config_data['port']
-            user = config_data['user']
-            password = config_data['password']
+            self._user = config_data['user']
+            self._password = config_data['password']
             logger.info('Loaded')
-            logger.info('Logging in')
-            result = requests.post(f'http://{self._host}:{self._port}/api/v1/token/',
-                                   data={'username': user, 'password': password})
-            if result.status_code != 200:
-                raise Exception(f'Invalid response code from FNGS login - {result.status_code}: {result.content.decode("utf-8")}')
-            result_data = json.loads(result.content)
-            self._token = result_data['access']
-            logger.info('Logged in')
-            logger.info('Getting data')
-            result = requests.get(f'http://{self._host}:{self._port}/api/v1/new-digest-records/',
-                                  headers={
-                                      'Authorization': f'Bearer {self._token}',
-                                      'Content-Type': 'application/json',
-                                  })
-            if result.status_code != 200:
-                raise Exception(f'Invalid response code from FNGS fetch - {result.status_code}: {result.content.decode("utf-8")}')
-            logger.info('Got data')
-            result_data = json.loads(result.content)
-            for record_plain in result_data:
-                record_object = DigestRecord(datetime.datetime.strptime(record_plain['dt'],
-                                                                        '%Y-%m-%dT%H:%M:%SZ'),
-                                             record_plain['title'],
-                                             record_plain['url'],
-                                             drid=record_plain['id'],
-                                             is_main=record_plain['is_main'])
-                records_objects.append(record_object)
-            self.records = records_objects
+
+    def load_specific_digest_records_from_server(self, yaml_config_path: str, digest_number):
+        self._load_config(yaml_config_path)
+        self._login()
+        self._basic_load_digest_records_from_server(yaml_config_path,
+                                                    f'http://{self._host}:{self._port}/api/v1/specific-digest-records/{digest_number}/')
+
+    def load_new_digest_records_from_server(self, yaml_config_path: str):
+        self._load_config(yaml_config_path)
+        self._login()
+        self._basic_load_digest_records_from_server(yaml_config_path,
+                                                    f'http://{self._host}:{self._port}/api/v1/new-digest-records/')
+
+    def _basic_load_digest_records_from_server(self, yaml_config_path: str, url: str):
+        records_objects: List[DigestRecord] = []
+        logger.info('Getting data')
+        result = requests.get(url,
+                              headers={
+                                  'Authorization': f'Bearer {self._token}',
+                                  'Content-Type': 'application/json',
+                              })
+        if result.status_code != 200:
+            raise Exception(
+                f'Invalid response code from FNGS fetch - {result.status_code}: {result.content.decode("utf-8")}')
+        logger.info('Got data')
+        result_data = json.loads(result.content)
+        for record_plain in result_data:
+            record_object = DigestRecord(datetime.datetime.strptime(record_plain['dt'],
+                                                                    '%Y-%m-%dT%H:%M:%SZ'),
+                                         record_plain['title'],
+                                         record_plain['url'],
+                                         digest_number=record_plain['digest_number'],
+                                         drid=record_plain['id'],
+                                         is_main=record_plain['is_main'])
+            record_object.state = DigestRecordState(record_plain['state'].lower()) if 'state' in record_plain and record_plain['state'] is not None else None
+            record_object.category = DigestRecordCategory(record_plain['category'].lower()) if 'category' in record_plain and record_plain['category'] is not None else None
+            record_object.subcategory = DigestRecordSubcategory(record_plain['subcategory'].lower()) if 'subcategory' in record_plain and record_plain['subcategory'] is not None else None
+            records_objects.append(record_object)
+        self.records = records_objects
+
+    def _clear_title(self, title: str):
+        return re.sub(r'^\[.+\]\s+', '', title)
+
+    def records_to_html(self, html_path):
+        output_records = {
+            'main': [],
+            DigestRecordCategory.NEWS.value: {subcategory_value: [] for subcategory_value in DIGEST_RECORD_SUBCATEGORY_VALUES},
+            DigestRecordCategory.ARTICLES.value: {subcategory_value: [] for subcategory_value in DIGEST_RECORD_SUBCATEGORY_VALUES},
+            DigestRecordCategory.RELEASES.value: {subcategory_value: [] for subcategory_value in DIGEST_RECORD_SUBCATEGORY_VALUES},
+            DigestRecordCategory.OTHER.value: [],
+        }
+        for digest_record in self.records:
+            if digest_record.state != DigestRecordState.IN_DIGEST:
+                continue
+            if digest_record.is_main:
+                output_records['main'].append(digest_record)
+            elif digest_record.category == DigestRecordCategory.OTHER:
+                output_records[digest_record.category.value].append(digest_record)
+            elif not digest_record.is_main and digest_record.category in (DigestRecordCategory.NEWS,
+                                                                          DigestRecordCategory.ARTICLES,
+                                                                          DigestRecordCategory.RELEASES):
+                if digest_record.subcategory is not None:
+                    output_records[digest_record.category.value][digest_record.subcategory.value].append(digest_record)
+            else:
+                print(digest_record.title, digest_record.category, digest_record.is_main)
+                raise NotImplementedError
+        output = '<h2>Главное</h2>\n\n'
+        for main_record in output_records['main']:
+            output += f'<h3>{self._clear_title(main_record.title)}</h3>\n\n'
+            output += f'Подробности - <a href="{main_record.url}">{main_record.url}</a>\n\n'
+
+        output += '<h2>Короткой строкой</h2>\n\n'
+
+        output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.NEWS.value]}</h3>\n\n'
+        for news_record_subcategory, news_records in output_records[DigestRecordCategory.NEWS.value].items():
+            if not news_records:
+                continue
+            output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[news_record_subcategory]}</h4>\n\n'
+            for news_record in news_records:
+                output += f'{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}<br></a>\n'
+
+        output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.ARTICLES.value]}</h3>\n\n'
+        for articles_record_subcategory, articles_records in output_records[DigestRecordCategory.ARTICLES.value].items():
+            if not articles_records:
+                continue
+            output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[articles_record_subcategory]}</h4>\n\n'
+            for articles_record in articles_records:
+                output += f'{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}<br></a>\n'
+
+        output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.RELEASES.value]}</h3>\n\n'
+        for releases_record_subcategory, releases_records in output_records[DigestRecordCategory.RELEASES.value].items():
+            if not releases_records:
+                continue
+            output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[releases_record_subcategory]}</h4>\n\n'
+            for releases_record in releases_records:
+                output += f'{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}<br></a>\n'
+
+        output += '<h2>Что ещё посмотреть</h2>\n\n'
+        for other_record in output_records[DigestRecordCategory.OTHER.value]:
+            output += f'{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a>\n'
+
+        with open(html_path, 'w') as fout:
+            logger.info(f'Saving output to "{html_path}"')
+            fout.write(output)
 
     def categorize_interactively(self):
         current_digest_number = None
@@ -414,7 +532,7 @@ class DigestRecordsCollection:
     def _ask_subcategory(self, record: DigestRecord):
         enum_name = 'digest record subcategory'
         if record.category != DigestRecordCategory.UNKNOWN and record.category != DigestRecordCategory.OTHER:
-            return self._ask_enum(enum_name, DigestRecordSubCategory, record)
+            return self._ask_enum(enum_name, DigestRecordSubcategory, record)
         else:
             raise NotImplementedError
 

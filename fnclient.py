@@ -20,7 +20,7 @@ def main():
     args = parse_command_line_args()
     config_path = args.FNGS_CONFIG
     records_collection = DigestRecordsCollection()
-    records_collection.load_from_server(config_path)
+    records_collection.load_new_digest_records_from_server(config_path)
     records_collection.categorize_interactively()
 
 
