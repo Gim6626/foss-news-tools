@@ -401,6 +401,7 @@ class DigestRecordsCollection:
 
         output += '<h2>Короткой строкой</h2>\n\n'
 
+        # TODO: Refactor following 3 loops, unite them in one upper
         output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.NEWS.value]}</h3>\n\n'
         for news_record_subcategory, news_records in output_records[DigestRecordCategory.NEWS.value].items():
             if not news_records:
