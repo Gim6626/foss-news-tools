@@ -233,9 +233,11 @@ class DigestRecord:
 
     def to_dict(self):
         return {
+            'drid': self.drid,
             'datetime': self.dt.strftime(DIGEST_RECORD_DATETIME_FORMAT),
             'title': self.title,
             'url': self.url,
+            'is_main': self.is_main,
             'state': self.state.value,
             'digest_number': self.digest_number,
             'category': self.category.value,
