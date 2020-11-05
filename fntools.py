@@ -276,16 +276,6 @@ class DigestRecordsCollection:
             logger.info(f'Saving results to "{yaml_path}"')
             yaml.safe_dump(records_plain, fout)
 
-    def load(self, file_path: str):
-        if '.conf.yaml' in file_path:
-            self.load_from_server(file_path)
-        elif '.html' in file_path:
-            self.load_from_html(file_path)
-        elif '.yaml' in file_path or '.yml' in file_path:
-            self.load_from_yaml(file_path)
-        else:
-            raise NotImplementedError
-
     def load_from_server(self, yaml_config_path: str):
         records_objects: List[DigestRecord] = []
         logger.info(f'Loading gathering server connect data from config "{yaml_config_path}"')
@@ -324,45 +314,6 @@ class DigestRecordsCollection:
                                              is_main=record_plain['is_main'])
                 records_objects.append(record_object)
             self.records = records_objects
-
-    def load_from_yaml(self, yaml_path: str):
-        records_objects: List[DigestRecord] = []
-        logger.info(f'Loading input data from "{yaml_path}"')
-        with open(yaml_path, 'r') as fin:
-            fin_data = yaml.safe_load(fin)
-            for record_plain in fin_data:
-                category = DigestRecordCategory(record_plain['category'])
-                subcategory_str = record_plain['subcategory']
-                if category != DigestRecordCategory.OTHER and category != DigestRecordCategory.UNKNOWN:
-                    subcategory = DigestRecordSubCategory(subcategory_str)
-                else:
-                    subcategory = None
-                record_object = DigestRecord(datetime.datetime.strptime(record_plain['datetime'],
-                                                                        DIGEST_RECORD_DATETIME_FORMAT),
-                                             record_plain['title'],
-                                             record_plain['url'],
-                                             DigestRecordState(record_plain['state']),
-                                             record_plain['digest_number'],
-                                             category,
-                                             subcategory)
-                records_objects.append(record_object)
-        self.records = records_objects
-
-    def load_from_html(self, html_path):
-        records_objects: List[DigestRecord] = []
-        with open(html_path, 'r') as fin:
-            html_content_str = fin.read()
-            re_str = r'(\d{4}.+)([-+]\d{2}:\d{2}) (.+?) <a href="(.+?)">'
-            re_res = re.findall(re_str, html_content_str)
-            if re_res:
-                for record in re_res:
-                    dt = datetime.datetime.strptime(f'{record[0]} {record[1].replace(":", "")}',
-                                                    DIGEST_RECORD_DATETIME_FORMAT)
-                    title = record[2].strip()
-                    url = record[3]
-                    record_object = DigestRecord(dt, title, url)
-                    records_objects.append(record_object)
-        self.records = records_objects
 
     def categorize_interactively(self):
         current_digest_number = None
