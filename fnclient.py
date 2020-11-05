@@ -175,7 +175,7 @@ class DigestRecordsCollection:
                 records_objects.append(record_object)
         self.records = records_objects
 
-    def load_from_html(html_path):
+    def load_from_html(self, html_path):
         records_objects: List[DigestRecord] = []
         with open(html_path, 'r') as fin:
             html_content_str = fin.read()
