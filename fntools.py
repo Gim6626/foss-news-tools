@@ -19,7 +19,6 @@ from pprint import (
 
 
 DIGEST_RECORD_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
-PRINT_PREFIX = '=> '
 
 days_count = None
 
@@ -272,7 +271,7 @@ class DigestRecordsCollection:
             }
             records_plain.append(record_plain)
         with open(yaml_path, 'w') as fout:
-            print(f'{PRINT_PREFIX}Saving results to "{yaml_path}"')
+            logger.info(f'Saving results to "{yaml_path}"')
             yaml.safe_dump(records_plain, fout)
 
     def load(self, file_path: str):
@@ -287,7 +286,7 @@ class DigestRecordsCollection:
 
     def load_from_server(self, yaml_config_path: str):
         records_objects: List[DigestRecord] = []
-        print(f'{PRINT_PREFIX}Loading gathering server connect data from config "{yaml_config_path}"')
+        logger.info(f'Loading gathering server connect data from config "{yaml_config_path}"')
         with open(yaml_config_path, 'r') as fin:
             config_data = yaml.safe_load(fin)
             # pprint(config_data)
@@ -295,16 +294,16 @@ class DigestRecordsCollection:
             self._port = config_data['port']
             user = config_data['user']
             password = config_data['password']
-            print(f'{PRINT_PREFIX}Loaded')
-            print(f'{PRINT_PREFIX}Logging in')
+            logger.info('Loaded')
+            logger.info('Logging in')
             result = requests.post(f'http://{self._host}:{self._port}/api/v1/token/',
                                    data={'username': user, 'password': password})
             if result.status_code != 200:
                 raise Exception(f'Invalid response code from FNGS login - {result.status_code}: {result.content.decode("utf-8")}')
             result_data = json.loads(result.content)
             self._token = result_data['access']
-            print(f'{PRINT_PREFIX}Logged in')
-            print(f'{PRINT_PREFIX}Getting data')
+            logger.info('Logged in')
+            logger.info('Getting data')
             result = requests.get(f'http://{self._host}:{self._port}/api/v1/new-digest-records/',
                                   headers={
                                       'Authorization': f'Bearer {self._token}',
@@ -312,7 +311,7 @@ class DigestRecordsCollection:
                                   })
             if result.status_code != 200:
                 raise Exception(f'Invalid response code from FNGS fetch - {result.status_code}: {result.content.decode("utf-8")}')
-            print(f'{PRINT_PREFIX}Got data')
+            logger.info('Got data')
             result_data = json.loads(result.content)
             for record_plain in result_data:
                 record_object = DigestRecord(datetime.datetime.strptime(record_plain['dt'],
@@ -326,7 +325,7 @@ class DigestRecordsCollection:
 
     def load_from_yaml(self, yaml_path: str):
         records_objects: List[DigestRecord] = []
-        print(f'{PRINT_PREFIX}Loading input data from "{yaml_path}"')
+        logger.info(f'Loading input data from "{yaml_path}"')
         with open(yaml_path, 'r') as fin:
             fin_data = yaml.safe_load(fin)
             for record_plain in fin_data:
@@ -384,12 +383,11 @@ class DigestRecordsCollection:
                     if record.category != DigestRecordCategory.OTHER:
                         self._filtered_records.append(record)
                         continue
-        print(f'{PRINT_PREFIX}{len(self._filtered_records)} record(s) left to process')
-        print()
+        logger.info(f'{len(self._filtered_records)} record(s) left to process')
         records_left_to_process = len(self._filtered_records)
         for record in self.records:
             # TODO: Rewrite using FSM
-            print(f'{PRINT_PREFIX}Processing record "{record.title}" from date {record.dt}:\n{record}')
+            logger.info(f'Processing record "{record.title}" from date {record.dt}:\n{record}')
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
             if record.is_main is None:
@@ -410,9 +408,9 @@ class DigestRecordsCollection:
             if record in self._filtered_records:
                 records_left_to_process -= 1
                 if records_left_to_process > 0:
-                    print(f'{PRINT_PREFIX}{records_left_to_process} record(s) left to process')
+                    logger.info(f'{records_left_to_process} record(s) left to process')
         if self._token is not None:
-            print(f'{PRINT_PREFIX}Uploading categorized results to FNGS')
+            logger.info('Uploading categorized results to FNGS')
             for record in self.records:
                 result = requests.patch(f'http://{self._host}:{self._port}/api/v1/digest-records/{record.drid}/',
                                         data=json.dumps({
@@ -429,19 +427,18 @@ class DigestRecordsCollection:
                                         })
                 if result.status_code != 200:
                     raise Exception(f'Invalid response code from FNGS patch - {result.status_code}: {result.content.decode("utf-8")}')
-                print(f'{PRINT_PREFIX}Uploaded record #{record.drid}')
-            print(f'{PRINT_PREFIX}Uploaded categorized results to FNGS')
+                logger.info(f'Uploaded record #{record.drid}')
+            logger.info('Uploaded categorized results to FNGS')
 
     def _ask_state(self, record: DigestRecord):
         return self._ask_enum('digest record state', DigestRecordState, record)
 
     def _ask_digest_number(self, record: DigestRecord):
         while True:
-            digest_number_str = input(f'{PRINT_PREFIX}Please input digest number for "{record.title}": ')
+            digest_number_str = input(f'Please input digest number for "{record.title}": ')
             if digest_number_str.isnumeric():
                 digest_number = int(digest_number_str)
-                print(f'{PRINT_PREFIX}Setting digest number of record "{record.title}" to {digest_number}')
-                print()
+                logger.info(f'Setting digest number of record "{record.title}" to {digest_number}')
                 return digest_number
             else:
                 print('Invalid digest number, it should be integer')
@@ -449,7 +446,7 @@ class DigestRecordsCollection:
 
     def _ask_bool(self, record: DigestRecord):
         while True:
-            bool_str = input(f'{PRINT_PREFIX}Please input whether or no "{record.title}" is main (y/n): ')
+            bool_str = input(f'Please input whether or no "{record.title}" is main (y/n): ')
             if bool_str == 'y':
                 return True
             elif bool_str == 'n':
@@ -470,20 +467,19 @@ class DigestRecordsCollection:
 
     def _ask_enum(self, enum_name, enum_class, record: DigestRecord):
         while True:
-            print(f'{PRINT_PREFIX}Waiting for {enum_name}')
-            print(f'{PRINT_PREFIX}Available values:')
+            logger.info(f'Waiting for {enum_name}')
+            logger.info('Available values:')
             enum_options_values = [enum_variant.value for enum_variant in enum_class]
             for enum_option_value_i, enum_option_value in enumerate(enum_options_values):
                 print(f'{enum_option_value_i + 1}. {enum_option_value}')
-            enum_value_index_str = input(f'{PRINT_PREFIX}Please input index of {enum_name} for "{record.title}": ')
+            enum_value_index_str = input(f'Please input index of {enum_name} for "{record.title}": ')
             if enum_value_index_str.isnumeric():
                 enum_value_index = int(enum_value_index_str)
                 if 0 <= enum_value_index <= len(enum_options_values):
                     try:
                         enum_value = enum_options_values[enum_value_index - 1]
                         enum_obj = enum_class(enum_value)
-                        print(f'{PRINT_PREFIX}Setting {enum_name} of record "{record.title}" to "{enum_obj.value}"')
-                        print()
+                        logger.info(f'Setting {enum_name} of record "{record.title}" to "{enum_obj.value}"')
                         return enum_obj
                     except ValueError:
                         print(f'Invalid {enum_name} value "{enum_value}"')
