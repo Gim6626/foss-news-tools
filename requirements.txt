@@ -1,3 +1,4 @@
 argcomplete
 python-dateutil
 lxml
+pyyaml
