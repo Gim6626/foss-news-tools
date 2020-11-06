@@ -12,12 +12,14 @@ import yaml
 import json
 from enum import Enum
 from typing import List
+import os
 from pprint import (
     pformat,
     pprint,
 )
 
 
+SCRIPT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 DIGEST_RECORD_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
 
 days_count = None
@@ -565,6 +567,12 @@ class DigestRecordsCollection:
         raise NotImplementedError
 
     def _make_backup(self):
+        backup_dir_name = 'backups'
+        backup_dir_path = os.path.join(SCRIPT_DIRECTORY,
+                                       backup_dir_name)
+        if not os.path.exists(backup_dir_path):
+            os.mkdir(backup_dir_path)
         current_datetime_stamp_str = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        backup_path = f'backups/{current_datetime_stamp_str}.yaml'
+        backup_path = os.path.join(backup_dir_path,
+                                   f'{current_datetime_stamp_str}.yaml')
         self.save_to_yaml(backup_path)
