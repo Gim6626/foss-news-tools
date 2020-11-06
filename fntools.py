@@ -483,26 +483,24 @@ class DigestRecordsCollection:
                 records_left_to_process -= 1
                 if records_left_to_process > 0:
                     logger.info(f'{records_left_to_process} record(s) left to process')
-        if self._token is not None:
-            logger.info('Uploading categorized results to FNGS')
-            for record in self.records:
-                result = requests.patch(f'http://{self._host}:{self._port}/api/v1/digest-records/{record.drid}/',
-                                        data=json.dumps({
-                                            'id': record.drid,
-                                            'state': record.state.name,
-                                            'digest_number': record.digest_number,
-                                            'is_main': record.is_main,
-                                            'category': record.category.name,
-                                            'subcategory': record.subcategory.name,
-                                        }),
-                                        headers={
-                                            'Authorization': f'Bearer {self._token}',
-                                            'Content-Type': 'application/json',
-                                        })
-                if result.status_code != 200:
-                    raise Exception(f'Invalid response code from FNGS patch - {result.status_code}: {result.content.decode("utf-8")}')
-                logger.info(f'Uploaded record #{record.drid}')
-            logger.info('Uploaded categorized results to FNGS')
+
+            logger.info(f'Uploading record #{record.drid} to FNGS')
+            result = requests.patch(f'http://{self._host}:{self._port}/api/v1/digest-records/{record.drid}/',
+                                    data=json.dumps({
+                                        'id': record.drid,
+                                        'state': record.state.name,
+                                        'digest_number': record.digest_number,
+                                        'is_main': record.is_main,
+                                        'category': record.category.name,
+                                        'subcategory': record.subcategory.name,
+                                    }),
+                                    headers={
+                                        'Authorization': f'Bearer {self._token}',
+                                        'Content-Type': 'application/json',
+                                    })
+            if result.status_code != 200:
+                raise Exception(f'Invalid response code from FNGS patch - {result.status_code}: {result.content.decode("utf-8")}')
+            logger.info(f'Uploaded record #{record.drid} to FNGS')
 
     def _ask_state(self, record: DigestRecord):
         return self._ask_enum('digest record state', DigestRecordState, record)
