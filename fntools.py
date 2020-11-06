@@ -333,7 +333,7 @@ class DigestRecordsCollection:
         self._load_config(yaml_config_path)
         self._login()
         self._basic_load_digest_records_from_server(yaml_config_path,
-                                                    f'http://{self._host}:{self._port}/api/v1/specific-digest-records/{digest_number}/')
+                                                    f'http://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_number={digest_number}')
 
     def load_new_digest_records_from_server(self, yaml_config_path: str):
         self._load_config(yaml_config_path)
