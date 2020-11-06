@@ -5,56 +5,38 @@ import argparse
 import logging
 import re
 import collections
+from pprint import pprint
+from fntools import DIGEST_RECORD_SUBCATEGORY_RU_MAPPING
 
+DIGEST_RECORD_SUBCATEGORY_RU_MAPPING_INVERTED = {value: key for key, value in DIGEST_RECORD_SUBCATEGORY_RU_MAPPING.items()}
 
 def main():
     args = parse_command_line_args()
     with open(args.SOURCE, 'r') as fin:
         source_text = fin.read()
-        in_shorts = False
-        in_releases = False
-        releases_h3_names_existing = []
-        shorts_h3_names_existing = []
+        subcategories_existing = {}
+        for category in shorts_categories_h3_names_set:
+            subcategories_existing[category] = []
         i = 0
         content_lines = source_text.split('\n')
         new_content = {}
-        shorts_header = h2_names_set[0]
-        releases_header = h2_names_set[1]
         current_section = None
         current_subsection = None
         for line_i, line in enumerate(content_lines):
             line = line.strip()
-            if line == shorts_header:
+            if line in shorts_categories_h3_names_set:
                 i = 0
-                in_shorts = True
-                current_section = shorts_header
-                new_content[shorts_header] = {
+                current_section = line
+                new_content[line] = {
                     'header': line,
                     'subsections': collections.OrderedDict(),
                 }
-            elif line == releases_header:
-                i = 0
-                in_shorts = False
-                in_releases = True
-                current_section = releases_header
-                new_content[releases_header] = {
-                    'header': line,
-                    'subsections': collections.OrderedDict(),
-                }
-            elif in_shorts and line in shorts_h3_names_set:
-                new_content[shorts_header]['subsections'][line] = {
+            elif line in subcategories_h4_names_set:
+                new_content[current_section]['subsections'][line] = {
                     'header': line,
                     'lines': [],
                 }
-                shorts_h3_names_existing.append(line)
-                current_subsection = line
-                i += 1
-            elif in_releases and line in releases_h3_names_set:
-                new_content[releases_header]['subsections'][line] = {
-                    'header': line,
-                    'lines': [],
-                }
-                releases_h3_names_existing.append(line)
+                subcategories_existing[current_section].append(line)
                 current_subsection = line
                 i += 1
             else:
@@ -81,11 +63,8 @@ def main():
                 new_content[current_section]['subsections'][current_subsection]['lines'].append(converted_line)
 
         converted_lines = []
-        for section_header in [shorts_header, releases_header]:
-            if section_header == shorts_header:
-                label = 'shorts'
-            else:
-                label = 'releases'
+        for section_header in shorts_categories_h3_names_set:
+            label = categories_labels[section_header]
             converted_lines.append(f'<anchor>{label}</anchor><h2>{new_content[section_header]["header"]}</h2>')
             converted_lines.append('')
             i = 0
@@ -111,21 +90,18 @@ def main():
         converted_toc_lines = []
         prefix = '        '
         converted_toc_lines.append(f'{prefix}<li><a href="#shorts">Короткой строкой</a>')
-        converted_toc_lines.append(f'{prefix}<ol>')
-        name_i = 0
-        for name in shorts_h3_names_existing:
-            if new_content[shorts_header]['subsections'][name]['lines']:
-                converted_toc_lines.append(f'{prefix}    <li><a href="#shorts-{name_i + 1}">{name}</a></li>')
-                name_i += 1
-        converted_toc_lines.append(f'{prefix}</ol></li>')
-        converted_toc_lines.append(f'{prefix}<li><a href="#releases">Релизы</a>')
-        converted_toc_lines.append(f'{prefix}<ol>')
-        name_i = 0
-        for name in releases_h3_names_existing:
-            if new_content[releases_header]['subsections'][name]['lines']:
-                converted_toc_lines.append(f'{prefix}    <li><a href="#releases-{name_i + 1}">{name}</a></li>')
-                name_i += 1
-        converted_toc_lines.append(f'{prefix}</ol></li>')
+        converted_toc_lines.append(f'{prefix}     <ol>')
+        for category in shorts_categories_h3_names_set:
+            converted_toc_lines.append(f'{prefix}          <li><a href="#{categories_labels[category]}">{category}</a>')
+            converted_toc_lines.append(f'{prefix}          <ol>')
+            subcategory_i = 0
+            for subcategory in subcategories_existing[category]:
+                if new_content[category]['subsections'][subcategory]['lines']:
+                    converted_toc_lines.append(f'{prefix}              <li><a href="#{categories_labels[category]}-{subcategory_i + 1}">{subcategory}</a>')
+                    subcategory_i += 1
+            converted_toc_lines.append(f'{prefix}          </ol>')
+        converted_toc_lines.append(f'{prefix}      </ol>')
+        converted_toc_lines.append(f'{prefix}  </li>')
 
         toc_text = '\n'.join(converted_toc_lines)
         with open(args.DEST_TOC, 'w')as fout_toc:
@@ -150,13 +126,20 @@ def parse_command_line_args():
     return args
 
 
-h2_names_set = (
-    'Короткой строкой',
+shorts_categories_h3_names_set = (
+    'Новости',
+    'Статьи',
     'Релизы',
 )
 
+categories_labels = {
+    'Новости': 'news',
+    'Статьи': 'articles',
+    'Релизы': 'releases',
+}
 
-shorts_h3_names_set = (
+
+subcategories_h4_names_set = (
     'Мероприятия',
     'Внедрения',
     'Открытие кода и данных',
@@ -176,22 +159,6 @@ shorts_h3_names_set = (
     'Пользовательское',
     'Игры',
     'Железо',
-    'Разное',
-)
-
-
-releases_h3_names_set = (
-    'Ядро и дистрибутивы',
-    'Системный софт',
-    'Безопасность',
-    'DevOps',
-    'Data Science',
-    'Web',
-    'Для разработчиков',
-    'Специальный софт',
-    'Мультимедиа',
-    'Игры',
-    'Пользовательский софт',
     'Разное',
 )
 
