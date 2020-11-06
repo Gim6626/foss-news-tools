@@ -271,9 +271,9 @@ class DigestRecord:
             'title': self.title,
             'url': self.url,
             'is_main': self.is_main,
-            'state': self.state.value,
+            'state': self.state.value if self.state is not None else None,
             'digest_number': self.digest_number,
-            'category': self.category.value,
+            'category': self.category.value if self.category is not None else None,
             'subcategory': self.subcategory.value if self.subcategory is not None else None,
         }
 
@@ -300,10 +300,10 @@ class DigestRecordsCollection:
                 'datetime': record_object.dt.strftime(DIGEST_RECORD_DATETIME_FORMAT),
                 'title': record_object.title,
                 'url': record_object.url,
-                'state': record_object.state.value,
+                'state': record_object.state.value if record_object.state is not None else None,
                 'is_main': record_object.is_main,
                 'digest_number': record_object.digest_number,
-                'category': record_object.category.value,
+                'category': record_object.category.value if record_object.category is not None else None,
                 'subcategory': record_object.subcategory.value if record_object.subcategory is not None else None,
             }
             records_plain.append(record_plain)
@@ -473,7 +473,7 @@ class DigestRecordsCollection:
                         current_digest_number = record.digest_number
                     else:
                         record.digest_number = current_digest_number
-                if record.category == DigestRecordCategory.UNKNOWN:
+                if record.category == DigestRecordCategory.UNKNOWN or record.category is None:
                     record.category = self._ask_category(record)
                 if record.subcategory is None:
                     if record.category != DigestRecordCategory.OTHER:
