@@ -466,9 +466,9 @@ class DigestRecordsCollection:
             logger.info(f'Processing record "{record.title}" from date {record.dt}:\n{record}')
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
-            if record.is_main is None:
-                record.is_main = self._ask_bool(record)
             if record.state == DigestRecordState.IN_DIGEST:
+                if record.is_main is None:
+                    record.is_main = self._ask_bool(record)
                 if record.digest_number is None:
                     if current_digest_number is None:
                         record.digest_number = self._ask_digest_number(record)
