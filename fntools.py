@@ -11,7 +11,7 @@ import datetime
 import yaml
 import json
 from enum import Enum
-from typing import List
+from typing import List, Dict
 import os
 from pprint import (
     pformat,
@@ -180,9 +180,11 @@ class DigestRecordCategory(Enum):
 
 
 DIGEST_RECORD_CATEGORY_RU_MAPPING = {
+    'unknown': 'Неизвестно',
     'news': 'Новости',
     'articles': 'Статьи',
-    'releases': 'Релизы'
+    'releases': 'Релизы',
+    'other': 'Прочее',
 }
 
 
@@ -474,10 +476,12 @@ class DigestRecordsCollection:
                     else:
                         record.digest_number = current_digest_number
                 if record.category == DigestRecordCategory.UNKNOWN or record.category is None:
-                    record.category = self._ask_category(record)
+                    record.category = self._ask_category(record,
+                                                         DIGEST_RECORD_CATEGORY_RU_MAPPING)
                 if record.subcategory is None:
                     if record.category != DigestRecordCategory.OTHER:
-                        record.subcategory = self._ask_subcategory(record)
+                        record.subcategory = self._ask_subcategory(record,
+                                                                   DIGEST_RECORD_SUBCATEGORY_RU_MAPPING)
             self._make_backup()
             if record in self._filtered_records:
                 records_left_to_process -= 1
@@ -527,23 +531,32 @@ class DigestRecordsCollection:
                 print('Invalid boolean, it should be "y" or "n"')
         raise NotImplementedError
 
-    def _ask_category(self, record: DigestRecord):
-        return self._ask_enum('digest record category', DigestRecordCategory, record)
+    def _ask_category(self,
+                      record: DigestRecord,
+                      translations: Dict[str, str] = None):
+        return self._ask_enum('digest record category', DigestRecordCategory, record, translations)
 
-    def _ask_subcategory(self, record: DigestRecord):
+    def _ask_subcategory(self,
+                         record: DigestRecord,
+                         translations: Dict[str, str] = None):
         enum_name = 'digest record subcategory'
         if record.category != DigestRecordCategory.UNKNOWN and record.category != DigestRecordCategory.OTHER:
-            return self._ask_enum(enum_name, DigestRecordSubcategory, record)
+            return self._ask_enum(enum_name, DigestRecordSubcategory, record, translations)
         else:
             raise NotImplementedError
 
-    def _ask_enum(self, enum_name, enum_class, record: DigestRecord):
+    def _ask_enum(self,
+                  enum_name,
+                  enum_class,
+                  record: DigestRecord,
+                  translations: Dict[str, str] = None):
         while True:
             logger.info(f'Waiting for {enum_name}')
             logger.info('Available values:')
             enum_options_values = [enum_variant.value for enum_variant in enum_class]
             for enum_option_value_i, enum_option_value in enumerate(enum_options_values):
-                print(f'{enum_option_value_i + 1}. {enum_option_value}')
+                enum_option_value_mod = translations[enum_option_value] if translations is not None else enum_option_value
+                print(f'{enum_option_value_i + 1}. {enum_option_value_mod}')
             enum_value_index_str = input(f'Please input index of {enum_name} for "{record.title}": ')
             if enum_value_index_str.isnumeric():
                 enum_value_index = int(enum_value_index_str)
@@ -551,7 +564,8 @@ class DigestRecordsCollection:
                     try:
                         enum_value = enum_options_values[enum_value_index - 1]
                         enum_obj = enum_class(enum_value)
-                        logger.info(f'Setting {enum_name} of record "{record.title}" to "{enum_obj.value}"')
+                        enum_obj_value_mod = translations[enum_obj.value] if translations is not None else enum_obj.value
+                        logger.info(f'Setting {enum_name} of record "{record.title}" to "{enum_obj_value_mod}"')
                         return enum_obj
                     except ValueError:
                         print(f'Invalid {enum_name} value "{enum_value}"')
