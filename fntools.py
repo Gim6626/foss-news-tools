@@ -432,7 +432,7 @@ class DigestRecordsCollection:
 
         output += '<h2>Что ещё посмотреть</h2>\n\n'
         for other_record in output_records[DigestRecordCategory.OTHER.value]:
-            output += f'{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a>\n'
+            output += f'{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a><br>\n'
 
         with open(html_path, 'w') as fout:
             logger.info(f'Saving output to "{html_path}"')
