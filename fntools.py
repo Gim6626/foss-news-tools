@@ -36,6 +36,18 @@ logger = logging.getLogger('fntools')
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 
+RUSSIAN_SOURCES = (
+    'habr.com',
+    'opennet.ru',
+    'cnews.ru',
+    'vk.com',
+    'pingvinus.ru',
+    'losst.ru',
+    'linux.org.ru',
+    'youtube.com',  # Confusing, yes, but currently we use videos from only one blogger and he is russian
+)
+
+
 class BasicPostsStatisticsGetter(metaclass=ABCMeta):
 
     def __init__(self):
@@ -375,6 +387,12 @@ class DigestRecordsCollection:
     def _clear_title(self, title: str):
         return re.sub(r'^\[.+\]\s+', '', title)
 
+    def _check_url_if_english(self, url):
+        for russian_source in RUSSIAN_SOURCES:
+            if russian_source in url:
+                return False
+        return True
+
     def records_to_html(self, html_path):
         output_records = {
             'main': [],
@@ -401,7 +419,7 @@ class DigestRecordsCollection:
         output = '<h2>Главное</h2>\n\n'
         for main_record in output_records['main']:
             output += f'<h3>{self._clear_title(main_record.title)}</h3>\n\n'
-            output += f'Подробности - <a href="{main_record.url}">{main_record.url}</a>\n\n'
+            output += f'Подробности - <a href="{main_record.url}">{main_record.url}</a>{" (en)" if self._check_url_if_english(main_record.url) else ""}\n\n'
 
         output += '<h2>Короткой строкой</h2>\n\n'
 
@@ -412,7 +430,7 @@ class DigestRecordsCollection:
                 continue
             output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[news_record_subcategory]}</h4>\n\n'
             for news_record in news_records:
-                output += f'{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}</a><br>\n'
+                output += f'{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}</a>{" (en)" if self._check_url_if_english(news_record.url) else ""}<br>\n'
 
         output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.ARTICLES.value]}</h3>\n\n'
         for articles_record_subcategory, articles_records in output_records[DigestRecordCategory.ARTICLES.value].items():
@@ -420,7 +438,7 @@ class DigestRecordsCollection:
                 continue
             output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[articles_record_subcategory]}</h4>\n\n'
             for articles_record in articles_records:
-                output += f'{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}</a><br>\n'
+                output += f'{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}</a>{" (en)" if self._check_url_if_english(articles_record.url) else ""}<br>\n'
 
         output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.RELEASES.value]}</h3>\n\n'
         for releases_record_subcategory, releases_records in output_records[DigestRecordCategory.RELEASES.value].items():
@@ -428,11 +446,11 @@ class DigestRecordsCollection:
                 continue
             output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[releases_record_subcategory]}</h4>\n\n'
             for releases_record in releases_records:
-                output += f'{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}</a><br>\n'
+                output += f'{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}</a>{" (en)" if self._check_url_if_english(releases_record.url) else ""}<br>\n'
 
         output += '<h2>Что ещё посмотреть</h2>\n\n'
         for other_record in output_records[DigestRecordCategory.OTHER.value]:
-            output += f'{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a><br>\n'
+            output += f'{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a>{" (en)" if self._check_url_if_english(other_record.url) else ""}<br>\n'
 
         with open(html_path, 'w') as fout:
             logger.info(f'Saving output to "{html_path}"')
