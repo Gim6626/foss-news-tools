@@ -412,7 +412,7 @@ class DigestRecordsCollection:
                 continue
             output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[news_record_subcategory]}</h4>\n\n'
             for news_record in news_records:
-                output += f'{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}<br></a>\n'
+                output += f'{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}</a><br>\n'
 
         output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.ARTICLES.value]}</h3>\n\n'
         for articles_record_subcategory, articles_records in output_records[DigestRecordCategory.ARTICLES.value].items():
@@ -420,7 +420,7 @@ class DigestRecordsCollection:
                 continue
             output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[articles_record_subcategory]}</h4>\n\n'
             for articles_record in articles_records:
-                output += f'{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}<br></a>\n'
+                output += f'{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}</a><br>\n'
 
         output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.RELEASES.value]}</h3>\n\n'
         for releases_record_subcategory, releases_records in output_records[DigestRecordCategory.RELEASES.value].items():
@@ -428,7 +428,7 @@ class DigestRecordsCollection:
                 continue
             output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[releases_record_subcategory]}</h4>\n\n'
             for releases_record in releases_records:
-                output += f'{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}<br></a>\n'
+                output += f'{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}</a><br>\n'
 
         output += '<h2>Что ещё посмотреть</h2>\n\n'
         for other_record in output_records[DigestRecordCategory.OTHER.value]:
