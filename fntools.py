@@ -488,11 +488,11 @@ class DigestRecordsCollection:
             result = requests.patch(f'http://{self._host}:{self._port}/api/v1/digest-records/{record.drid}/',
                                     data=json.dumps({
                                         'id': record.drid,
-                                        'state': record.state.name,
+                                        'state': record.state.name if record.state is not None else None,
                                         'digest_number': record.digest_number,
                                         'is_main': record.is_main,
-                                        'category': record.category.name,
-                                        'subcategory': record.subcategory.name,
+                                        'category': record.category.name if record.category is not None else None,
+                                        'subcategory': record.subcategory.name if record.subcategory is not None else None,
                                     }),
                                     headers={
                                         'Authorization': f'Bearer {self._token}',
