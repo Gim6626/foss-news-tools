@@ -65,12 +65,12 @@ def main():
         converted_lines = []
         for section_header in shorts_categories_h3_names_set:
             label = categories_labels[section_header]
-            converted_lines.append(f'<anchor>{label}</anchor><h2>{new_content[section_header]["header"]}</h2>')
+            converted_lines.append(f'<anchor>{label}</anchor><h3>{new_content[section_header]["header"]}</h2>')
             converted_lines.append('')
             i = 0
             for header, subsection_data in new_content[section_header]['subsections'].items():
                 if subsection_data['lines']:
-                    converted_lines.append(f'<anchor>{label}-{i + 1}</anchor><h3>{subsection_data["header"]}</h3>')
+                    converted_lines.append(f'<anchor>{label}-{i + 1}</anchor><h4>{subsection_data["header"]}</h3>')
                     converted_lines.append('')
                     if len(subsection_data['lines']) > 1:
                         converted_lines.append('<ol>')
@@ -97,9 +97,10 @@ def main():
             subcategory_i = 0
             for subcategory in subcategories_existing[category]:
                 if new_content[category]['subsections'][subcategory]['lines']:
-                    converted_toc_lines.append(f'{prefix}              <li><a href="#{categories_labels[category]}-{subcategory_i + 1}">{subcategory}</a>')
+                    converted_toc_lines.append(f'{prefix}              <li><a href="#{categories_labels[category]}-{subcategory_i + 1}">{subcategory}</a></li>')
                     subcategory_i += 1
             converted_toc_lines.append(f'{prefix}          </ol>')
+            converted_toc_lines.append(f'{prefix}          </li>')
         converted_toc_lines.append(f'{prefix}      </ol>')
         converted_toc_lines.append(f'{prefix}  </li>')
 
