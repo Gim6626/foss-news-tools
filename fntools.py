@@ -50,6 +50,10 @@ RUSSIAN_SOURCES = (
 
 class BasicPostsStatisticsGetter(metaclass=ABCMeta):
 
+    GET_TIMEOUT_SECONDS = 10
+    SLEEP_BETWEEN_ATTEMPTS_SECONDS = 5
+    GET_ATTEMPTS = 5
+
     def __init__(self):
         self._posts_urls = {}
         self.source_name = None
@@ -62,6 +66,19 @@ class BasicPostsStatisticsGetter(metaclass=ABCMeta):
             logger.info(f'Views count for {self.source_name} post #{number} ({url}): {views_count}')
             time.sleep(1)
         return posts_statistics
+
+    def _get_with_retries(self, url):
+        for attempt_i in range(self.GET_ATTEMPTS):
+            try:
+                response = requests.get(url, timeout=self.GET_TIMEOUT_SECONDS)
+                return response
+            except requests.exceptions.ReadTimeout:
+                base_timeout_msg = f'Fetching {url} timeout of {self.GET_TIMEOUT_SECONDS} seconds exceeded'
+                if attempt_i != self.GET_ATTEMPTS - 1:
+                    logger.error(f'{base_timeout_msg}, sleeping {self.SLEEP_BETWEEN_ATTEMPTS_SECONDS} seconds and trying again, {self.GET_ATTEMPTS - attempt_i - 1} retries left')
+                    time.sleep(self.SLEEP_BETWEEN_ATTEMPTS_SECONDS)
+                else:
+                    raise Exception(f'{base_timeout_msg}, retries count {self.GET_ATTEMPTS} exceeded')
 
     @abstractmethod
     def post_statistics(self, number, url):
@@ -123,7 +140,7 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter):
         }
 
     def post_statistics(self, number, url):
-        response = requests.get(url)
+        response = self._get_with_retries(url)
         content = response.text
         re_result = re.search('<span class="post-stats__views-count">(.*?)</span>', content)
         if re_result is None:
@@ -167,7 +184,7 @@ class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
         return self._posts_urls
 
     def post_statistics(self, number, url):
-        response = requests.get(url)
+        response = self._get_with_retries(url)
         content = response.text
         re_result = re.search(r'<div class="articleView__views_info">(\d+) просмотр', content)
         if re_result is None:
