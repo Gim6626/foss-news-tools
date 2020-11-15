@@ -119,6 +119,7 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter):
             39: 'https://habr.com/ru/post/524968/',
             40: 'https://habr.com/ru/post/526014/',
             41: 'https://habr.com/ru/post/526986/',
+            42: 'https://habr.com/ru/post/528132/',
         }
 
     def post_statistics(self, number, url):
@@ -156,7 +157,7 @@ class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
         super().__init__()
         self.source_name = 'VK'
         self._posts_urls = {}
-        self._posts_count = 42
+        self._posts_count = 43
 
     @property
     def posts_urls(self):
