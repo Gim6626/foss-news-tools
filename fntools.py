@@ -48,6 +48,16 @@ RUSSIAN_SOURCES = (
 )
 
 
+RELEASES_KEYWORDS = (
+    'обновление',
+    'релиз',
+    'выпуск',
+    'доступен',
+    'вышел',
+    'вышла',
+)
+
+
 class BasicPostsStatisticsGetter(metaclass=ABCMeta):
 
     GET_TIMEOUT_SECONDS = 10
@@ -243,6 +253,34 @@ class DigestRecordSubcategory(Enum):
     GAMES = 'games'
     HARDWARE = 'hardware'
     MISC = 'misc'
+
+
+DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
+    'events': (),
+    'intros': (),
+    'opening': (),
+    'news': (),
+    'diy': (),
+    'law': (),
+    'knd': (),
+    'system': (),
+    'special': (),
+    'db': (),
+    'multimedia': (),
+    'security': (),
+    'devops': (),
+    'data_science': (),
+    'web': (
+        'SeaMonkey',
+    ),
+    'dev': (),
+    'history': (),
+    'management': (),
+    'user': (),
+    'games': (),
+    'hardware': (),
+    'misc': (),
+}
 
 
 DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
@@ -478,6 +516,19 @@ class DigestRecordsCollection:
             logger.info(f'Saving output to "{html_path}"')
             fout.write(output)
 
+    def _guess_category(self, title: str) -> DigestRecordCategory:
+        for release_keyword in RELEASES_KEYWORDS:
+            if release_keyword in title.lower():
+                return DigestRecordCategory.RELEASES
+        return None
+
+    def _guess_subcategory(self, title: str) -> DigestRecordSubcategory:
+        for subcategory_value, keywords in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
+            for keyword in keywords:
+                if keyword.lower() in title.lower():
+                    return DigestRecordSubcategory(subcategory_value)
+        return None
+
     def categorize_interactively(self):
         current_digest_number = None
         self._filtered_records = []
@@ -508,13 +559,36 @@ class DigestRecordsCollection:
                 record.state = self._ask_state(record)
             if record.state == DigestRecordState.IN_DIGEST:
                 if record.is_main is None:
-                    record.is_main = self._ask_bool(record)
+                    record.is_main = self._ask_bool(f'Please input whether or no "{record.title}" is main (y/n): ')
                 if record.digest_number is None:
                     if current_digest_number is None:
                         record.digest_number = self._ask_digest_number(record)
                         current_digest_number = record.digest_number
                     else:
                         record.digest_number = current_digest_number
+                guessed_category = self._guess_category(record.title)
+                guessed_subcategory = self._guess_subcategory(record.title)
+                if guessed_category is not None or guessed_subcategory is not None:
+                    msg = ''
+                    if guessed_category is not None:
+                        msg += f'guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"'
+                    if msg:
+                        msg += ', '
+                    if guessed_category is not None:
+                        msg += f'guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"'
+                    if not msg:
+                        raise NotImplementedError
+                    msg = msg.capitalize()
+                    msg += '. Accept? y/n: '
+                    accepted = self._ask_bool(msg)
+                    if accepted:
+                        if guessed_category is not None:
+                            logger.info(f'Setting category of record "{record.title}" to "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
+                            record.category = guessed_category
+                        if guessed_subcategory is not None:
+                            logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
+                            record.subcategory = guessed_subcategory
+
                 if record.category == DigestRecordCategory.UNKNOWN or record.category is None:
                     record.category = self._ask_category(record,
                                                          DIGEST_RECORD_CATEGORY_RU_MAPPING)
@@ -560,9 +634,9 @@ class DigestRecordsCollection:
                 print('Invalid digest number, it should be integer')
         raise NotImplementedError
 
-    def _ask_bool(self, record: DigestRecord):
+    def _ask_bool(self, question: str):
         while True:
-            bool_str = input(f'Please input whether or no "{record.title}" is main (y/n): ')
+            bool_str = input(question)
             if bool_str == 'y':
                 return True
             elif bool_str == 'n':
