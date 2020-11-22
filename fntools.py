@@ -243,6 +243,7 @@ class DigestRecordSubcategory(Enum):
     SYSTEM = 'system'
     SPECIAL = 'special'
     MULTIMEDIA = 'multimedia'
+    MOBILE = 'mobile'
     SECURITY = 'security'
     DEVOPS = 'devops'
     DATA_SCIENCE = 'data_science'
@@ -267,6 +268,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': (),
     'db': (),
     'multimedia': (),
+    'mobile': (),
     'security': (),
     'devops': (),
     'data_science': (),
@@ -295,6 +297,7 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
     'special': 'Специальное',
     'db': 'Базы данных',
     'multimedia': 'Мультимедиа',
+    'mobile': 'Мобильные',
     'security': 'Безопасность',
     'devops': 'DevOps',
     'data_science': 'AI & Data Science',
