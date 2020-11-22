@@ -574,7 +574,7 @@ class DigestRecordsCollection:
                         msg += f'guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"'
                     if msg:
                         msg += ', '
-                    if guessed_category is not None:
+                    if guessed_subcategory is not None:
                         msg += f'guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"'
                     if not msg:
                         raise NotImplementedError
