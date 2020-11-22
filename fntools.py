@@ -572,13 +572,12 @@ class DigestRecordsCollection:
                 guessed_category = self._guess_category(record.title)
                 guessed_subcategory = self._guess_subcategory(record.title)
                 if guessed_category is not None or guessed_subcategory is not None:
-                    msg = ''
+                    msgs_about_guesses = []
                     if guessed_category is not None:
-                        msg += f'guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"'
-                    if msg:
-                        msg += ', '
+                        msgs_about_guesses.append(f'guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
                     if guessed_subcategory is not None:
-                        msg += f'guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"'
+                        msgs_about_guesses.append(f'guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
+                    msg = ', '.join(msgs_about_guesses)
                     if not msg:
                         raise NotImplementedError
                     msg = msg.capitalize()
