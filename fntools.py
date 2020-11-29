@@ -501,6 +501,7 @@ class DigestRecordsCollection:
         return True
 
     def records_to_html(self, html_path):
+        logger.info('Converting records to HTML')
         output_records = {
             'main': [],
             DigestRecordCategory.NEWS.value: {subcategory_value: [] for subcategory_value in DIGEST_RECORD_SUBCATEGORY_VALUES},
@@ -560,6 +561,7 @@ class DigestRecordsCollection:
         for other_record in output_records[DigestRecordCategory.OTHER.value]:
             output += f'{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a>{" (en)" if self._check_url_if_english(other_record.url) else ""}<br>\n'
 
+        logger.info('Converted')
         with open(html_path, 'w') as fout:
             logger.info(f'Saving output to "{html_path}"')
             fout.write(output)
