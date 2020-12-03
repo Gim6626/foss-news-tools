@@ -248,6 +248,7 @@ class DigestRecordSubcategory(Enum):
     KnD = 'knd'
     SYSTEM = 'system'
     SPECIAL = 'special'
+    EDUCATION = 'education'
     MULTIMEDIA = 'multimedia'
     MOBILE = 'mobile'
     SECURITY = 'security'
@@ -311,6 +312,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Coq',
         'KStars',
         'Wine',
+    ),
+    'education': (
+        'GCompris',
+        'course',
     ),
     'db': (
         'libmdbx',
@@ -392,6 +397,7 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
     'knd': 'Ядро и дистрибутивы',
     'system': 'Системное',
     'special': 'Специальное',
+    'education': 'Обучение',
     'db': 'Базы данных',
     'multimedia': 'Мультимедиа',
     'mobile': 'Мобильные',
