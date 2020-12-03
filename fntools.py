@@ -310,6 +310,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Proxmox',
         'Coq',
         'KStars',
+        'Wine',
     ),
     'db': (
         'libmdbx',
@@ -356,6 +357,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'cSvn',
         'Rust',
         'Scala',
+        'Node.js',
+        'Javascript',
         'Electron',
         'make',
         'PHP',
