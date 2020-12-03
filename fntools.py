@@ -15,8 +15,14 @@ from typing import List, Dict
 import os
 from pprint import (
     pformat,
-    pprint,
 )
+
+from data.russiansources import *
+from data.releaseskeywords import *
+from data.habrposts import *
+from data.digestrecordcategory import *
+from data.digestrecordstate import *
+from data.digestrecordsubcategory import *
 
 
 SCRIPT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
@@ -34,31 +40,6 @@ logging.basicConfig(**LOGGING_SETTINGS)
 
 logger = logging.getLogger('fntools')
 logging.getLogger("requests").setLevel(logging.WARNING)
-
-
-RUSSIAN_SOURCES = (
-    'habr.com',
-    'opennet.ru',
-    'cnews.ru',
-    'vk.com',
-    'pingvinus.ru',
-    'losst.ru',
-    'linux.org.ru',
-    'youtube.com',  # Confusing, yes, but currently we use videos from only one blogger and he is russian
-)
-
-
-RELEASES_KEYWORDS = (
-    'обновление',
-    'релиз',
-    'выпуск',
-    'доступен',
-    'вышел',
-    'вышла',
-    'представляем',
-    'представлен',
-    'представила',
-)
 
 
 class BasicPostsStatisticsGetter(metaclass=ABCMeta):
@@ -107,52 +88,7 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter):
     def __init__(self):
         super().__init__()
         self.source_name = 'Habr'
-        self._posts_urls = {
-            1: 'https://habr.com/ru/post/486178/',
-            2: 'https://habr.com/ru/post/487662/',
-            3: 'https://habr.com/ru/post/488590/',
-            4: 'https://habr.com/ru/post/489632/',
-            5: 'https://habr.com/ru/post/490594/',
-            6: 'https://habr.com/ru/post/491562/',
-            7: 'https://habr.com/ru/post/492440/',
-            8: 'https://habr.com/ru/post/493780/',
-            9: 'https://habr.com/ru/post/494682/',
-            10: 'https://habr.com/ru/post/495782/',
-            11: 'https://habr.com/ru/post/496858/',
-            12: 'https://habr.com/ru/post/498026/',
-            13: 'https://habr.com/ru/post/499166/',
-            14: 'https://habr.com/ru/post/500248/',
-            15: 'https://habr.com/ru/post/501336/',
-            16: 'https://habr.com/ru/post/502414/',
-            17: 'https://habr.com/ru/post/503598/',
-            18: 'https://habr.com/ru/post/504710/',
-            19: 'https://habr.com/ru/post/505706/',
-            20: 'https://habr.com/ru/post/506624/',
-            21: 'https://habr.com/ru/post/507590/',
-            22: 'https://habr.com/ru/post/508632/',
-            23: 'https://habr.com/ru/post/509660/',
-            24: 'https://habr.com/ru/post/510636/',
-            25: 'https://habr.com/ru/post/511610/',
-            26: 'https://habr.com/ru/post/512552/',
-            27: 'https://habr.com/ru/post/513652/',
-            28: 'https://habr.com/ru/post/514434/',
-            29: 'https://habr.com/ru/post/515372/',
-            30: 'https://habr.com/ru/post/516292/',
-            31: 'https://habr.com/ru/post/517138/',
-            32: 'https://habr.com/ru/post/518010/',
-            33: 'https://habr.com/ru/post/518942/',
-            34: 'https://habr.com/ru/post/519914/',
-            35: 'https://habr.com/ru/post/520718/',
-            36: 'https://habr.com/ru/post/522160/',
-            37: 'https://habr.com/ru/post/522958/',
-            38: 'https://habr.com/ru/post/523978/',
-            39: 'https://habr.com/ru/post/524968/',
-            40: 'https://habr.com/ru/post/526014/',
-            41: 'https://habr.com/ru/post/526986/',
-            42: 'https://habr.com/ru/post/528132/',
-            43: 'https://habr.com/ru/post/529328/',
-            44: 'https://habr.com/ru/post/530480/',
-        }
+        self._posts_urls = HABR_POSTS
 
     def post_statistics(self, number, url):
         response = self._get_with_retries(url)
@@ -189,7 +125,7 @@ class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
         super().__init__()
         self.source_name = 'VK'
         self._posts_urls = {}
-        self._posts_count = 45
+        self._posts_count = len(HABR_POSTS) + 1
 
     @property
     def posts_urls(self):
@@ -206,216 +142,6 @@ class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
             logger.error(f'Failed to find statistics in FOSS News #{number} ({url}) on VK')
             return None
         return int(re_result.group(1))
-
-
-class DigestRecordState(Enum):
-    UNKNOWN = 'unknown'
-    IN_DIGEST = 'in_digest'
-    OUTDATED = 'outdated'
-    IGNORED = 'ignored'
-
-
-DIGEST_RECORD_STATE_VALUES = [state.value for state in DigestRecordState]
-
-
-class DigestRecordCategory(Enum):
-    UNKNOWN = 'unknown'
-    NEWS = 'news'
-    ARTICLES = 'articles'
-    RELEASES = 'releases'
-    OTHER = 'other'
-
-
-DIGEST_RECORD_CATEGORY_RU_MAPPING = {
-    'unknown': 'Неизвестно',
-    'news': 'Новости',
-    'articles': 'Статьи',
-    'releases': 'Релизы',
-    'other': 'Прочее',
-}
-
-
-DIGEST_RECORD_CATEGORY_VALUES = [category.value for category in DigestRecordCategory]
-
-
-class DigestRecordSubcategory(Enum):
-    EVENTS = 'events'
-    INTROS = 'intros'
-    OPENING = 'opening'
-    NEWS = 'news'
-    DIY = 'diy'
-    LAW = 'law'
-    KnD = 'knd'
-    SYSTEM = 'system'
-    SPECIAL = 'special'
-    EDUCATION = 'education'
-    MULTIMEDIA = 'multimedia'
-    MOBILE = 'mobile'
-    SECURITY = 'security'
-    DEVOPS = 'devops'
-    DATA_SCIENCE = 'data_science'
-    WEB = 'web'
-    DEV = 'dev'
-    MANAGEMENT = 'management'
-    USER = 'user'
-    GAMES = 'games'
-    HARDWARE = 'hardware'
-    MISC = 'misc'
-
-
-DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
-    'events': (),
-    'intros': (),
-    'opening': (),
-    'news': (
-        'GitHub',
-    ),
-    'diy': (),
-    'law': (),
-    'education': (
-        'GCompris',
-    ),
-    'knd': (
-        'дистрибутив',
-        '4MLinux',
-        'Armbian',
-        'MidnightBSD',
-        'KDE Neon',
-        'Kubuntu',
-        'Ubuntu',
-        'Chrome OS',
-        'Tails',
-        'Solaris',
-        'Kali Linux',
-        'Альт',
-        'ELKS',
-        'Void Linux',
-    ),
-    'system': (
-        'Grub',
-        'systemd',
-        'Xorg',
-        'Mir',
-        'Wayland',
-        'PowerShell',
-        'Guix',
-        'bash',
-        'i3wm',
-        'ZFS',
-        'Btrfs',
-        'sysvinit',
-        'Coreboot',
-    ),
-    'special': (
-        'XCP-NG',
-        'Proxmox',
-        'Coq',
-        'KStars',
-        'Wine',
-    ),
-    'education': (
-        'GCompris',
-        'course',
-    ),
-    'db': (
-        'libmdbx',
-    ),
-    'multimedia': (
-        'MPV',
-        'Ardour',
-        'PulseAudio',
-        'Paint',
-        'LazPaint',
-        'GIMP',
-        'Blender',
-    ),
-    'mobile': (
-        'Android',
-        'Ubuntu Touch',
-        'KDE Plasma Mobile',
-        'PinePhone',
-    ),
-    'security': (
-        'LibreSSL',
-    ),
-    'devops': (
-        'Docker',
-        'Kubernetes',
-        'Terraform',
-    ),
-    'data_science': (),
-    'web': (
-        'nginx',
-        'Firefox',
-        'Chrome'
-        'SeaMonkey',
-        'GNUnet',
-        'Tor Browser',
-        'Thunderbird',
-        'Chromium',
-        'Pale Moon',
-    ),
-    'dev': (
-        'Git',
-        'Kivy',
-        'BPF',
-        'cSvn',
-        'Rust',
-        'Scala',
-        'Node.js',
-        'Javascript',
-        'Electron',
-        'make',
-        'PHP',
-        'Perl',
-    ),
-    'history': (),
-    'management': (),
-    'user': (
-        'LibreOffice',
-        'Cinnamon',
-        'Regolith',
-        'motd',
-    ),
-    'games': (
-        'Verloren',
-    ),
-    'hardware': (
-        'Raspberry Pi',
-    ),
-    'misc': (),
-}
-
-
-DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
-    'events': 'Мероприятия',
-    'intros': 'Внедрения',
-    'opening': 'Открытие кода и данных',
-    'news': 'Новости FOSS организаций',
-    'diy': 'DIY',
-    'law': 'Юридические вопросы',
-    'knd': 'Ядро и дистрибутивы',
-    'system': 'Системное',
-    'special': 'Специальное',
-    'education': 'Обучение',
-    'db': 'Базы данных',
-    'multimedia': 'Мультимедиа',
-    'mobile': 'Мобильные',
-    'security': 'Безопасность',
-    'devops': 'DevOps',
-    'data_science': 'AI & Data Science',
-    'web': 'Web',
-    'dev': 'Для разработчиков',
-    'history': 'История',
-    'management': 'Менеджмент',
-    'user': 'Пользовательское',
-    'games': 'Игры',
-    'hardware': 'Железо',
-    'misc': 'Разное',
-}
-
-
-DIGEST_RECORD_SUBCATEGORY_VALUES = [category.value for category in DigestRecordSubcategory]
 
 
 class DigestRecord:
