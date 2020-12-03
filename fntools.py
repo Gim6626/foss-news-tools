@@ -211,6 +211,7 @@ class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
 class DigestRecordState(Enum):
     UNKNOWN = 'unknown'
     IN_DIGEST = 'in_digest'
+    OUTDATED = 'outdated'
     IGNORED = 'ignored'
 
 
@@ -655,7 +656,8 @@ class DigestRecordsCollection:
             logger.info(f'Processing record "{record.title}" from date {record.dt}:\n{record}')
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
-            if record.state == DigestRecordState.IN_DIGEST:
+            if record.state in (DigestRecordState.IN_DIGEST,
+                                DigestRecordState.OUTDATED):
                 if record.is_main is None:
                     record.is_main = self._ask_bool(f'Please input whether or no "{record.title}" is main (y/n): ')
                 if record.digest_number is None:
