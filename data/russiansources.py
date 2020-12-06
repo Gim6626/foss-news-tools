@@ -7,4 +7,5 @@ RUSSIAN_SOURCES = (
     'losst.ru',
     'linux.org.ru',
     'youtube.com',  # Confusing, yes, but currently we use videos from only one blogger and he is russian
+    'basealt.ru',
 )
