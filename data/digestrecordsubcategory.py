@@ -11,6 +11,7 @@ class DigestRecordSubcategory(Enum):
     SYSTEM = 'system'
     SPECIAL = 'special'
     EDUCATION = 'education'
+    DATABASES = 'db'
     MULTIMEDIA = 'multimedia'
     MOBILE = 'mobile'
     SECURITY = 'security'
@@ -34,13 +35,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     ),
     'diy': (),
     'law': (),
-    'education': (
-        'GCompris',
-    ),
     'knd': (
         'дистрибутив',
         '4MLinux',
         'Armbian',
+        'GhostBSD',
         'MidnightBSD',
         'KDE Neon',
         'Kubuntu',
@@ -81,6 +80,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     ),
     'db': (
         'libmdbx',
+        'postgresql',
+        'mysql',
     ),
     'multimedia': (
         'MPV',
@@ -104,6 +105,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Docker',
         'Kubernetes',
         'Terraform',
+        'Kafka',
     ),
     'data_science': (),
     'web': (
