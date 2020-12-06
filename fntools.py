@@ -271,6 +271,8 @@ class DigestRecordsCollection:
                                          is_main=record_plain['is_main'])
             record_object.state = DigestRecordState(record_plain['state'].lower()) if 'state' in record_plain and record_plain['state'] is not None else None
             record_object.category = DigestRecordCategory(record_plain['category'].lower()) if 'category' in record_plain and record_plain['category'] is not None else None
+            if 'subcategory' in record_plain and record_plain['subcategory'] == 'DATABASES':
+                record_plain['subcategory'] = 'db'
             record_object.subcategory = DigestRecordSubcategory(record_plain['subcategory'].lower()) if 'subcategory' in record_plain and record_plain['subcategory'] is not None else None
             records_objects.append(record_object)
         self.records = records_objects
