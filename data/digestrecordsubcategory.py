@@ -19,6 +19,7 @@ class DigestRecordSubcategory(Enum):
     DATA_SCIENCE = 'data_science'
     WEB = 'web'
     DEV = 'dev'
+    HISTORY = 'history'
     MANAGEMENT = 'management'
     USER = 'user'
     GAMES = 'games'
@@ -44,6 +45,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'KDE Neon',
         'Kubuntu',
         'Ubuntu',
+        'Debian',
         'Chrome OS',
         'Tails',
         'Solaris',
@@ -51,6 +53,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Альт',
         'ELKS',
         'Void Linux',
+        'NethServer',
+        'OpenWRT',
+        'Raspberry Pi OS',
+        'T2 SDE',
     ),
     'system': (
         'Grub',
@@ -80,8 +86,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     ),
     'db': (
         'libmdbx',
-        'postgresql',
-        'mysql',
+        'PostgreSQL',
+        'MySQL',
+        'SQLite',
     ),
     'multimedia': (
         'MPV',
@@ -100,6 +107,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     ),
     'security': (
         'LibreSSL',
+        'WireGuard',
+        'VPN',
+        'уязвим',
+        'вирус',
     ),
     'devops': (
         'Docker',
@@ -118,6 +129,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Thunderbird',
         'Chromium',
         'Pale Moon',
+        'Beaker',
+        'Lighttpd',
     ),
     'dev': (
         'Git',
@@ -133,13 +146,19 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'PHP',
         'Perl',
     ),
-    'history': (),
+    'history': (
+        'история',
+    ),
     'management': (),
     'user': (
         'LibreOffice',
         'Cinnamon',
         'Regolith',
         'motd',
+        'KDE',
+        'Plasma',
+        'GNOME',
+        'Budgie',
     ),
     'games': (
         'Verloren',
