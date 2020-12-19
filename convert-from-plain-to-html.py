@@ -31,7 +31,7 @@ def main():
                     'header': line,
                     'subsections': collections.OrderedDict(),
                 }
-            elif line in subcategories_h4_names_set:
+            elif line in DIGEST_RECORD_SUBCATEGORY_RU_MAPPING.values():
                 new_content[current_section]['subsections'][line] = {
                     'header': line,
                     'lines': [],
@@ -65,12 +65,12 @@ def main():
         converted_lines = []
         for section_header in shorts_categories_h3_names_set:
             label = categories_labels[section_header]
-            converted_lines.append(f'<anchor>{label}</anchor><h3>{new_content[section_header]["header"]}</h2>')
+            converted_lines.append(f'<anchor>{label}</anchor><h3>{new_content[section_header]["header"]}</h3>')
             converted_lines.append('')
             i = 0
             for header, subsection_data in new_content[section_header]['subsections'].items():
                 if subsection_data['lines']:
-                    converted_lines.append(f'<anchor>{label}-{i + 1}</anchor><h4>{subsection_data["header"]}</h3>')
+                    converted_lines.append(f'<anchor>{label}-{i + 1}</anchor><h4>{subsection_data["header"]}</h4>')
                     converted_lines.append('')
                     if len(subsection_data['lines']) > 1:
                         converted_lines.append('<ol>')
@@ -138,32 +138,6 @@ categories_labels = {
     'Статьи': 'articles',
     'Релизы': 'releases',
 }
-
-
-subcategories_h4_names_set = (
-    'Мероприятия',
-    'Внедрения',
-    'Открытие кода и данных',
-    'Новости FOSS организаций',
-    'DIY',
-    'Юридические вопросы',
-    'Ядро и дистрибутивы',
-    'Системное',
-    'Специальное',
-    'Базы данных',
-    'Мультимедиа',
-    'Безопасность',
-    'DevOps',
-    'AI & Data Science',
-    'Web',
-    'Для разработчиков',
-    'История',
-    'Менеджмент',
-    'Пользовательское',
-    'Игры',
-    'Железо',
-    'Разное',
-)
 
 
 if __name__ == "__main__":
