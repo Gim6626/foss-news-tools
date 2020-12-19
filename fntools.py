@@ -23,6 +23,7 @@ from data.habrposts import *
 from data.digestrecordcategory import *
 from data.digestrecordstate import *
 from data.digestrecordsubcategory import *
+from data.digestrecordsubcategorykeywords import *
 
 
 SCRIPT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
