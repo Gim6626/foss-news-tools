@@ -45,4 +45,5 @@ HABR_POSTS = {
     44: 'https://habr.com/ru/post/530480/',
     45: 'https://habr.com/ru/post/531576/',
     46: 'https://habr.com/ru/post/532798/',
+    47: 'https://habr.com/ru/post/534012/',
 }
