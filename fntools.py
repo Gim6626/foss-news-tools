@@ -357,6 +357,10 @@ class DigestRecordsCollection:
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword in title.lower():
                 return DigestRecordCategory.RELEASES
+        for category, keywords in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
+            for keyword in keywords:
+                if re.search(keyword + r'\s+\d', title):
+                    return DigestRecordCategory.RELEASES
         return None
 
     def _guess_subcategory(self, title: str) -> DigestRecordSubcategory:
