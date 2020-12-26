@@ -408,27 +408,22 @@ class DigestRecordsCollection:
                         current_digest_number = record.digest_number
                     else:
                         record.digest_number = current_digest_number
+
                 guessed_category = self._guess_category(record.title)
-                guessed_subcategory = self._guess_subcategory(record.title)
-                if guessed_category is not None or guessed_subcategory is not None:
-                    msgs_about_guesses = []
-                    if guessed_category is not None:
-                        msgs_about_guesses.append(f'guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
-                    if guessed_subcategory is not None:
-                        msgs_about_guesses.append(f'guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
-                    msg = ', '.join(msgs_about_guesses)
-                    if not msg:
-                        raise NotImplementedError
-                    msg = msg.capitalize()
-                    msg += '. Accept? y/n: '
+                if guessed_category is not None:
+                    msg = f'Guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}". Accept? y/n: '
                     accepted = self._ask_bool(msg)
                     if accepted:
-                        if guessed_category is not None:
-                            logger.info(f'Setting category of record "{record.title}" to "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
-                            record.category = guessed_category
-                        if guessed_subcategory is not None:
-                            logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
-                            record.subcategory = guessed_subcategory
+                        logger.info(f'Setting category of record "{record.title}" to "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
+                        record.category = guessed_category
+
+                guessed_subcategory = self._guess_subcategory(record.title)
+                if guessed_subcategory is not None:
+                    msg = f'Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: '
+                    accepted = self._ask_bool(msg)
+                    if accepted:
+                        logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
+                        record.subcategory = guessed_subcategory
 
                 if record.category == DigestRecordCategory.UNKNOWN or record.category is None:
                     record.category = self._ask_category(record,
