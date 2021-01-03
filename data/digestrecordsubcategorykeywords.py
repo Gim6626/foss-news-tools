@@ -40,6 +40,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'DentOS',
         'Icaros',
         'Redox OS',
+        'Fedora',
+        'Kodachi',
+        'Embox',
+        'Slackel',
     ),
     'system': (
         'Grub',
@@ -56,6 +60,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'sysvinit',
         'Coreboot',
         'Mesa',
+        'Smartmontools',
     ),
     'special': (
         'XCP-NG',
@@ -75,10 +80,14 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'FFmpeg',
         'Bareos',
         'Airflow',
+        'Stellarium',
+        'lsFusion',
+        'BusyBox',
     ),
     'education': (
         'GCompris',
         'course',
+        'Tux Paint',
     ),
     'db': (
         'libmdbx',
@@ -86,6 +95,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'MySQL',
         'SQLite',
         'TimescaleDB',
+        'Patroni',
+        'Tarantool',
+        'ClickHouse',
     ),
     'multimedia': (
         'MPV',
@@ -100,6 +112,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Guitarix',
         'Kdenlive',
         'Darktable',
+        'Parole',
+        'mtPaint',
     ),
     'mobile': (
         'Android',
@@ -135,6 +149,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'werf',
         'Headlamp',
         'OpenShift',
+        'CI/CD',
     ),
     'data_science': (
         'OpenVINO',
@@ -155,6 +170,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Lighttpd',
         'WordPress',
         'Threema',
+        'Otter',
+        'Wget',
     ),
     'dev': (
         'Git',
@@ -184,6 +201,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Tizen Studio',
         'Ruby',
         'React',
+        'RESTinio',
+        'CIDER',
+        'CMake',
+        'libmicrohttpd',
     ),
     'history': (
         'история',
@@ -211,9 +232,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Mindustry',
         'FlightGear',
         'fheroes',
+        'Bubble Chains',
     ),
     'hardware': (
         'Raspberry Pi',
     ),
-    'misc': (),
+    'misc': (
+        'Buttplug',
+    ),
 }
