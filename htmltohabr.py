@@ -127,12 +127,59 @@ def main():
                                  label)
             tags_fixed.append(tag_with_label)
         else:
+            # TODO: Process categories and subcategories
+            # TODO: Process lists
+            # TODO: Process dash before link in main news
+            if '[←] Предыдущий выпуск' in tag.html_src:
+                re_match = re.search(r'(\[←\])\s+(Предыдущий выпуск)\s+.\s+(https?://[^<]+)', tag.html_src)
+                if re_match:
+                    processed_html_src = tag.html_src.replace(re_match.group(0), f'<a href="{re_match.group(3)}">{re_match.group(1)}</a> {re_match.group(2)}')
+                else:
+                    raise Exception(f'Bad string "{tag.html_src}" format')
+            elif 'Подписывайтесь на наш' in tag.html_src:
+                processed_html_src = '<p>Подписывайтесь на <a href="https://t.me/permlug_channel">наш Telegram канал</a>, <a href="https://vk.com/permlug">группу ВКонтакте</a> или <a href="http://permlug.org/rss">RSS</a> чтобы не пропустить новые выпуски FOSS News.</p>'
+            elif len(re.findall('https?://', tag.html_src)) == 1:
+                if '(en)' in tag.html_src:
+                    re_match = re.search(r'(https?://\S+)(\s+\(en\))', tag.html_src)
+                    if re_match:
+                        to_replace = re_match.group(0)
+                        link = re_match.group(1)
+                        en = re_match.group(2)
+                else:
+                    re_match = re.search(r'https?://[^< ]+', tag.html_src)
+                    if re_match:
+                        to_replace = re_match.group(0)
+                        link = re_match.group(0)
+                        en = None
+                if re_match:
+                    processed_html_src = tag.html_src.replace(to_replace,
+                                                              f'<a href="{link}">[→{en if en is not None else ""}]</a>')
+                else:
+                    raise Exception(f'Bad string "{tag}" format')
+            elif len(re.findall('https?://', tag.html_src)) > 1:
+                re_matches = re.findall(r'(https?://\S+)( \(en\))?', tag.html_src)
+                links = []
+                for i, re_match in enumerate(re_matches):
+                    url: str = re_match[0]
+                    if i < len(re_matches) - 1:
+                        url = url.strip(',')
+                    en: str = re_match[1]
+                    link = f'<a href="{url}">{i + 1}{en if en else ""}</a>'
+                    links.append(link)
+                links_str = ', '.join(links)
+                processed_html_src = re.sub('https?://.*',
+                                            f'[→ {links_str}]',
+                                            tag.html_src)
+            else:
+                processed_html_src = tag.html_src
+            tag.html_src = processed_html_src
             tags_fixed.append(tag)
 
-    for tag in tags_fixed:
-        print(tag.html_src)
-        if tag.label == 'toc':
-            toc.print_html()
+    with open(args.DESTINATION, 'w') as fout:
+        for tag in tags_fixed:
+            print(tag.html_src, file=fout)
+            if tag.label == 'toc':
+                toc.print_html(file=fout)
 
 
 def parse_command_line_args():
@@ -182,18 +229,19 @@ class TocItem:
             subitem.print_plain(offset + '    ')
 
     def print_html(self,
-                   offset=''):
+                   offset='',
+                   file=None):
         html = f'{offset}<li><a href="#{self.label}">{self.title}</a>'
         if self.subitems:
-            print(html)
-            print(f'{offset}<ol>')
+            print(html, file=file)
+            print(f'{offset}<ol>', file=file)
         else:
             html += '</li>'
-            print(html)
+            print(html, file=file)
         for subitem in self.subitems:
-            subitem.print_html(offset + '    ')
+            subitem.print_html(offset + '    ', file=file)
         if self.subitems:
-            print(f'{offset}</ol></li>')
+            print(f'{offset}</ol></li>', file=file)
 
     def __str__(self):
         return f'<{self.tag_type.value}> {self.title} #{self.label}'
@@ -208,11 +256,11 @@ class TOC:
         for toc_item in self.items:
             toc_item.print_plain()
 
-    def print_html(self):
-        print('<ol>')
+    def print_html(self, file=None):
+        print('<ol>', file=file)
         for toc_item in self.items:
-            toc_item.print_html('    ')
-        print('</ol>')
+            toc_item.print_html('    ', file=file)
+        print('</ol>', file=file)
 
 
 class TagType(Enum):
