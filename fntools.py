@@ -359,7 +359,7 @@ class DigestRecordsCollection:
                 return DigestRecordCategory.RELEASES
         for category, keywords in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
             for keyword in keywords:
-                if re.search(keyword + r'\s+\d', title):
+                if re.search(keyword + r'\s+v?\d', title):
                     return DigestRecordCategory.RELEASES
         return None
 
