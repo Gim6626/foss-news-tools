@@ -157,7 +157,7 @@ def main():
                 else:
                     raise Exception(f'Bad string "{tag}" format')
             elif len(re.findall('https?://', tag.html_src)) > 1:
-                re_matches = re.findall(r'(https?://\S+)( \(en\))?', tag.html_src)
+                re_matches = re.findall(r'(https?://\S+)(\s+\(en\))?', tag.html_src)
                 links = []
                 for i, re_match in enumerate(re_matches):
                     url: str = re_match[0]
