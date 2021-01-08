@@ -10,7 +10,6 @@ from typing import (
     List,
     Tuple,
 )
-from bs4 import BeautifulSoup
 import lxml.html.clean as lxml_cleaner
 
 from pprint import pprint

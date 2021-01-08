@@ -2,4 +2,3 @@ argcomplete
 python-dateutil
 lxml
 pyyaml
-beautifulsoup4
