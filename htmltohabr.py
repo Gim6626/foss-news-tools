@@ -138,25 +138,17 @@ def main():
             elif 'Подписывайтесь на наш' in tag.html_src:
                 processed_html_src = '<p>Подписывайтесь на <a href="https://t.me/permlug_channel">наш Telegram канал</a>, <a href="https://vk.com/permlug">группу ВКонтакте</a> или <a href="http://permlug.org/rss">RSS</a> чтобы не пропустить новые выпуски FOSS News.</p>'
             elif len(re.findall('https?://', tag.html_src)) == 1:
-                if '(en)' in tag.html_src:
-                    re_match = re.search(r'(https?://\S+)(\s+\(en\))', tag.html_src)
-                    if re_match:
-                        to_replace = re_match.group(0)
-                        link = re_match.group(1)
-                        en = re_match.group(2)
-                else:
-                    re_match = re.search(r'https?://[^< ]+', tag.html_src)
-                    if re_match:
-                        to_replace = re_match.group(0)
-                        link = re_match.group(0)
-                        en = None
+                re_match = re.search(r'(https?://[^<\s]+)(\s+\(en\))?', tag.html_src)
                 if re_match:
+                    to_replace = re_match.group(0)
+                    link = re_match.group(1)
+                    en = re_match.group(2)
                     processed_html_src = tag.html_src.replace(to_replace,
                                                               f'<a href="{link}">[→{en if en is not None else ""}]</a>')
                 else:
                     raise Exception(f'Bad string "{tag}" format')
             elif len(re.findall('https?://', tag.html_src)) > 1:
-                re_matches = re.findall(r'(https?://\S+)(\s+\(en\))?', tag.html_src)
+                re_matches = re.findall(r'(https?://[^<\s]+)(\s+\(en\))?', tag.html_src)
                 links = []
                 for i, re_match in enumerate(re_matches):
                     url: str = re_match[0]
@@ -166,7 +158,7 @@ def main():
                     link = f'<a href="{url}">{i + 1}{en if en else ""}</a>'
                     links.append(link)
                 links_str = ', '.join(links)
-                processed_html_src = re.sub('https?://.*',
+                processed_html_src = re.sub(r'https?://[^<$]+',
                                             f'[→ {links_str}]',
                                             tag.html_src)
             else:
