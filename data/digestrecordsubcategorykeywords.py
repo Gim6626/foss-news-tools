@@ -15,7 +15,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Armbian',
         'GhostBSD',
         'MidnightBSD',
-        'OpenBSD,'
+        'OpenBSD',
         'KDE Neon',
         'Kubuntu',
         'Ubuntu',
@@ -44,6 +44,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Kodachi',
         'Embox',
         'Slackel',
+        'Gentoo',
+        'Slacko Puppy',
+        'Linux Mint',
     ),
     'system': (
         'Grub',
@@ -150,6 +153,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Headlamp',
         'OpenShift',
         'CI/CD',
+        'Bastille',
+        'Consul',
     ),
     'data_science': (
         'OpenVINO',
@@ -172,6 +177,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Threema',
         'Otter',
         'Wget',
+        'QuiteRSS',
+        'Wasmer',
+        'PeerTube',
+        'Cawbird',
+        'BIND',
     ),
     'dev': (
         'Git',
@@ -205,11 +215,17 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'CIDER',
         'CMake',
         'libmicrohttpd',
+        'Tcl/Tk',
+        'C++',
+        'PicoLibc',
+        'KDE Frameworks',
     ),
     'history': (
         'история',
     ),
-    'management': (),
+    'management': (
+        'RunaWFE Free',
+    ),
     'user': (
         'LibreOffice',
         'Cinnamon',
@@ -226,6 +242,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'nano',
         'Vim',
         'EMACS',
+        'GNU tar',
+        'CherryTree',
     ),
     'games': (
         'Verloren',
