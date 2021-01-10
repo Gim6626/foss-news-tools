@@ -30,7 +30,7 @@ def main():
         cleaner = lxml_cleaner.Cleaner(safe_attrs=frozenset())
         src_content_unescaped_cleaned = cleaner.clean_html(src_content_unescaped)
         src_content_unescaped_cleaned_2 = clear_tags(src_content_unescaped_cleaned,
-                                                     ('a', 'span', 'img'))
+                                                     ('a', 'span', 'img', '<ul>', '<ol>'))
     tags_names_for_parsing = (tag_type.value for tag_type in TagType)
     regexps = (tag_regexp_from_tag_name(tag_name) for tag_name in tags_names_for_parsing)
     regexp = '|'.join(regexps)
@@ -126,9 +126,6 @@ def main():
                                  label)
             tags_fixed.append(tag_with_label)
         else:
-            # TODO: Process categories and subcategories
-            # TODO: Process lists
-            # TODO: Process dash before link in main news
             if '[←] Предыдущий выпуск' in tag.html_src:
                 re_match = re.search(r'(\[←\])\s+(Предыдущий выпуск)\s+.\s+(https?://[^<]+)', tag.html_src)
                 if re_match:
@@ -137,6 +134,12 @@ def main():
                     raise Exception(f'Bad string "{tag.html_src}" format')
             elif 'Подписывайтесь на наш' in tag.html_src:
                 processed_html_src = '<p>Подписывайтесь на <a href="https://t.me/permlug_channel">наш Telegram канал</a>, <a href="https://vk.com/permlug">группу ВКонтакте</a> или <a href="http://permlug.org/rss">RSS</a> чтобы не пропустить новые выпуски FOSS News.</p>'
+            elif 'Категория:' in tag.html_src:
+                re_match = re.search(r'Категория:\s+([^<$]+)', tag.html_src)
+                if re_match:
+                    processed_html_src = f'<i><b>Категория:</b> {re_match.group(1)}</i>'
+                else:
+                    raise NotImplementedError
             elif len(re.findall('https?://', tag.html_src)) == 1:
                 re_match = re.search(r'(https?://[^<\s]+)(\s+\(en\))?', tag.html_src)
                 if re_match:
@@ -167,7 +170,14 @@ def main():
             tags_fixed.append(tag)
 
     with open(args.DESTINATION, 'w') as fout:
+        in_list = False
         for tag in tags_fixed:
+            if tag.ttype == TagType.LI and not in_list:
+                print('<ol>', file=fout)
+                in_list = True
+            if tag.ttype != TagType.LI and in_list:
+                print('</ol>', file=fout)
+                in_list = False
             print(tag.html_src, file=fout)
             if tag.label == 'toc':
                 toc.print_html(file=fout)
@@ -261,8 +271,9 @@ class TagType(Enum):
     H3 = 'h3'
     H4 = 'h4'
     P = 'p'
-    UL = 'ul'
-    OL = 'ol'
+    # UL = 'ul'
+    # OL = 'ol'
+    LI = 'li'
 
     @staticmethod
     def from_html(src_tag_content: str):
