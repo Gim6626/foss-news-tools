@@ -325,24 +325,42 @@ class DigestRecordsCollection:
             if not news_records:
                 continue
             output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[news_record_subcategory]}</h4>\n\n'
-            for news_record in news_records:
-                output += f'{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}</a>{" (en)" if self._check_url_if_english(news_record.url) else ""}<br>\n'
+            if len(news_records) == 1:
+                news_record = news_records[0]
+                output += f'<p>{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}</a>{" (en)" if self._check_url_if_english(news_record.url) else ""}</p>\n'
+            else:
+                output += '<ol>\n'
+                for news_record in news_records:
+                    output += f'<li>{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}</a>{" (en)" if self._check_url_if_english(news_record.url) else ""}</li>\n'
+                output += '</ol>\n'
 
         output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.ARTICLES.value]}</h3>\n\n'
         for articles_record_subcategory, articles_records in output_records[DigestRecordCategory.ARTICLES.value].items():
             if not articles_records:
                 continue
             output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[articles_record_subcategory]}</h4>\n\n'
-            for articles_record in articles_records:
-                output += f'{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}</a>{" (en)" if self._check_url_if_english(articles_record.url) else ""}<br>\n'
+            if len(articles_records) == 1:
+                articles_record = articles_records[0]
+                output += f'<p>{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}</a>{" (en)" if self._check_url_if_english(articles_record.url) else ""}</p>\n'
+            else:
+                output += '<ol>\n'
+                for articles_record in articles_records:
+                    output += f'<li>{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}</a>{" (en)" if self._check_url_if_english(articles_record.url) else ""}</li>\n'
+                output += '</ol>\n'
 
         output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.RELEASES.value]}</h3>\n\n'
         for releases_record_subcategory, releases_records in output_records[DigestRecordCategory.RELEASES.value].items():
             if not releases_records:
                 continue
             output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[releases_record_subcategory]}</h4>\n\n'
-            for releases_record in releases_records:
-                output += f'{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}</a>{" (en)" if self._check_url_if_english(releases_record.url) else ""}<br>\n'
+            if len(releases_records) == 1:
+                releases_record = releases_records[0]
+                output += f'<p>{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}</a>{" (en)" if self._check_url_if_english(releases_record.url) else ""}</p>\n'
+            else:
+                output += '<ol>\n'
+                for releases_record in releases_records:
+                    output += f'<li>{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}</a>{" (en)" if self._check_url_if_english(releases_record.url) else ""}</li>\n'
+                output += '</ol>\n'
 
         output += '<h2>Что ещё посмотреть</h2>\n\n'
         for other_record in output_records[DigestRecordCategory.OTHER.value]:
