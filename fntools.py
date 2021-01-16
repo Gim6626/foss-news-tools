@@ -203,7 +203,9 @@ class DigestRecordsCollection:
         records_plain = []
         for record_object in self.records:
             record_plain = {
-                'datetime': record_object.dt.strftime(DIGEST_RECORD_DATETIME_FORMAT),
+                'datetime': record_object.dt.strftime(DIGEST_RECORD_DATETIME_FORMAT)
+                            if record_object.dt is not None
+                            else None,
                 'title': record_object.title,
                 'url': record_object.url,
                 'state': record_object.state.value if record_object.state is not None else None,
@@ -263,8 +265,12 @@ class DigestRecordsCollection:
         logger.info('Got data')
         result_data = json.loads(result.content)
         for record_plain in result_data:
-            record_object = DigestRecord(datetime.datetime.strptime(record_plain['dt'],
-                                                                    '%Y-%m-%dT%H:%M:%SZ'),
+            if record_plain['dt'] is not None:
+                dt_str = datetime.datetime.strptime(record_plain['dt'],
+                                                    '%Y-%m-%dT%H:%M:%SZ')
+            else:
+                dt_str = None
+            record_object = DigestRecord(dt_str,
                                          record_plain['title'],
                                          record_plain['url'],
                                          digest_number=record_plain['digest_number'],
