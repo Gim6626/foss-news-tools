@@ -321,7 +321,7 @@ class DigestRecordsCollection:
         for main_record in output_records['main']:
             output += f'<h3>{self._clear_title(main_record.title)}</h3>\n\n'
             output += f'<i><b>Категория</b>: {DIGEST_RECORD_CATEGORY_RU_MAPPING[main_record.category.value]}/{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[main_record.subcategory.value]}</i><br>\n\n'
-            output += f'Подробности - <a href="{main_record.url}">{main_record.url}</a>{" (en)" if self._check_url_if_english(main_record.url) else ""}\n\n'
+            output += f'Подробности <a href="{main_record.url}">{main_record.url}</a>{" (en)" if self._check_url_if_english(main_record.url) else ""}\n\n'
 
         output += '<h2>Короткой строкой</h2>\n\n'
 
