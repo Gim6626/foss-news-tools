@@ -173,7 +173,7 @@ class DigestRecord:
     def to_dict(self):
         return {
             'drid': self.drid,
-            'datetime': self.dt.strftime(DIGEST_RECORD_DATETIME_FORMAT),
+            'datetime': self.dt.strftime(DIGEST_RECORD_DATETIME_FORMAT) if self.dt is not None else None,
             'title': self.title,
             'url': self.url,
             'is_main': self.is_main,
