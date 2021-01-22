@@ -10,4 +10,5 @@ RUSSIAN_SOURCES = (
     'basealt.ru',
     'weeklyosm.eu/ru',
     'ixbt.com',
+    '3dnews.ru',
 )
