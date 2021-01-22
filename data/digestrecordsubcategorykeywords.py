@@ -47,6 +47,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Gentoo',
         'Slacko Puppy',
         'Linux Mint',
+        'AlmaLinux',
+        'Alpine Linux',
     ),
     'system': (
         'Grub',
@@ -64,6 +66,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Coreboot',
         'Mesa',
         'Smartmontools',
+        'JuiceFS',
+        'tcb',
+        'sudo',
+        'Panfrost',
+        'iptables',
+        'nftables',
     ),
     'special': (
         'XCP-NG',
@@ -86,6 +94,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Stellarium',
         'lsFusion',
         'BusyBox',
+        'RDP',
+        'Elasticsearch',
+        'Kibana',
+        'BleachBit',
     ),
     'education': (
         'GCompris',
@@ -101,6 +113,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Patroni',
         'Tarantool',
         'ClickHouse',
+        'SQL',
+        'urm',
     ),
     'multimedia': (
         'MPV',
@@ -117,6 +131,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Darktable',
         'Parole',
         'mtPaint',
+        'AviSynth+',
+        'OpenGL',
     ),
     'mobile': (
         'Android',
@@ -134,7 +150,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'CrowdSec',
         'уязвим',
         'вирус',
+        'OpenVPN',
+        'Mozilla VPN',
         'security',
+        'exploit',
+        'эксплойт',
     ),
     'devops': (
         'Docker',
@@ -155,6 +175,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'CI/CD',
         'Bastille',
         'Consul',
+        'Grafana',
+        'Periskop',
     ),
     'data_science': (
         'OpenVINO',
@@ -182,6 +204,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'PeerTube',
         'Cawbird',
         'BIND',
+        'Hubzilla',
+        'Laravel',
+        'WordPress',
+        'Django',
+        'Cloud Custodian',
     ),
     'dev': (
         'Git',
@@ -191,7 +218,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Rust',
         'Scala',
         'Node.js',
-        'Javascript',
+        'JavaScript',
         'Electron',
         'make',
         'PHP',
@@ -219,6 +246,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'C++',
         'PicoLibc',
         'KDE Frameworks',
+        'Python',
+        'Golang',
+        'Java',
     ),
     'history': (
         'история',
@@ -244,8 +274,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'EMACS',
         'GNU tar',
         'CherryTree',
+        'Super Productivity',
+        'awk',
+        'sed',
     ),
     'games': (
+        'Lutris',
         'Verloren',
         'Mindustry',
         'FlightGear',
@@ -254,8 +288,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     ),
     'hardware': (
         'Raspberry Pi',
+        'bladeRF-wiphy',
     ),
     'misc': (
         'Buttplug',
+        'xVA-Synth',
     ),
 }
