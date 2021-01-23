@@ -388,12 +388,14 @@ class DigestRecordsCollection:
                     return DigestRecordCategory.RELEASES
         return None
 
-    def _guess_subcategory(self, title: str) -> DigestRecordSubcategory:
+    def _guess_subcategory(self, title: str) -> List[DigestRecordSubcategory]:
+        guessed_subcategories = []
         for subcategory_value, keywords in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
             for keyword in keywords:
                 if keyword.lower() in title.lower():
-                    return DigestRecordSubcategory(subcategory_value)
-        return None
+                    guessed_subcategories.append(DigestRecordSubcategory(subcategory_value))
+                    break
+        return guessed_subcategories
 
     def categorize_interactively(self):
         current_digest_number = None
@@ -442,13 +444,26 @@ class DigestRecordsCollection:
                         logger.info(f'Setting category of record "{record.title}" to "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
                         record.category = guessed_category
 
-                guessed_subcategory = self._guess_subcategory(record.title)
-                if guessed_subcategory is not None:
-                    msg = f'Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: '
-                    accepted = self._ask_bool(msg)
-                    if accepted:
-                        logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
-                        record.subcategory = guessed_subcategory
+                guessed_subcategories = self._guess_subcategory(record.title)
+                if guessed_subcategories:
+                    if len(guessed_subcategories) == 1:
+                        guessed_subcategory = guessed_subcategories[0]
+                        msg = f'Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: '
+                        accepted = self._ask_bool(msg)
+                        if accepted:
+                            logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
+                            record.subcategory = guessed_subcategory
+                    else:
+                        msg = 'Guessed subcategories are:'
+                        for guessed_subcategory_i, guessed_subcategory in enumerate(guessed_subcategories):
+                            msg += f'\n{guessed_subcategory_i + 1}. {DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}'
+                        msg += '\nType guessed subcategory index or "n" if no match: '
+                        guessed_subcategory_index = self._ask_guessed_subcategory_index(msg,
+                                                                                        len(guessed_subcategories))
+                        if guessed_subcategory_index is not None:
+                            guessed_subcategory = guessed_subcategories[guessed_subcategory_index - 1]
+                            logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
+                            record.subcategory = guessed_subcategory
 
                 if record.category == DigestRecordCategory.UNKNOWN or record.category is None:
                     record.category = self._ask_category(record,
@@ -493,6 +508,25 @@ class DigestRecordsCollection:
                 return digest_number
             else:
                 print('Invalid digest number, it should be integer')
+        raise NotImplementedError
+
+    def _ask_guessed_subcategory_index(self,
+                                       question: str,
+                                       indexes_count: int):
+        while True:
+            answer = input(question)
+            if answer.isnumeric():
+                index = int(answer)
+                if 1 <= index <= indexes_count:
+                    return index
+                else:
+                    print(f'Invalid index, it should be between 1 and {indexes_count}')
+                    continue
+            elif answer == 'n':
+                return None
+            else:
+                print(f'Invalid answer, it should be positive integer between 1 and {indexes_count} or "n"')
+                continue
         raise NotImplementedError
 
     def _ask_bool(self, question: str):
