@@ -72,6 +72,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Panfrost',
         'iptables',
         'nftables',
+        'Flatpak',
     ),
     'special': (
         'XCP-NG',
