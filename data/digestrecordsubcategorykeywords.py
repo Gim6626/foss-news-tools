@@ -8,6 +8,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'RedHat',
         'Canonical',
         'Mozilla',
+        'Apache Software Foundation',
+        'Linux Foundation',
     ),
     'diy': (),
     'law': (),
@@ -64,6 +66,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Nitrux',
         'Clonezilla Live',
         'GParted Live',
+        'XigmaNAS',
+        'GeckoLinux',
     ),
     'system': (
         'Grub',
@@ -92,6 +96,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Yum',
         'APT',
         'Zypper',
+        'NFS',
+        'Binutils',
         'GParted',
     ),
     'special': (
@@ -134,6 +140,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Restic',
         'NumPy',
         'MatPlotLib',
+        'Apache CloudStack',
     ),
     'education': (
         'GCompris',
@@ -200,8 +207,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'vulnerabilit',
         'threat',
         'malware',
+        'botnet',
         'эксплойт',
         'strongSwan',
+        'GPG',
     ),
     'devops': (
         'Docker',
@@ -284,6 +293,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Taiga UI',
         'Signal',
         'WebRTC',
+        'Movim',
     ),
     'dev': (
         'Git',
@@ -333,6 +343,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Dotenv-linter',
         'Selenium Grid',
         'Callisto',
+        'ruleguard',
     ),
     'history': (
         'история',
@@ -364,6 +375,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Argos Translate',
         'gedit',
         'Midnight Commander',
+        'Kate',
+        'Thunar',
     ),
     'games': (
         'Lutris',
