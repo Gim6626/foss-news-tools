@@ -12,4 +12,5 @@ RUSSIAN_SOURCES = (
     'ixbt.com',
     '3dnews.ru',
     'ruops.medium.com',
+    'evrone.ru',
 )
