@@ -11,4 +11,5 @@ RUSSIAN_SOURCES = (
     'weeklyosm.eu/ru',
     'ixbt.com',
     '3dnews.ru',
+    'ruops.medium.com',
 )
