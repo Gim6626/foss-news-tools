@@ -158,6 +158,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'ClickHouse',
         'SQL',
         'urm',
+        'MariaDB',
     ),
     'multimedia': (
         'MPV',
@@ -181,6 +182,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Haruna',
         'VLC',
         'Tilt Brush',
+        'Filmulator',
     ),
     'mobile': (
         'Android',
@@ -244,6 +246,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Redpanda',
         'Argo CD',
         'Hadoop',
+        'HAProxy',
     ),
     'data_science': (
         'OpenVINO',
@@ -344,6 +347,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Selenium Grid',
         'Callisto',
         'ruleguard',
+        'GitLab',
     ),
     'history': (
         'история',
