@@ -425,16 +425,16 @@ class DigestRecordsCollection:
             logger.info(f'Processing record "{record.title}" from date {record.dt}:\n{record}')
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
+            if record.digest_number is None:
+                if current_digest_number is None:
+                    record.digest_number = self._ask_digest_number(record)
+                    current_digest_number = record.digest_number
+                else:
+                    record.digest_number = current_digest_number
             if record.state in (DigestRecordState.IN_DIGEST,
                                 DigestRecordState.OUTDATED):
                 if record.is_main is None:
                     record.is_main = self._ask_bool(f'Please input whether or no "{record.title}" is main (y/n): ')
-                if record.digest_number is None:
-                    if current_digest_number is None:
-                        record.digest_number = self._ask_digest_number(record)
-                        current_digest_number = record.digest_number
-                    else:
-                        record.digest_number = current_digest_number
 
                 guessed_category = self._guess_category(record.title)
                 if guessed_category is not None:
