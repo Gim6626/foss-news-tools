@@ -68,6 +68,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'GParted Live',
         'XigmaNAS',
         'GeckoLinux',
+        'JingOS',
+        'линукс',
+        'Solus',
     ),
     'system': (
         'Grub',
@@ -99,6 +102,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'NFS',
         'Binutils',
         'GParted',
+        'Glibc',
+        'Paru',
+        'inetutils',
     ),
     'special': (
         'XCP-NG',
@@ -141,6 +147,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'NumPy',
         'MatPlotLib',
         'Apache CloudStack',
+        'Phoronix Test Suite',
     ),
     'education': (
         'GCompris',
@@ -183,6 +190,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'VLC',
         'Tilt Brush',
         'Filmulator',
+        'Shotcut',
+        'Audacious',
     ),
     'mobile': (
         'Android',
@@ -205,6 +214,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Snort',
         'Libgcrypt',
         'security',
+        'secure',
         'exploit',
         'vulnerabilit',
         'threat',
@@ -213,6 +223,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'эксплойт',
         'strongSwan',
         'GPG',
+        'zero-day',
+        'backdoor',
     ),
     'devops': (
         'Docker',
@@ -247,6 +259,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Argo CD',
         'Hadoop',
         'HAProxy',
+        'Grafana Tempo',
     ),
     'data_science': (
         'OpenVINO',
@@ -264,6 +277,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Deep learning',
         'LightAutoML',
         'LAMA',
+        'PyTorch',
+        'spaCy',
     ),
     'web': (
         'Apache',
@@ -297,6 +312,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Signal',
         'WebRTC',
         'Movim',
+        'Zimbra',
+        'qutebrowser',
+        'curl',
+        'Rocket.Chat',
+        'Rocket Chat',
     ),
     'dev': (
         'Git',
@@ -348,6 +368,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Callisto',
         'ruleguard',
         'GitLab',
+        'D-Bus',
     ),
     'history': (
         'история',
@@ -381,13 +402,16 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Midnight Commander',
         'Kate',
         'Thunar',
+        'MAPS.ME',
+        'Windows Terminal',
+        'Windows Terminal Preview',
     ),
     'games': (
         'Lutris',
         'Verloren',
         'Mindustry',
         'FlightGear',
-        'fheroes',
+        'fheroes2',
         'Bubble Chains',
     ),
     'hardware': (
