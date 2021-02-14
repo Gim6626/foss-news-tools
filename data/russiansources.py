@@ -13,4 +13,5 @@ RUSSIAN_SOURCES = (
     '3dnews.ru',
     'ruops.medium.com',
     'evrone.ru',
+    'tadviser.ru',
 )
