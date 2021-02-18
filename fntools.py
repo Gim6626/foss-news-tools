@@ -368,9 +368,16 @@ class DigestRecordsCollection:
                     output += f'<li>{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}</a>{" (en)" if self._check_url_if_english(releases_record.url) else ""}</li>\n'
                 output += '</ol>\n'
 
-        output += '<h2>Что ещё посмотреть</h2>\n\n'
-        for other_record in output_records[DigestRecordCategory.OTHER.value]:
-            output += f'{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a>{" (en)" if self._check_url_if_english(other_record.url) else ""}<br>\n'
+        if len(output_records[DigestRecordCategory.OTHER.value]):
+            output += '<h2>Что ещё посмотреть</h2>\n\n'
+            if len(output_records[DigestRecordCategory.OTHER.value]) == 1:
+                other_record = output_records[DigestRecordCategory.OTHER.value][0]
+                output += f'{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a>{" (en)" if self._check_url_if_english(other_record.url) else ""}<br>\n'
+            else:
+                output += '<ol>\n'
+                for other_record in output_records[DigestRecordCategory.OTHER.value]:
+                    output += f'<li>{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a>{" (en)" if self._check_url_if_english(other_record.url) else ""}</li>\n'
+                output += '</ol>\n'
 
         logger.info('Converted')
         with open(html_path, 'w') as fout:
