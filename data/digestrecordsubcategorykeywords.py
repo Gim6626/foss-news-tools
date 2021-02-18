@@ -72,6 +72,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'JingOS',
         'линукс',
         'Solus',
+        'Solus Linux',
         'distro',
         'PCLinuxOS',
         'Sailfish',
@@ -80,6 +81,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'helloSystem',
         'OpenMandriva Lx',
         'OpenMandriva',
+        'Devuan',
+        'Siduction',
     ),
     'system': (
         'Grub',
@@ -164,6 +167,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'IPCDump',
         'OpenTaxSolver',
         'pgmpy',
+        'Cantera',
+        'Home Assistant',
+        'Moodle',
+        'Gobblin',
     ),
     'education': (
         'GCompris',
@@ -211,6 +218,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Audacious',
         'Flowblade',
         'QMMP',
+        'Monado',
     ),
     'mobile': (
         'Android',
@@ -236,6 +244,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'secure',
         'exploit',
         'vulnerabilit',
+        'vulnerabl',
         'threat',
         'malware',
         'botnet',
@@ -307,6 +316,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'AI',
         'DL',
         'SuperAnnotate',
+        'VISSL',
     ),
     'web': (
         'Apache',
@@ -349,6 +359,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Viper',
         'Nextcloud',
         'ownCloud',
+        'Drupal',
     ),
     'dev': (
         'Git',
@@ -407,6 +418,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'SmartApp Framework',
         'deno',
         'GitQlient',
+        'Haxe',
+        'Racket',
+        'Vala',
+        'bpftrace',
     ),
     'history': (
         'история',
@@ -447,6 +462,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'Skrooge',
         'HomeBank',
         'gThumb',
+        'CUPS',
+        'Sane',
     ),
     'games': (
         'Cocos Creator',
