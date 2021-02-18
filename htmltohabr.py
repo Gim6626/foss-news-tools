@@ -144,7 +144,13 @@ def main():
                 re_match = re.search(r'(https?://[^<\s]+)(\s+\(en\))?', tag.html_src)
                 if re_match:
                     to_replace = re_match.group(0)
+                    if to_replace[-2:] == '/,':
+                        # OpenNET handling at the conclusion section
+                        to_replace = to_replace[:-1]
                     link = re_match.group(1)
+                    if link[-2:] == '/,':
+                        # OpenNET handling at the conclusion section
+                        link = link[:-1]
                     en = re_match.group(2)
                     processed_html_src = tag.html_src.replace(to_replace,
                                                               f'<a href="{link}">[→{en if en is not None else ""}]</a>')
