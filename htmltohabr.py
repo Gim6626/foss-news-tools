@@ -5,6 +5,8 @@ import argparse
 import logging
 import re
 import html
+import os
+import subprocess
 from enum import Enum
 from typing import (
     List,
@@ -24,17 +26,27 @@ def main():
     # TODO: Remove hardcode
     args = parse_command_line_args()
     logger.setLevel(args.log_level)
-    with open(args.SOURCE, 'r') as fin:
+    if re.search(r'\.html$', args.SOURCE):
+        html_path = args.SOURCE
+        logger.debug('HTML file passed, will work with it')
+    elif re.search(r'\.zip$', args.SOURCE):
+        logger.debug('ZIP archive passed, extracting HTML from it')
+        html_path = html_from_zip(os.path.abspath(args.SOURCE))
+        logger.debug(f'Extracted HTML "{html_path}", will work with it')
+    else:
+        raise Exception('Unsupported SOURCE file type, only HTML and ZIP are supported')
+    logger.debug('Reading HTML')
+    with open(html_path, 'r') as fin:
         src_content = fin.read()
-        src_content_unescaped = html.unescape(src_content)
-        cleaner = lxml_cleaner.Cleaner(safe_attrs=frozenset())
-        src_content_unescaped_cleaned = cleaner.clean_html(src_content_unescaped)
-        src_content_unescaped_cleaned_2 = clear_tags(src_content_unescaped_cleaned,
-                                                     ('a', 'span', 'img', '<ul>', '<ol>'))
+    logger.debug('Processing HTML')
+    src_content_unescaped = html.unescape(src_content)
+    cleaner = lxml_cleaner.Cleaner(safe_attrs=frozenset())
+    src_content_unescaped_cleaned = cleaner.clean_html(src_content_unescaped)
+    src_content_unescaped_cleaned_2 = clear_tags(src_content_unescaped_cleaned,
+                                                 ('a', 'span', 'img', '<ul>', '<ol>'))
     tags_names_for_parsing = (tag_type.value for tag_type in TagType)
     regexps = (tag_regexp_from_tag_name(tag_name) for tag_name in tags_names_for_parsing)
     regexp = '|'.join(regexps)
-    logger.debug(f'Searching for regexp "{regexp}" in source file content')
     # TODO: Maybe we could remove BS from here and requirements, seems that it is not needed
     # bs_obj = BeautifulSoup(src_content_unescaped_cleaned_2)
     # pretty_src_content_unescaped_cleaned_2_prettified = bs_obj.prettify()
@@ -175,6 +187,7 @@ def main():
             tag.html_src = processed_html_src
             tags_fixed.append(tag)
 
+    logger.debug(f'Saving convertation results to "{args.DESTINATION}"')
     with open(args.DESTINATION, 'w') as fout:
         in_list = False
         for tag in tags_fixed:
@@ -203,6 +216,28 @@ def parse_command_line_args():
     args = parser.parse_args()
     args.log_level = logging.DEBUG if args.debug else logging.INFO
     return args
+
+
+def html_from_zip(zip_absolute_path: str):
+    base_tmp_path = '/tmp/fossnews'
+    if not os.path.exists(base_tmp_path):
+        os.mkdir(base_tmp_path)
+    elif not os.path.isdir(base_tmp_path):
+        raise NotImplementedError
+    specific_tmp_path = os.path.join(base_tmp_path, os.path.basename(zip_absolute_path).replace('.zip', ''))
+    cmd = f'unzip -o "{zip_absolute_path}" -d "{specific_tmp_path}"'
+    logger.debug(f'Executing "{cmd}"')
+    proc = subprocess.run(cmd,
+                          shell=True,
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE)
+    if proc.returncode != 0:
+        raise Exception(f'Failed to unzip: {proc.stderr}')
+    logger.debug(f'Extracted HTML to "{specific_tmp_path}"')
+    for file_name in os.listdir(specific_tmp_path):
+        if re.search(r'\.html$', file_name):
+            return f'{specific_tmp_path}/{file_name}'
+    raise Exception('HTML not found in archive')
 
 
 def tag_regexp_from_tag_name(tag_name: str):
