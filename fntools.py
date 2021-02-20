@@ -395,14 +395,24 @@ class DigestRecordsCollection:
                     return DigestRecordCategory.RELEASES
         return None
 
-    def _guess_subcategory(self, title: str) -> List[DigestRecordSubcategory]:
-        guessed_subcategories = []
+    def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
+        guessed_subcategories: List[DigestRecordSubcategory] = []
+        matched_subcategories_keywords = {}
         for subcategory_value, keywords in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
             for keyword in keywords:
                 if keyword.lower() in title.lower():
-                    guessed_subcategories.append(DigestRecordSubcategory(subcategory_value))
-                    break
-        return guessed_subcategories
+                    subcategory_already_matched = False
+                    for guessed_subcategory in guessed_subcategories:
+                        if guessed_subcategory.value == subcategory_value:
+                            subcategory_already_matched = True
+                            break
+                    if not subcategory_already_matched:
+                        guessed_subcategories.append(DigestRecordSubcategory(subcategory_value))
+                    if subcategory_value in matched_subcategories_keywords:
+                        matched_subcategories_keywords[subcategory_value].append(keyword)
+                    else:
+                        matched_subcategories_keywords[subcategory_value] = [keyword]
+        return guessed_subcategories, matched_subcategories_keywords
 
     def categorize_interactively(self):
         current_digest_number = None
@@ -451,8 +461,12 @@ class DigestRecordsCollection:
                         logger.info(f'Setting category of record "{record.title}" to "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
                         record.category = guessed_category
 
-                guessed_subcategories = self._guess_subcategory(record.title)
+                guessed_subcategories, matched_subcategories_keywords = self._guess_subcategory(record.title)
                 if guessed_subcategories:
+                    matched_subcategories_keywords_translated = {}
+                    for matched_subcategory, keywords in matched_subcategories_keywords.items():
+                        matched_subcategories_keywords_translated[DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[matched_subcategory]] = keywords
+                    print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
                     if len(guessed_subcategories) == 1:
                         guessed_subcategory = guessed_subcategories[0]
                         msg = f'Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: '
