@@ -14,4 +14,6 @@ RUSSIAN_SOURCES = (
     'ruops.medium.com',
     'evrone.ru',
     'tadviser.ru',
+    'it-world.ru',
+    'astralinux.ru',
 )
