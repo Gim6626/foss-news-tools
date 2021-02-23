@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from data.digestrecordsubcategorykeywords import DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING
 from data.generalkeywords import GENERAL_KEYWORDS
 from data.lfkeywords import LF_KEYWORDS
