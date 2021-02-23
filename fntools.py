@@ -15,6 +15,7 @@ from typing import List, Dict
 import os
 from pprint import (
     pformat,
+    pprint,
 )
 
 from data.russiansources import *
@@ -156,7 +157,8 @@ class DigestRecord:
                  category: DigestRecordCategory = DigestRecordCategory.UNKNOWN,
                  subcategory: Enum = None,
                  drid: int = None,
-                 is_main: bool = None):
+                 is_main: bool = None,
+                 keywords: List[str] = None):
         self.dt = dt
         self.title = title
         self.url = url
@@ -166,6 +168,7 @@ class DigestRecord:
         self.subcategory = subcategory
         self.drid = drid
         self.is_main = is_main
+        self.keywords = keywords
 
     def __str__(self):
         return pformat(self.to_dict())
@@ -181,6 +184,7 @@ class DigestRecord:
             'digest_number': self.digest_number,
             'category': self.category.value if self.category is not None else None,
             'subcategory': self.subcategory.value if self.subcategory is not None else None,
+            'keywords': self.keywords,
         }
 
 
@@ -275,7 +279,8 @@ class DigestRecordsCollection:
                                          record_plain['url'],
                                          digest_number=record_plain['digest_number'],
                                          drid=record_plain['id'],
-                                         is_main=record_plain['is_main'])
+                                         is_main=record_plain['is_main'],
+                                         keywords=record_plain['keywords'].split(';') if record_plain['keywords'] is not None else [])
             record_object.state = DigestRecordState(record_plain['state'].lower()) if 'state' in record_plain and record_plain['state'] is not None else None
             record_object.category = DigestRecordCategory(record_plain['category'].lower()) if 'category' in record_plain and record_plain['category'] is not None else None
             if 'subcategory' in record_plain and record_plain['subcategory'] == 'DATABASES':
