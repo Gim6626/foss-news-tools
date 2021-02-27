@@ -280,7 +280,7 @@ class DigestRecordsCollection:
                                          digest_number=record_plain['digest_number'],
                                          drid=record_plain['id'],
                                          is_main=record_plain['is_main'],
-                                         keywords=record_plain['keywords'].split(';') if record_plain['keywords'] is not None else [])
+                                         keywords=record_plain['keywords'].split(';') if record_plain['keywords'] else [])
             record_object.state = DigestRecordState(record_plain['state'].lower()) if 'state' in record_plain and record_plain['state'] is not None else None
             record_object.category = DigestRecordCategory(record_plain['category'].lower()) if 'category' in record_plain and record_plain['category'] is not None else None
             if 'subcategory' in record_plain and record_plain['subcategory'] == 'DATABASES':
