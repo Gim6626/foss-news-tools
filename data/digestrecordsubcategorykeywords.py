@@ -1,6 +1,8 @@
 DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'events': (),
-    'intros': (),
+    'intros': (
+        'внедр',
+    ),
     'opening': (),
     'news': (
         'GitHub',
@@ -14,6 +16,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'LF Networking',
         'Mobile Native Foundation',
         'MNF',
+        'Open Mainframe Project',
     ),
     'diy': (),
     'law': (),
@@ -102,6 +105,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'NomadBSD',
         'Qubes OS',
         'Qubes',
+        'SystemRescue',
+        'Debian ISO FastInstall',
+        'Trisquel',
+        'Triskel',
+        'FreeDOS',
+        'ALT',
     ),
     'system': (
         'Grub',
@@ -140,6 +149,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'IPFS',
         'DRBD',
         'fish',
+        'labwc',
+        'coreutils',
+        'journald',
+        'syslog',
+        'Samba',
     ),
     'special': (
         'XCP-NG',
@@ -212,6 +226,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'SAS.Планета',
         'GraphHopper',
         'Daffodil',
+        'Yggdrasil',
+        'gImageReader',
+        'lebowski',
+        'MediaGoblin',
+        'Vitis HLS',
     ),
     'education': (
         'GCompris',
@@ -236,6 +255,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'OrbitDB',
         'database',
         'MongoDB',
+        'Dolt',
     ),
     'multimedia': (
         'MPV',
@@ -271,6 +291,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'MPD',
         'Clapper',
         'Vital',
+        'Rend-o-matic',
     ),
     'mobile': (
         'Android',
@@ -282,6 +303,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         '/e/',
     ),
     'security': (
+        'атака',
         'OpenSSL',
         'OpenPGP',
         'LibreSSL',
@@ -360,6 +382,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'OpenTelemetry',
         'ELK',
         'Cortex',
+        'Linkerd',
+        'Glances',
+        'Istio',
     ),
     'data_science': (
         'OpenVINO',
@@ -402,6 +427,13 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'SciBERT',
         'Julia',
         'ALBERT',
+        'OpenChat',
+        'TensorLy',
+        'BoTorch',
+        'GPyTorch',
+        'ClearML',
+        'Dragonfly',
+        'KGCNN',
     ),
     'web': (
         'Apache',
@@ -456,6 +488,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'NeoChat',
         'Gemini-клиента',
         'Lagrange',
+        'Discord',
+        'Akash MAINNET 2',
+        'qBittorrent',
     ),
     'dev': (
         'Git',
@@ -526,6 +561,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'G-Profiler',
         'Power Fx',
         'GNU Debugger',
+        'Kotlin',
+        'Swift',
     ),
     'history': (
         'история',
@@ -574,6 +611,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'SysMonTask',
         'ONLYOFFICE',
         'ONLYOFFICE Docs',
+        'KDE Apps',
+        '7-zip',
     ),
     'games': (
         'Cocos Creator',
@@ -589,6 +628,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         '0 A.D.',
         'Steam',
         'Steam Link',
+        'Minetest',
     ),
     'hardware': (
         'Raspberry Pi',
