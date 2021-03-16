@@ -393,8 +393,8 @@ class DigestRecordsCollection:
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword in title.lower():
                 return DigestRecordCategory.RELEASES
-        for category, keywords in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
-            for keyword in keywords:
+        for category, keywords_by_type in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
+            for keyword in keywords_by_type['specific']:
                 keyword = keyword.replace('+', r'\+')
                 if re.search(keyword + r'\s+v?\d', title):
                     return DigestRecordCategory.RELEASES
@@ -403,7 +403,8 @@ class DigestRecordsCollection:
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
         guessed_subcategories: List[DigestRecordSubcategory] = []
         matched_subcategories_keywords = {}
-        for subcategory_value, keywords in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
+        for subcategory_value, keywords_by_type in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
+            keywords = keywords_by_type['generic'] + keywords_by_type['specific']
             for keyword in keywords:
                 if keyword.lower() in title.lower():
                     subcategory_already_matched = False

@@ -3,14 +3,19 @@
 from data.digestrecordsubcategorykeywords import DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING
 from data.generalkeywords import GENERAL_KEYWORDS
 from data.lfkeywords import LF_KEYWORDS
+import yaml
 
-keywords = []
-keywords += GENERAL_KEYWORDS
-keywords += LF_KEYWORDS
+keywords = {
+    'generic': [],
+    'specific': [],
+}
+keywords['specific'] += GENERAL_KEYWORDS
+keywords['specific'] += LF_KEYWORDS
 for subcategory, subcategory_keywords in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
-    keywords += subcategory_keywords
+    for keywords_type in ('generic', 'specific'):
+        keywords[keywords_type] += subcategory_keywords[keywords_type]
 
-keywords.sort()
+for keywords_type in ('generic', 'specific'):
+    keywords[keywords_type] = sorted(keywords[keywords_type])
 
-for keyword in keywords:
-    print(keyword)
+print(yaml.dump(keywords))
