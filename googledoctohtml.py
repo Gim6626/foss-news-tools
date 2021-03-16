@@ -21,6 +21,11 @@ from fntools import (
 )
 
 
+class HtmlMode(Enum):
+    HABR = 'habr'
+    PERMLUG = 'permlug'
+
+
 def main():
     # TODO: Refactor
     # TODO: Remove hardcode
@@ -97,8 +102,14 @@ def main():
             toc.items.append(toc_item)
             current_toc_h2_item = toc_item
             current_toc_h3_item = None
+            if args.MODE == HtmlMode.HABR.value:
+                header_html = f'<anchor>{label}</anchor>{tag.html_src}'
+            elif args.MODE == HtmlMode.PERMLUG.value:
+                header_html = f'<a id="{label}"></a>{tag.html_src}'
+            else:
+                raise NotImplementedError
             tag_with_label = Tag(tag.ttype,
-                                 f'<anchor>{label}</anchor>{tag.html_src}',
+                                 header_html,
                                  label)
             tags_fixed.append(tag_with_label)
         elif tag.ttype == TagType.H3:
@@ -118,8 +129,14 @@ def main():
             toc_item = TocItem(tag.ttype, tag.cleared_html_src, [], label)
             current_toc_h2_item.subitems.append(toc_item)
             current_toc_h3_item = toc_item
+            if args.MODE == HtmlMode.HABR.value:
+                header_html = f'<anchor>{label}</anchor>{tag.html_src}'
+            elif args.MODE == HtmlMode.PERMLUG.value:
+                header_html = f'<a id="{label}"></a>{tag.html_src}'
+            else:
+                raise NotImplementedError
             tag_with_label = Tag(tag.ttype,
-                                 f'<anchor>{label}</anchor>{tag.html_src}',
+                                 header_html,
                                  label)
             tags_fixed.append(tag_with_label)
         elif tag.ttype == TagType.H4:
@@ -133,8 +150,14 @@ def main():
                 raise NotImplementedError
             toc_item = TocItem(tag.ttype, tag.cleared_html_src, [], label)
             current_toc_h3_item.subitems.append(toc_item)
+            if args.MODE == HtmlMode.HABR.value:
+                header_html = f'<anchor>{label}</anchor>{tag.html_src}'
+            elif args.MODE == HtmlMode.PERMLUG.value:
+                header_html = f'<a id="{label}"></a>{tag.html_src}'
+            else:
+                raise NotImplementedError
             tag_with_label = Tag(tag.ttype,
-                                 f'<anchor>{label}</anchor>{tag.html_src}',
+                                 header_html,
                                  label)
             tags_fixed.append(tag_with_label)
         else:
@@ -149,7 +172,12 @@ def main():
             elif 'Категория:' in tag.html_src:
                 re_match = re.search(r'Категория:\s+([^<$]+)', tag.html_src)
                 if re_match:
-                    processed_html_src = f'<i><b>Категория:</b> {re_match.group(1)}</i>'
+                    if args.MODE == HtmlMode.HABR.value:
+                        processed_html_src = f'<i><b>Категория:</b> {re_match.group(1)}</i>'
+                    elif args.MODE == HtmlMode.PERMLUG.value:
+                        processed_html_src = f'<em><strong>Категория:</strong> {re_match.group(1)}</em>'
+                    else:
+                        raise NotImplementedError
                 else:
                     raise NotImplementedError
             elif len(re.findall('https?://', tag.html_src)) == 1:
@@ -209,6 +237,9 @@ def parse_command_line_args():
                         '--debug',
                         action='store_true',
                         help='Enable debugging output')
+    parser.add_argument('MODE',
+                        help='HTML mode',
+                        choices=[mode.value for mode in HtmlMode])
     parser.add_argument('SOURCE',
                         help='Source file')
     parser.add_argument('DESTINATION',
