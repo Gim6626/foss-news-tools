@@ -406,7 +406,7 @@ class DigestRecordsCollection:
         for subcategory_value, keywords_by_type in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
             keywords = keywords_by_type['generic'] + keywords_by_type['specific']
             for keyword in keywords:
-                if keyword.lower() in title.lower():
+                if re.search(rf'\b{re.escape(keyword.lower())}\b', title.lower()):
                     subcategory_already_matched = False
                     for guessed_subcategory in guessed_subcategories:
                         if guessed_subcategory.value == subcategory_value:
