@@ -521,7 +521,7 @@ class DigestRecordsCollection:
                                     })
             if result.status_code != 200:
                 raise Exception(f'Invalid response code from FNGS patch - {result.status_code}: {result.content.decode("utf-8")}')
-            logger.info(f'Uploaded record #{record.drid} to FNGS')
+            logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_number} to FNGS')
             logger.info(f'If you want to change some parameters that you\'ve set - go to http://fn.permlug.org/admin/gatherer/digestrecord/{record.drid}/change/')
 
     def _ask_state(self, record: DigestRecord):
