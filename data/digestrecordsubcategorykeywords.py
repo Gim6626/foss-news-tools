@@ -42,10 +42,16 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'generic': (
             'ОС',
             'дистрибутив',
+            'дистрибутива',
             'distributive',
             'distro',
         ),
         'specific': (
+            'JingOS',
+            'KernelCI',
+            'Asahi Linux',
+            'GNU Mes',
+            'Mes',
             '4MLinux',
             'Armbian',
             'GhostBSD',
@@ -137,12 +143,17 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'system': {
         'generic': (),
         'specific': (
+            'PF',
+            'PulseAudio',
+            'zlib',
+            'zlib-ng',
             'Grub',
             'Grub2',
             'systemd',
             'Xorg',
             'Mir',
             'Wayland',
+            'XWayland',
             'PowerShell',
             'Guix',
             'bash',
@@ -183,6 +194,13 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'RudderStack',
+            'Sphinx Search',
+            'Sphinx',
+            'Apache OpenMeetings',
+            'OpenMeetings',
+            'Kooha',
+            'LeoCAD',
             'XCP-NG',
             'Proxmox',
             'Coq',
@@ -276,6 +294,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'СУБД',
         ),
         'specific': (
+            'TerminusDB',
             'libmdbx',
             'PostgreSQL',
             'MySQL',
@@ -295,9 +314,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'sK1',
+            'Audacity',
             'MPV',
             'Ardour',
-            'PulseAudio',
             'Paint',
             'LazPaint',
             'GIMP',
@@ -347,7 +367,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'generic': (
             'атака',
             'VPN',
-            'уязвим',
+            'уязвимость',
             'вирус',
             'security',
             'secure',
@@ -359,8 +379,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'zero-day',
             'backdoor',
             'утечка',
+            'vulnerability',
+            'vulnerable',
+            'vulnerabilities',
         ),
         'specific': (
+            'ovpn-admin',
             'OpenSSL',
             'OpenPGP',
             'LibreSSL',
@@ -370,8 +394,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Mozilla VPN',
             'Snort',
             'Libgcrypt',
-            'vulnerabilit',
-            'vulnerabl',
             'strongSwan',
             'GPG',
             'Bitwarden',
@@ -388,6 +410,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'Mirantis Lens',
+            'Lens',
+            'k6',
+            'ossh',
             'Docker',
             'Kubernetes',
             'Terraform',
@@ -417,6 +443,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Redpanda',
             'Argo CD',
             'Hadoop',
+            'Hudi',
             'HAProxy',
             'Grafana Tempo',
             'Octopod',
@@ -446,6 +473,16 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Neural',
         ),
         'specific': (
+            'PyKeen',
+            'PyVista',
+            'Kornia',
+            'Real-time Voice Cloning',
+            'ELECTRA',
+            'Torch-Points3D',
+            'Wave ML',
+            'Kubeflow',
+            'TensorFlow Extended',
+            'TFX',
             'OpenVINO',
             'NlpCraft',
             'TensorFlow',
@@ -494,6 +531,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'web': {
         'generic': (),
         'specific': (
+            'Mojolicious',
+            'RetroShare',
+            'links',
             'Apache',
             'Nginx',
             'Firefox',
@@ -554,6 +594,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'PascalABC.NET',
+            'Arrow',
+            'PeachPie',
+            'WebAssembly',
+            'Viztracer',
             'Git',
             'Kivy',
             'BPF',
@@ -633,7 +678,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'specific': (),
     },
     'management': {
-        'generic': (),
+        'generic': (
+            'management',
+            'менеджмент',
+        ),
         'specific': (
             'RunaWFE Free',
         ),
@@ -641,6 +689,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'user': {
         'generic': (),
         'specific': (
+            'aptitude',
+            'gdu',
             'LibreOffice',
             'Cinnamon',
             'Regolith',
@@ -707,6 +757,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'hardware': {
         'generic': (),
         'specific': (
+            'Cosmic Pi',
+            'Kubuntu Focus',
             'Raspberry Pi',
             'bladeRF-wiphy',
         ),
