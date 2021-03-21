@@ -16,4 +16,6 @@ RUSSIAN_SOURCES = (
     'tadviser.ru',
     'it-world.ru',
     'astralinux.ru',
+    'ferra.ru',
+    'rbc.ru',
 )
