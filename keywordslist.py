@@ -16,6 +16,6 @@ for subcategory, subcategory_keywords in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPP
         keywords[keywords_type] += subcategory_keywords[keywords_type]
 
 for keywords_type in ('generic', 'specific'):
-    keywords[keywords_type] = sorted(keywords[keywords_type])
+    keywords[keywords_type] = sorted(list(set(keywords[keywords_type])))
 
 print(yaml.dump(keywords))
