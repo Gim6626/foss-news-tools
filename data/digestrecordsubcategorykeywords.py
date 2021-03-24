@@ -47,6 +47,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'Garuda',
+            'Deepin',
+            'Deepin Linux',
+            'Porteus Kiosk',
             'JingOS',
             'KernelCI',
             'Asahi Linux',
@@ -194,6 +198,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'FreeCAD',
             'RudderStack',
             'Sphinx Search',
             'Sphinx',
@@ -292,8 +297,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'generic': (
             'SQL',
             'СУБД',
+            'database',
         ),
         'specific': (
+            'Presto',
+            'Apache Pinot',
+            'Pinot',
             'TerminusDB',
             'libmdbx',
             'PostgreSQL',
@@ -306,7 +315,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'urm',
             'MariaDB',
             'OrbitDB',
-            'database',
             'MongoDB',
             'Dolt',
         ),
@@ -314,6 +322,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'Celluloid',
             'sK1',
             'Audacity',
             'MPV',
@@ -365,8 +374,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     },
     'security': {
         'generic': (
+            'attack',
             'атака',
             'VPN',
+            'безопасность',
             'уязвимость',
             'вирус',
             'security',
@@ -473,12 +484,17 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Neural',
         ),
         'specific': (
+            'Catalyst',
+            'THiNC',
+            'Spleeter',
+            'Orbit',
             'PyKeen',
             'PyVista',
             'Kornia',
             'Real-time Voice Cloning',
             'ELECTRA',
             'Torch-Points3D',
+            'Wave',
             'Wave ML',
             'Kubeflow',
             'TensorFlow Extended',
@@ -586,7 +602,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'NeoChat',
             'Gemini-клиента',
             'Lagrange',
-            'Discord',
             'Akash MAINNET 2',
             'qBittorrent',
         ),
@@ -594,6 +609,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'Crystal',
             'PascalABC.NET',
             'Arrow',
             'PeachPie',
@@ -689,6 +705,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'user': {
         'generic': (),
         'specific': (
+            'KDE Gear',
+            'KDE Applications',
+            'newsboat',
+            'PeaZip',
             'aptitude',
             'gdu',
             'LibreOffice',
@@ -749,8 +769,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Bubble Chains',
             'Godot Engine',
             '0 A.D.',
-            'Steam',
-            'Steam Link',
             'Minetest',
         ),
     },
