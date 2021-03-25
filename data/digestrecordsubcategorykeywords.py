@@ -28,6 +28,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Mobile Native Foundation',
             'MNF',
             'Open Mainframe Project',
+            'Eclipse Foundation',
         ),
     },
     'diy': {
@@ -47,6 +48,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'OpenHarmony',
+            'Manjaro Linux',
+            'Manjaro',
+            'Plan9',
+            'SONiC',
             'Garuda',
             'Deepin',
             'Deepin Linux',
@@ -147,6 +153,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'system': {
         'generic': (),
         'specific': (
+            'Monitorix',
             'PF',
             'PulseAudio',
             'zlib',
@@ -198,6 +205,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'lightsquid',
+            'RetroArch',
             'FreeCAD',
             'RudderStack',
             'Sphinx Search',
@@ -484,6 +493,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Neural',
         ),
         'specific': (
+            'Vowpal Wabbit',
+            'SelfTime',
             'Catalyst',
             'THiNC',
             'Spleeter',
@@ -624,7 +635,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Node.js',
             'JavaScript',
             'Electron',
-            'make',
+            # 'make',
             'GNU Make',
             'goredo',
             'PHP',
