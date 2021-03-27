@@ -46,7 +46,7 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 
 class BasicPostsStatisticsGetter(metaclass=ABCMeta):
 
-    GET_TIMEOUT_SECONDS = 10
+    GET_TIMEOUT_SECONDS = 30
     SLEEP_BETWEEN_ATTEMPTS_SECONDS = 5
     GET_ATTEMPTS = 5
 
