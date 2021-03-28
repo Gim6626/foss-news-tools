@@ -48,6 +48,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'Sculpt',
             'OpenHarmony',
             'Manjaro Linux',
             'Manjaro',
@@ -205,6 +206,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'XRDP',
+            'SpamAssassin',
             'lightsquid',
             'RetroArch',
             'FreeCAD',
@@ -250,6 +253,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'PyCubed',
             'SSH',
             'SSHFS',
+            'WindTerm',
             'EiskaltDC++',
             'Restic',
             'NumPy',
@@ -309,6 +313,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'database',
         ),
         'specific': (
+            'Cassandra',
             'Presto',
             'Apache Pinot',
             'Pinot',
@@ -331,6 +336,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'SAIL',
             'Celluloid',
             'sK1',
             'Audacity',
@@ -430,6 +436,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'OpenNebula',
             'Mirantis Lens',
             'Lens',
             'k6',
@@ -438,6 +445,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Kubernetes',
             'Terraform',
             'Kafka',
+            'Pulsar',
             'RabbitMQ',
             'Prometheus',
             'Vault',
@@ -493,6 +501,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Neural',
         ),
         'specific': (
+            'AmpliGraph',
+            'DVC',
+            'Neural Body',
+            'neuralbody',
+            'CoreMLTools',
             'Vowpal Wabbit',
             'SelfTime',
             'Catalyst',
@@ -563,6 +576,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'links',
             'Apache',
             'Nginx',
+            'Nginx Unit',
             'Firefox',
             'Chrome',
             'SeaMonkey',
@@ -620,6 +634,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'Gradle',
             'Crystal',
             'PascalABC.NET',
             'Arrow',
@@ -716,6 +731,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'user': {
         'generic': (),
         'specific': (
+            'GNOME Commander',
             'KDE Gear',
             'KDE Applications',
             'newsboat',
