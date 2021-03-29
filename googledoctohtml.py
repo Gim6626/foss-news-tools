@@ -168,7 +168,8 @@ def main():
                 else:
                     raise Exception(f'Bad string "{tag.html_src}" format')
             elif 'Подписывайтесь на наш' in tag.html_src:
-                processed_html_src = '<p>Подписывайтесь на <a href="https://t.me/permlug_channel">наш Telegram канал</a>, <a href="https://vk.com/permlug">группу ВКонтакте</a> или <a href="http://permlug.org/rss">RSS</a> чтобы не пропустить новые выпуски FOSS News.</p>'
+                # TODO: Remove hardcode, process text from source document
+                processed_html_src = '<p>Подписывайтесь на наш Telegram канал <a href="https://t.me/permlug">наш Telegram канал</a> или <a href="http://permlug.org/rss">RSS</a> чтобы не пропустить новые выпуски FOSS News. Также мы есть во всех основных соцсетях:</p>'
             elif 'Категория:' in tag.html_src:
                 re_match = re.search(r'Категория:\s+([^<$]+)', tag.html_src)
                 if re_match:
