@@ -127,7 +127,7 @@ class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
         super().__init__()
         self.source_name = 'VK'
         self._posts_urls = {}
-        self._posts_count = len(HABR_POSTS) + 1
+        self._posts_count = 1
 
     @property
     def posts_urls(self):
