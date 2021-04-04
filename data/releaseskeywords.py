@@ -1,4 +1,5 @@
 RELEASES_KEYWORDS = (
+    'release',
     'обновление',
     'релиз',
     'выпуск',

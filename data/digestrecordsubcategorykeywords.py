@@ -1,11 +1,15 @@
 DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'events': {
-        'generic': (),
+        'generic': (
+            'митап',
+            'конференция',
+            'встреча',
+        ),
         'specific': (),
     },
     'intros': {
         'generic': (
-            'внедр',
+            'внедрение',
         ),
         'specific': (),
     },
@@ -48,6 +52,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'Parrot',
+            'Makulu',
+            'MakuluLinux',
+            'LinDoz',
             'Sculpt',
             'OpenHarmony',
             'Manjaro Linux',
@@ -206,6 +214,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'Apache Spark',
+            'Spark',
+            'Cygwin',
             'XRDP',
             'SpamAssassin',
             'lightsquid',
@@ -313,6 +324,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'database',
         ),
         'specific': (
+            'Apache Ignite',
+            'Ignite',
             'Cassandra',
             'Presto',
             'Apache Pinot',
@@ -336,6 +349,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'digiKam',
             'SAIL',
             'Celluloid',
             'sK1',
@@ -376,8 +390,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         ),
     },
     'mobile': {
-        'generic': (),
+        'generic': (
+            'смартфон',
+            'телефон',
+        ),
         'specific': (
+            'LineageOS',
             'Android',
             'Ubuntu Touch',
             'Plasma Mobile',
@@ -393,6 +411,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'атака',
             'VPN',
             'безопасность',
+            'бэкдор',
             'уязвимость',
             'вирус',
             'security',
@@ -436,6 +455,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'Filebeat',
+            'Kubestr',
             'OpenNebula',
             'Mirantis Lens',
             'Lens',
@@ -499,8 +520,26 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'AI',
             'DL',
             'Neural',
+            'data science',
         ),
         'specific': (
+            'NeX',
+            'Open3D',
+            'HiSD',
+            'PaddleSeg',
+            'Mayavi',
+            'BigGAN',
+            'TensorForce',
+            'Cesium',
+            'Featuretools',
+            'TSFRESH',
+            'PM4Py',
+            'Lux',
+            'PyOD',
+            'PyFlux',
+            'TimeSynth',
+            'Sktime',
+            'Darts',
             'AmpliGraph',
             'DVC',
             'Neural Body',
@@ -532,7 +571,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'MLflow',
             'Apache Kylin',
             'Apache Superset',
-            'data science',
             'AI Fairness 360',
             'AIF360',
             'AI Explainability 360',
@@ -571,6 +609,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'web': {
         'generic': (),
         'specific': (
+            'Proxmox Mail Gateway',
             'Mojolicious',
             'RetroShare',
             'links',
@@ -634,6 +673,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'grex',
+            'IPython',
+            'Jupyter',
+            'QGit',
+            'WebKitGTK',
             'Gradle',
             'Crystal',
             'PascalABC.NET',
@@ -731,6 +775,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'user': {
         'generic': (),
         'specific': (
+            'moe',
+            'NewsFlash',
             'GNOME Commander',
             'KDE Gear',
             'KDE Applications',
