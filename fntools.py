@@ -188,6 +188,7 @@ class DigestRecord:
         }
 
 
+# TODO: Refactor
 class DigestRecordsCollection:
 
     def __init__(self,
@@ -202,6 +203,10 @@ class DigestRecordsCollection:
 
     def __str__(self):
         return pformat([record.to_dict() for record in self.records])
+
+    @property
+    def api_url(self):
+        return f'http://{self._host}:{self._port}/api/v1'
 
     def save_to_yaml(self, yaml_path: str):
         records_plain = []
@@ -500,13 +505,49 @@ class DigestRecordsCollection:
                         record.subcategory = self._ask_subcategory(record,
                                                                    DIGEST_RECORD_SUBCATEGORY_RU_MAPPING)
 
+                if record.category is not None \
+                        and record.subcategory is not None:
+                    current_records_with_similar_categories = self._similar_digest_records(record.digest_number,
+                                                                                           record.category,
+                                                                                           record.subcategory)
+                    if current_records_with_similar_categories:
+                        print(f'Are there any duplicates for digest record "{record.title}"? Here is list of possible ones:')
+                        i = 1
+                        options_indexes = []
+                        for option in current_records_with_similar_categories['duplicates']:
+                            print(f'{i}. {"; ".join([dr["title"] + " " + dr["url"] for dr in option["digest_records"]])}')
+                            options_indexes.append(option['id'])
+                            i += 1
+                        for option in current_records_with_similar_categories['records']:
+                            print(f'{i}. {option["title"]} {option["url"]}')
+                            options_indexes.append(option['id'])
+                            i += 1
+                        option_index = self._ask_option_index_or_no(i - 1)
+                        if option_index is not None:
+                            if option_index <= len(current_records_with_similar_categories['duplicates']):
+                                existing_drids = None
+                                for option in current_records_with_similar_categories['duplicates']:
+                                    if option['id'] == options_indexes[option_index - 1]:
+                                        existing_drids = [dr['id'] for dr in option['digest_records']]
+                                self._add_digest_record_do_duplicate(options_indexes[option_index - 1], existing_drids, record.drid)
+                                logger.info('Added to duplicate')  # TODO: More details
+                            else:
+                                option_index_corrected = option_index - len(current_records_with_similar_categories['duplicates'])
+                                self._create_digest_record_duplicate([options_indexes[option_index_corrected - 1], record.drid])
+                                logger.info('New duplicate created')  # TODO: More details
+                        else:
+                            logger.info('No duplicates specified')
+                    else:
+                        logger.info('Similar digest records not found')
+
+
             if record in self._filtered_records:
                 records_left_to_process -= 1
                 if records_left_to_process > 0:
                     logger.info(f'{records_left_to_process} record(s) left to process')
 
             logger.info(f'Uploading record #{record.drid} to FNGS')
-            result = requests.patch(f'http://{self._host}:{self._port}/api/v1/digest-records/{record.drid}/',
+            result = requests.patch(f'{self.api_url}/digest-records/{record.drid}/',
                                     data=json.dumps({
                                         'id': record.drid,
                                         'state': record.state.name if record.state is not None else None,
@@ -526,6 +567,21 @@ class DigestRecordsCollection:
 
     def _ask_state(self, record: DigestRecord):
         return self._ask_enum('digest record state', DigestRecordState, record)
+
+    def _ask_option_index_or_no(self, max_index):
+        while True:
+            option_index_str = input(f'Please input option number or "n" to skip: ')
+            if option_index_str.isnumeric():
+                option_index = int(option_index_str)
+                if 0 < option_index <= max_index:
+                    return option_index
+                else:
+                    logger.error(f'Index should be positive and not more than {max_index}')
+            elif option_index_str == 'n':
+                return None
+            else:
+                print('Invalid index, it should be integer')
+        raise NotImplementedError
 
     def _ask_digest_number(self, record: DigestRecord):
         while True:
@@ -581,6 +637,143 @@ class DigestRecordsCollection:
             return self._ask_enum(enum_name, DigestRecordSubcategory, record, translations)
         else:
             raise NotImplementedError
+
+    def _similar_digest_records(self,
+                                digest_number,
+                                category,
+                                subcategory):
+        logger.info(f'Getting similar records for digest number #{digest_number}, category "{category}" and subcategory "{subcategory}"')
+        url = f'{self.api_url}/similar-digest-records/?digest_number={digest_number}&category={category.name}&subcategory={subcategory.name}'
+        # TODO: Make debug
+        logger.info(f'Getting URL {url}')
+        result = requests.get(url,
+                              headers={
+                                  'Authorization': f'Bearer {self._token}',
+                                  'Content-Type': 'application/json',
+                              })
+        if result.status_code != 200:
+            logger.error(f'Failed to retrieve similar digest records, status code {result.status_code}, response: {result.content}')
+            # TODO: Raise exception
+            return None
+        response_str = result.content.decode()
+        response = json.loads(response_str)
+        if not response:
+            logger.info('No similar records found')
+            return None
+        options_duplicates_brief = []
+        options_records = []
+        for similar_record_i, similar_record in enumerate(response):
+            duplicates_object = self._duplicates_by_digest_record(similar_record['id'])
+            if duplicates_object:
+                options_duplicates_brief.append(duplicates_object)
+            else:
+                options_records.append({'id': similar_record['id'], 'title': similar_record['title'], 'url': similar_record['url']})
+        options_duplicates = []
+        for option_duplicate_brief in options_duplicates_brief:
+            duplicate_digest_records = []
+            for duplicate_digest_record_id in option_duplicate_brief['digest_records']:
+                duplicate_digest_record = self._digest_record_by_id(duplicate_digest_record_id)
+                if duplicate_digest_record:
+                    duplicate_digest_records.append({'id': duplicate_digest_record['id'], 'title': duplicate_digest_record['title'], 'url': duplicate_digest_record['url']})
+            exists = False
+            for option_duplicates in options_duplicates:
+                if option_duplicates['id'] == option_duplicate_brief['id']:
+                    exists = True
+                    break
+            if not exists:
+                options_duplicates.append({'id': option_duplicate_brief['id'], 'digest_records': duplicate_digest_records})
+        return {
+            'duplicates': options_duplicates,
+            'records': options_records,
+        }
+
+    def _add_digest_record_do_duplicate(self, duplicate_id, existing_drids, digest_record_id):
+        # TODO: Make debug
+        logger.info(f'Adding digest record #{digest_record_id} to duplicate #{duplicate_id}')
+        # TODO: Make debug
+        url = f'{self.api_url}/digest-records-duplicates/{duplicate_id}/'
+        data = {
+            'id': duplicate_id,
+            'digest_records': existing_drids + [digest_record_id],
+        }
+        logger.info(f'PATCHing URL {url} with data {data}')
+        result = requests.patch(url,
+                                data=json.dumps(data),
+                                headers={
+                                    'Authorization': f'Bearer {self._token}',
+                                    'Content-Type': 'application/json',
+                                })
+        if result.status_code != 200:
+            logger.error(f'Failed to update digest record duplicate, status code {result.status_code}, response: {result.content}')
+            # TODO: Raise exception
+
+    def _create_digest_record_duplicate(self, digest_records_ids):
+        # TODO: Make debug
+        logger.info(f'Creating digest record duplicate from #{digest_records_ids}')
+        # TODO: Make debug
+        url = f'{self.api_url}/digest-records-duplicates/'
+        data = {
+            'digest_records': digest_records_ids,
+        }
+        logger.info(f'POSTing data {data} to URL {url}')
+        result = requests.post(url,
+                               data=json.dumps(data),
+                               headers={
+                                   'Authorization': f'Bearer {self._token}',
+                                   'Content-Type': 'application/json',
+                               })
+        if result.status_code != 201:
+            logger.error(f'Failed to create digest record duplicate, status code {result.status_code}, response: {result.content}')
+            # TODO: Raise exception
+
+    def _digest_record_by_id(self, digest_record_id):
+        # TODO: Make debug
+        logger.info(f'Loading digest record #{digest_record_id}')
+        # TODO: Make debug
+        url = f'{self.api_url}/digest-records/{digest_record_id}'
+        logger.info(f'Getting URL {url}')
+        result = requests.get(url,
+                              headers = {
+                                  'Authorization': f'Bearer {self._token}',
+                                  'Content-Type': 'application/json',
+                              })
+        if result.status_code != 200:
+            logger.error(f'Failed to retrieve digest record, status code {result.status_code}, response: {result.content}')
+            # TODO: Raise exception
+            return None
+        # TODO: Make debug
+        logger.info(f'Received response: {result.content}')
+        response_str = result.content.decode()
+        response = json.loads(response_str)
+        if not response:
+            # TODO: Raise exception
+            logger.error('No digest record in response')
+            return None
+        return response
+
+    def _duplicates_by_digest_record(self, digest_record_id):
+        # TODO: Make debug
+        logger.info(f'Checking if there are duplicates for digest record #{digest_record_id}')
+        url = f'{self.api_url}/duplicates-by-digest-record/?digest_record={digest_record_id}'
+        # TODO: Make debug
+        logger.info(f'Getting URL {url}')
+        result = requests.get(url,
+                              headers={
+                                  'Authorization': f'Bearer {self._token}',
+                                  'Content-Type': 'application/json',
+                              })
+        if result.status_code != 200:
+            logger.error(f'Failed to retrieve similar digest records, status code {result.status_code}, response: {result.content}')
+            # TODO: Raise exception
+            return None
+        # TODO: Make debug
+        logger.info(f'Received response: {result.content}')
+        response_str = result.content.decode()
+        response = json.loads(response_str)
+        if not response:
+            logger.info('No duplicates found')
+            return None
+        return response[0] # TODO: Handle multiple case
 
     def _ask_enum(self,
                   enum_name,
