@@ -499,7 +499,7 @@ class DigestRecordsCollection:
                     if record.category != DigestRecordCategory.OTHER:
                         record.subcategory = self._ask_subcategory(record,
                                                                    DIGEST_RECORD_SUBCATEGORY_RU_MAPPING)
-            self._make_backup()
+
             if record in self._filtered_records:
                 records_left_to_process -= 1
                 if records_left_to_process > 0:
@@ -614,14 +614,3 @@ class DigestRecordsCollection:
                 print('Invalid index, it should be integer')
                 continue
         raise NotImplementedError
-
-    def _make_backup(self):
-        backup_dir_name = 'backups'
-        backup_dir_path = os.path.join(SCRIPT_DIRECTORY,
-                                       backup_dir_name)
-        if not os.path.exists(backup_dir_path):
-            os.mkdir(backup_dir_path)
-        current_datetime_stamp_str = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        backup_path = os.path.join(backup_dir_path,
-                                   f'{current_datetime_stamp_str}.yaml')
-        self.save_to_yaml(backup_path)
