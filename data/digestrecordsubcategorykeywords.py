@@ -20,6 +20,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'news': {
         'generic': (),
         'specific': (
+            'Gitpod',
+            'FinOps Foundation',
             'GitHub',
             'Red Hat',
             'RedHat',
@@ -52,6 +54,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'FreeBSD',
+            'webOS Open Source Edition',
             'Parrot',
             'Makulu',
             'MakuluLinux',
@@ -93,6 +97,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Void Linux',
             'NethServer',
             'OpenWRT',
+            'DD-WRT',
             'Raspberry Pi OS',
             'T2 SDE',
             'CentOS',
@@ -162,6 +167,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'system': {
         'generic': (),
         'specific': (
+            'Sway',
+            'wlroots',
             'Monitorix',
             'PF',
             'PulseAudio',
@@ -214,6 +221,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'groff',
+            'DDSP',
+            'L2TP',
+            'libp2p',
+            'TeX',
+            'TeX Live',
             'Apache Spark',
             'Spark',
             'Cygwin',
@@ -243,7 +256,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Cutter',
             'radare2',
             'Rizin',
-            'FFmpeg',
             'Bareos',
             'Airflow',
             'Stellarium',
@@ -349,6 +361,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'OpenToonz',
+            'FFmpeg',
+            'Lyra',
             'digiKam',
             'SAIL',
             'Celluloid',
@@ -413,6 +428,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'безопасность',
             'бэкдор',
             'уязвимость',
+            'уязвимости',
             'вирус',
             'security',
             'secure',
@@ -429,6 +445,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'vulnerabilities',
         ),
         'specific': (
+            'Kubesploit',
+            'ClamAV',
             'ovpn-admin',
             'OpenSSL',
             'OpenPGP',
@@ -440,6 +458,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Snort',
             'Libgcrypt',
             'strongSwan',
+            'Kleopatra',
+            'GnuPG',
             'GPG',
             'Bitwarden',
             'wolfSSL',
@@ -455,6 +475,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'Mesos',
+            'Tinkerbell',
             'Filebeat',
             'Kubestr',
             'OpenNebula',
@@ -523,6 +545,13 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'data science',
         ),
         'specific': (
+            'Pykg2vec',
+            'TensorFlow Quantum',
+            'TFQ',
+            'Featuretools',
+            'Giotto-TDA',
+            'NeuralTracking',
+            'GPT-Neo',
             'NeX',
             'Open3D',
             'HiSD',
@@ -609,6 +638,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'web': {
         'generic': (),
         'specific': (
+            'ArchiveBox',
             'Proxmox Mail Gateway',
             'Mojolicious',
             'RetroShare',
@@ -673,6 +703,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'LLVM',
+            'HPVM',
+            'Chipmunk',
+            'NativeScript',
+            'Ergo',
+            'CPython',
             'grex',
             'IPython',
             'Jupyter',
@@ -775,6 +811,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'user': {
         'generic': (),
         'specific': (
+            'Worker',
+            'Getting Things GNOME',
             'moe',
             'NewsFlash',
             'GNOME Commander',
@@ -794,6 +832,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Xfce',
             'Budgie',
             '4Pane',
+            'bspwm',
             'IceWM',
             'Camelot',
             'nano',
@@ -831,6 +870,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'games': {
         'generic': (),
         'specific': (
+            'Warzone 2100',
             'Cocos Creator',
             'Lutris',
             'Verloren',
