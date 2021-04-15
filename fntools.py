@@ -401,7 +401,7 @@ class DigestRecordsCollection:
         for category, keywords_by_type in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
             for keyword in keywords_by_type['specific']:
                 keyword = keyword.replace('+', r'\+')
-                if re.search(keyword + r'\s+v?\d', title):
+                if re.search(keyword + r'\s+v?\d', title, re.IGNORECASE):
                     return DigestRecordCategory.RELEASES
         return None
 
