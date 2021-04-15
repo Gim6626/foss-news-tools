@@ -532,8 +532,7 @@ class DigestRecordsCollection:
                                 self._add_digest_record_do_duplicate(options_indexes[option_index - 1], existing_drids, record.drid)
                                 logger.info('Added to duplicate')  # TODO: More details
                             else:
-                                option_index_corrected = option_index - len(current_records_with_similar_categories['duplicates'])
-                                self._create_digest_record_duplicate([options_indexes[option_index_corrected - 1], record.drid])
+                                self._create_digest_record_duplicate([options_indexes[option_index - 1], record.drid])
                                 logger.info('New duplicate created')  # TODO: More details
                         else:
                             logger.info('No duplicates specified')
