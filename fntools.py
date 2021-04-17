@@ -532,7 +532,7 @@ class DigestRecordsCollection:
                                 self._add_digest_record_do_duplicate(options_indexes[option_index - 1], existing_drids, record.drid)
                                 logger.info('Added to duplicate')  # TODO: More details
                             else:
-                                self._create_digest_record_duplicate([options_indexes[option_index - 1], record.drid])
+                                self._create_digest_record_duplicate(record.digest_number, [options_indexes[option_index - 1], record.drid])
                                 logger.info('New duplicate created')  # TODO: More details
                         else:
                             logger.info('No duplicates specified')
@@ -706,12 +706,16 @@ class DigestRecordsCollection:
             logger.error(f'Failed to update digest record duplicate, status code {result.status_code}, response: {result.content}')
             # TODO: Raise exception
 
-    def _create_digest_record_duplicate(self, digest_records_ids):
+    def _create_digest_record_duplicate(self,
+                                        digest_number,
+                                        digest_records_ids,
+                                        ):
         # TODO: Make debug
         logger.info(f'Creating digest record duplicate from #{digest_records_ids}')
         # TODO: Make debug
         url = f'{self.api_url}/digest-records-duplicates/'
         data = {
+            'digest_number': digest_number,
             'digest_records': digest_records_ids,
         }
         logger.info(f'POSTing data {data} to URL {url}')
