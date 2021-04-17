@@ -54,6 +54,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'LKRG',
+            'Slackware',
             'FreeBSD',
             'webOS Open Source Edition',
             'Parrot',
@@ -167,6 +169,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'system': {
         'generic': (),
         'specific': (
+            'X.Org Server',
             'Sway',
             'wlroots',
             'Monitorix',
@@ -221,6 +224,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'EDA',
+            'Xen',
+            'Sigil',
             'groff',
             'DDSP',
             'L2TP',
@@ -262,8 +268,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'lsFusion',
             'BusyBox',
             'RDP',
-            'Elasticsearch',
-            'Kibana',
             'BleachBit',
             'VirtualBox',
             'Venus',
@@ -422,6 +426,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     },
     'security': {
         'generic': (
+            'Infection Monkey',
+            'securing',
             'attack',
             'атака',
             'VPN',
@@ -475,6 +481,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'MicroK8s',
+            'OpenSearch',
+            'Elasticsearch',
+            'Kibana',
             'Mesos',
             'Tinkerbell',
             'Filebeat',
@@ -545,6 +555,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'data science',
         ),
         'specific': (
+            'OpenCV',
             'Pykg2vec',
             'TensorFlow Quantum',
             'TFQ',
@@ -638,6 +649,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'web': {
         'generic': (),
         'specific': (
+            'I2P',
             'ArchiveBox',
             'Proxmox Mail Gateway',
             'Mojolicious',
@@ -703,6 +715,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'OpenBuilt',
+            'Temurin',
+            'Dart Code Metrics',
             'LLVM',
             'HPVM',
             'Chipmunk',
@@ -811,6 +826,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'user': {
         'generic': (),
         'specific': (
+            'COSMIC',
             'Worker',
             'Getting Things GNOME',
             'moe',
@@ -830,6 +846,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Plasma',
             'GNOME',
             'Xfce',
+            'LXQt',
             'Budgie',
             '4Pane',
             'bspwm',
