@@ -659,30 +659,28 @@ class DigestRecordsCollection:
         if not response:
             logger.info('No similar records found')
             return None
-        options_duplicates_brief = []
+        options_duplicates = []
         options_records = []
         for similar_record_i, similar_record in enumerate(response):
             duplicates_object = self._duplicates_by_digest_record(similar_record['id'])
             if duplicates_object:
-                options_duplicates_brief.append(duplicates_object)
+                options_duplicates.append(duplicates_object)
             else:
                 options_records.append({'id': similar_record['id'], 'title': similar_record['title'], 'url': similar_record['url']})
-        options_duplicates = []
-        for option_duplicate_brief in options_duplicates_brief:
+        options_duplicates_filtered = []
+        for option_duplicate in options_duplicates:
             duplicate_digest_records = []
-            for duplicate_digest_record_id in option_duplicate_brief['digest_records']:
-                duplicate_digest_record = self._digest_record_by_id(duplicate_digest_record_id)
-                if duplicate_digest_record:
-                    duplicate_digest_records.append({'id': duplicate_digest_record['id'], 'title': duplicate_digest_record['title'], 'url': duplicate_digest_record['url']})
+            for duplicate_digest_record in option_duplicate['digest_records']:
+                duplicate_digest_records.append({'id': duplicate_digest_record['id'], 'title': duplicate_digest_record['title'], 'url': duplicate_digest_record['url']})
             exists = False
-            for option_duplicates in options_duplicates:
-                if option_duplicates['id'] == option_duplicate_brief['id']:
+            for option_duplicates_filtered in options_duplicates_filtered:
+                if option_duplicates_filtered['id'] == option_duplicate['id']:
                     exists = True
                     break
             if not exists:
-                options_duplicates.append({'id': option_duplicate_brief['id'], 'digest_records': duplicate_digest_records})
+                options_duplicates_filtered.append({'id': option_duplicate['id'], 'digest_records': duplicate_digest_records})
         return {
-            'duplicates': options_duplicates,
+            'duplicates': options_duplicates_filtered,
             'records': options_records,
         }
 
