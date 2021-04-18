@@ -194,6 +194,7 @@ class DigestRecordsCollection:
     def __init__(self,
                  records: List[DigestRecord] = None):
         self.records = records if records is not None else []
+        self.duplicates = []
         self._filtered_records = []
         self._host = None
         self._port = None
@@ -248,9 +249,13 @@ class DigestRecordsCollection:
             self._password = config_data['password']
             logger.info('Loaded')
 
-    def load_specific_digest_records_from_server(self, yaml_config_path: str, digest_number):
+    def load_specific_digest_records_from_server(self,
+                                                 yaml_config_path: str,
+                                                 digest_number: int):
         self._load_config(yaml_config_path)
         self._login()
+        self._load_duplicates_for_specific_digest(yaml_config_path,
+                                                  digest_number)
         self._basic_load_digest_records_from_server(yaml_config_path,
                                                     f'http://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_number={digest_number}')
 
@@ -259,6 +264,59 @@ class DigestRecordsCollection:
         self._login()
         self._basic_load_digest_records_from_server(yaml_config_path,
                                                     f'http://{self._host}:{self._port}/api/v1/new-digest-records/')
+
+    def _load_duplicates_for_specific_digest(self,
+                                             yaml_config_path: str,
+                                             digest_number: int):
+        logger.info(f'Getting digest records duplicates for digest number #{digest_number}')
+        url = f'{self.api_url}/digest-records-duplicates-detailed/?digest_number={digest_number}'
+        # TODO: Make debug
+        logger.info(f'Getting URL {url}')
+        result = requests.get(url,
+                              headers={
+                                  'Authorization': f'Bearer {self._token}',
+                                  'Content-Type': 'application/json',
+                              })
+        if result.status_code != 200:
+            logger.error(f'Failed to retrieve digest records duplicates, status code {result.status_code}, response: {result.content}')
+            # TODO: Raise exception
+            return None
+        response_str = result.content.decode()
+        response = json.loads(response_str)
+        if not response:
+            logger.info('No digest records duplicates found')
+            return None
+        response_converted = []
+        for duplicate in response:
+            duplicate_converted = {}
+            for key in ('id', 'digest_number'):
+                duplicate_converted[key] = duplicate[key]
+            if not duplicate['digest_records']:
+                logger.warning(f'Empty digest records list in duplicate #{duplicate["id"]}')
+                continue
+            duplicate_converted['digest_records'] = []
+            for record in duplicate['digest_records']:
+                if record['dt'] is not None:
+                    dt_str = datetime.datetime.strptime(record['dt'],
+                                                        '%Y-%m-%dT%H:%M:%SZ')
+                else:
+                    dt_str = None
+                record_obj = DigestRecord(dt_str,
+                                          record['title'],
+                                          record['url'],
+                                          digest_number=record['digest_number'],
+                                          drid=record['id'],
+                                          is_main=record['is_main'],
+                                          keywords=record['keywords'].split(';') if record['keywords'] else [])
+                record_obj.state = DigestRecordState(record['state'].lower()) if 'state' in record and record['state'] is not None else None
+                record_obj.category = DigestRecordCategory(record['category'].lower()) if 'category' in record and record['category'] is not None else None
+                if 'subcategory' in record and record['subcategory'] == 'DATABASES':
+                    record['subcategory'] = 'db'
+                record_obj.subcategory = DigestRecordSubcategory(record['subcategory'].lower()) if 'subcategory' in record and record['subcategory'] is not None else None
+                duplicate_converted['digest_records'].append(record_obj)
+            response_converted.append(duplicate_converted)
+        self.duplicates += response_converted
+
 
     def _basic_load_digest_records_from_server(self, yaml_config_path: str, url: str):
         records_objects: List[DigestRecord] = []
@@ -303,6 +361,9 @@ class DigestRecordsCollection:
                 return False
         return True
 
+    def _build_url_html(self, url: str):
+        return f'<a href="{url}">{url}</a>{" (en)" if self._check_url_if_english(url) else ""}'
+
     def records_to_html(self, html_path):
         logger.info('Converting records to HTML')
         output_records = {
@@ -312,8 +373,30 @@ class DigestRecordsCollection:
             DigestRecordCategory.RELEASES.value: {subcategory_value: [] for subcategory_value in DIGEST_RECORD_SUBCATEGORY_VALUES},
             DigestRecordCategory.OTHER.value: [],
         }
+        digest_records_ids_from_duplicates = []
+        for duplicate in self.duplicates:
+            duplicate_records = duplicate['digest_records']
+            first_in_duplicate = duplicate_records[0]
+            if first_in_duplicate.state != DigestRecordState.IN_DIGEST:
+                continue
+            for duplicate_record in duplicate_records:
+                digest_records_ids_from_duplicates.append(duplicate_record.drid)
+            if first_in_duplicate.is_main:
+                output_records['main'].append(duplicate_records)
+            elif first_in_duplicate.category == DigestRecordCategory.OTHER:
+                output_records[first_in_duplicate.category.value].append(duplicate_records)
+            elif not first_in_duplicate.is_main and first_in_duplicate.category in (DigestRecordCategory.NEWS,
+                                                                                    DigestRecordCategory.ARTICLES,
+                                                                                    DigestRecordCategory.RELEASES):
+                if first_in_duplicate.subcategory is not None:
+                    output_records[first_in_duplicate.category.value][first_in_duplicate.subcategory.value].append(duplicate_records)
+            else:
+                pprint(duplicate)
+                raise NotImplementedError
         for digest_record in self.records:
             if digest_record.state != DigestRecordState.IN_DIGEST:
+                continue
+            if digest_record.drid in digest_records_ids_from_duplicates:
                 continue
             if digest_record.is_main:
                 output_records['main'].append(digest_record)
@@ -329,54 +412,46 @@ class DigestRecordsCollection:
                 raise NotImplementedError
         output = '<h2>Главное</h2>\n\n'
         for main_record in output_records['main']:
-            output += f'<h3>{self._clear_title(main_record.title)}</h3>\n\n'
-            output += f'<i><b>Категория</b>: {DIGEST_RECORD_CATEGORY_RU_MAPPING[main_record.category.value]}/{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[main_record.subcategory.value]}</i><br>\n\n'
-            output += f'Подробности <a href="{main_record.url}">{main_record.url}</a>{" (en)" if self._check_url_if_english(main_record.url) else ""}\n\n'
+            if not isinstance(main_record, list):
+                output += f'<h3>{self._clear_title(main_record.title)}</h3>\n\n'
+                output += f'<i><b>Категория</b>: {DIGEST_RECORD_CATEGORY_RU_MAPPING[main_record.category.value]}/{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[main_record.subcategory.value]}</i><br>\n\n'
+                output += f'Подробности {self._build_url_html(main_record.url)}\n\n'
+            else:
+                output += f'<h3>{[self._clear_title(r.title) for r in main_record]}</h3>\n\n'
+                output += f'<i><b>Категория</b>: {DIGEST_RECORD_CATEGORY_RU_MAPPING[main_record[0].category.value]}/{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[main_record[0].subcategory.value]}</i><br>\n\n'
+                output += 'Подробности:<br>\n\n'
+                output += '<ol>\n'
+                for r in main_record:
+                    output += f'<li>{r.title} {self._build_url_html(r.url)}</li>\n\n'
+                output += '</ol>\n'
 
         output += '<h2>Короткой строкой</h2>\n\n'
 
-        # TODO: Refactor following 3 loops, unite them in one upper
-        output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.NEWS.value]}</h3>\n\n'
-        for news_record_subcategory, news_records in output_records[DigestRecordCategory.NEWS.value].items():
-            if not news_records:
-                continue
-            output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[news_record_subcategory]}</h4>\n\n'
-            if len(news_records) == 1:
-                news_record = news_records[0]
-                output += f'<p>{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}</a>{" (en)" if self._check_url_if_english(news_record.url) else ""}</p>\n'
-            else:
-                output += '<ol>\n'
-                for news_record in news_records:
-                    output += f'<li>{self._clear_title(news_record.title)} <a href={news_record.url}>{news_record.url}</a>{" (en)" if self._check_url_if_english(news_record.url) else ""}</li>\n'
-                output += '</ol>\n'
-
-        output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.ARTICLES.value]}</h3>\n\n'
-        for articles_record_subcategory, articles_records in output_records[DigestRecordCategory.ARTICLES.value].items():
-            if not articles_records:
-                continue
-            output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[articles_record_subcategory]}</h4>\n\n'
-            if len(articles_records) == 1:
-                articles_record = articles_records[0]
-                output += f'<p>{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}</a>{" (en)" if self._check_url_if_english(articles_record.url) else ""}</p>\n'
-            else:
-                output += '<ol>\n'
-                for articles_record in articles_records:
-                    output += f'<li>{self._clear_title(articles_record.title)} <a href={articles_record.url}>{articles_record.url}</a>{" (en)" if self._check_url_if_english(articles_record.url) else ""}</li>\n'
-                output += '</ol>\n'
-
-        output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.RELEASES.value]}</h3>\n\n'
-        for releases_record_subcategory, releases_records in output_records[DigestRecordCategory.RELEASES.value].items():
-            if not releases_records:
-                continue
-            output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[releases_record_subcategory]}</h4>\n\n'
-            if len(releases_records) == 1:
-                releases_record = releases_records[0]
-                output += f'<p>{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}</a>{" (en)" if self._check_url_if_english(releases_record.url) else ""}</p>\n'
-            else:
-                output += '<ol>\n'
-                for releases_record in releases_records:
-                    output += f'<li>{self._clear_title(releases_record.title)} <a href={releases_record.url}>{releases_record.url}</a>{" (en)" if self._check_url_if_english(releases_record.url) else ""}</li>\n'
-                output += '</ol>\n'
+        keys = (
+            DigestRecordCategory.NEWS.value,
+            DigestRecordCategory.ARTICLES.value,
+            DigestRecordCategory.RELEASES.value,
+        )
+        for key in keys:
+            output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[key]}</h3>\n\n'
+            for key_record_subcategory, key_records in output_records[key].items():
+                if not key_records:
+                    continue
+                output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[key_record_subcategory]}</h4>\n\n'
+                if len(key_records) == 1:
+                    key_record = key_records[0]
+                    if not isinstance(key_record, list):
+                        output += f'<p>{self._clear_title(key_record.title)} {self._build_url_html(key_record.url)}</p>\n'
+                    else:
+                        output += f'<p>{", ".join([self._clear_title(r.title) for r in key_record])} {", ".join([self._build_url_html(r.url) for r in key_record])}</p>\n'
+                else:
+                    output += '<ol>\n'
+                    for key_record in key_records:
+                        if not isinstance(key_record, list):
+                            output += f'<li>{self._clear_title(key_record.title)} {self._build_url_html(key_record.url)}</li>\n'
+                        else:
+                            output += f'<li>{[self._clear_title(r.title) for r in key_record]} {", ".join([self._build_url_html(r.url) for r in key_record])}</li>\n'
+                    output += '</ol>\n'
 
         if len(output_records[DigestRecordCategory.OTHER.value]):
             output += '<h2>Что ещё посмотреть</h2>\n\n'
