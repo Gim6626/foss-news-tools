@@ -580,7 +580,8 @@ class DigestRecordsCollection:
                         record.subcategory = self._ask_subcategory(record,
                                                                    DIGEST_RECORD_SUBCATEGORY_RU_MAPPING)
 
-                if record.category is not None \
+                if record.state == DigestRecordState.IN_DIGEST \
+                        and record.category is not None \
                         and record.subcategory is not None:
                     current_records_with_similar_categories = self._similar_digest_records(record.digest_number,
                                                                                            record.category,
