@@ -847,7 +847,7 @@ class DigestRecordsCollection:
         response_str = result.content.decode()
         response = json.loads(response_str)
         if not response:
-            logger.info('No duplicates found')
+            logger.info(f'No duplicates found for digest record #{digest_record_id}')
             return None
         return response[0] # TODO: Handle multiple case
 
