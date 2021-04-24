@@ -443,7 +443,7 @@ class DigestRecordsCollection:
                     if not isinstance(key_record, list):
                         output += f'<p>{self._clear_title(key_record.title)} {self._build_url_html(key_record.url)}</p>\n'
                     else:
-                        output += f'<p>{", ".join([self._clear_title(r.title) for r in key_record])} {", ".join([self._build_url_html(r.url) for r in key_record])}</p>\n'
+                        output += f'<p>{[self._clear_title(r.title) for r in key_record]} {", ".join([self._build_url_html(r.url) for r in key_record])}</p>\n'
                 else:
                     output += '<ol>\n'
                     for key_record in key_records:
