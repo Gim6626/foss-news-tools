@@ -20,6 +20,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'news': {
         'generic': (),
         'specific': (
+            'Open19',
+            'Open19 Foundation',
+            'ГК Astra Linux',
             'Gitpod',
             'FinOps Foundation',
             'GitHub',
@@ -54,6 +57,13 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'MX Linux',
+            'ToaruOS',
+            'Astra Linux',
+            'Yunohost',
+            'EndeavourOS',
+            'Proxmox Backup Server',
+            'Hyperbola',
             'LKRG',
             'Slackware',
             'FreeBSD',
@@ -224,6 +234,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'OpenSSH',
+            'u2if',
             'EDA',
             'Xen',
             'Sigil',
@@ -340,6 +352,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'database',
         ),
         'specific': (
+            'Kubegres',
+            'Noisia',
             'Apache Ignite',
             'Ignite',
             'Cassandra',
@@ -365,6 +379,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'Open Broadcaster Software',
+            'OBS Studio',
+            'OBS',
             'OpenToonz',
             'FFmpeg',
             'Lyra',
@@ -426,6 +443,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     },
     'security': {
         'generic': (
+            'Velociraptor',
+            'VeraCrypt',
             'Infection Monkey',
             'securing',
             'attack',
@@ -481,6 +500,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'emissary-ingress',
+            'SigNoz',
             'MicroK8s',
             'OpenSearch',
             'Elasticsearch',
@@ -510,6 +531,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'werf',
             'Headlamp',
             'OpenShift',
+            'CodeReady Containers',
             'Bastille',
             'Consul',
             'Grafana',
@@ -555,6 +577,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'data science',
         ),
         'specific': (
+            'Pandas',
+            'Giotto-Time',
+            'PyTerrier',
+            'Shapash',
             'OpenCV',
             'Pykg2vec',
             'TensorFlow Quantum',
@@ -649,6 +675,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'web': {
         'generic': (),
         'specific': (
+            'Geary',
+            'Nhost',
+            'Seafile',
             'I2P',
             'ArchiveBox',
             'Proxmox Mail Gateway',
@@ -715,6 +744,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'Markdown',
+            'Kuroko',
+            'Node-RED',
             'OpenBuilt',
             'Temurin',
             'Dart Code Metrics',
@@ -742,6 +774,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'cSvn',
             'Rust',
             'Scala',
+            'NodeJS',
             'Node.js',
             'JavaScript',
             'Electron',
@@ -826,6 +859,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'user': {
         'generic': (),
         'specific': (
+            'Shortwave',
+            'nnn',
             'COSMIC',
             'Worker',
             'Getting Things GNOME',
@@ -914,6 +949,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'misc': {
         'generic': (),
         'specific': (
+            'Blanket',
             'Buttplug',
             'xVA-Synth',
         ),
