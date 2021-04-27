@@ -65,4 +65,5 @@ HABR_POSTS = {
     64: 'https://habr.com/ru/post/550640/',
     65: 'https://habr.com/ru/post/551870/',
     66: 'https://habr.com/ru/post/553086/',
+    67: 'https://habr.com/ru/post/554308/',
 }
