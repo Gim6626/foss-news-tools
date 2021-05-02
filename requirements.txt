@@ -2,3 +2,4 @@ argcomplete
 python-dateutil
 lxml
 pyyaml
+requests
