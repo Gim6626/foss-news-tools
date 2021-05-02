@@ -14,12 +14,17 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         'specific': (),
     },
     'opening': {
-        'generic': (),
+        'generic': (
+            'open-sources',
+            'открывает',
+            'открывают',
+        ),
         'specific': (),
     },
     'news': {
         'generic': (),
         'specific': (
+            'Rust Foundation',
             'Open19',
             'Open19 Foundation',
             'ГК Astra Linux',
@@ -57,6 +62,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'Calculate Linux',
             'MX Linux',
             'ToaruOS',
             'Astra Linux',
@@ -234,6 +240,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'GNU Screen',
+            'Finit',
+            'iDempiere',
             'OpenSSH',
             'u2if',
             'EDA',
@@ -242,7 +251,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'groff',
             'DDSP',
             'L2TP',
-            'libp2p',
             'TeX',
             'TeX Live',
             'Apache Spark',
@@ -379,6 +387,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'Akira',
+            'MusE',
             'Open Broadcaster Software',
             'OBS Studio',
             'OBS',
@@ -443,14 +453,13 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     },
     'security': {
         'generic': (
-            'Velociraptor',
-            'VeraCrypt',
-            'Infection Monkey',
+            'вредоносное',
             'securing',
             'attack',
             'атака',
             'VPN',
             'безопасность',
+            'безопасности',
             'бэкдор',
             'уязвимость',
             'уязвимости',
@@ -470,6 +479,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'vulnerabilities',
         ),
         'specific': (
+            'hola-proxy',
+            'opera-proxy',
+            'SniperPhish',
+            'Velociraptor',
+            'VeraCrypt',
+            'Infection Monkey',
             'Kubesploit',
             'ClamAV',
             'ovpn-admin',
@@ -500,6 +515,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'LitmusChaos',
+            'Chaos Mesh',
+            'OPA',
+            'Open Policy Agent',
             'emissary-ingress',
             'SigNoz',
             'MicroK8s',
@@ -537,7 +556,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Grafana',
             'Periskop',
             'Helm',
-            'Quarkus',
             'KubeEdge',
             'Jenkins',
             'Longhorn',
@@ -577,6 +595,13 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'data science',
         ),
         'specific': (
+            'ONNX',
+            'EvalML',
+            'Avalanche',
+            'skweak',
+            'Prophet',
+            'LayoutParser',
+            'MMDetection',
             'Pandas',
             'Giotto-Time',
             'PyTerrier',
@@ -675,6 +700,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'web': {
         'generic': (),
         'specific': (
+            'Postfix',
             'Geary',
             'Nhost',
             'Seafile',
@@ -695,6 +721,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Tor',
             'Thunderbird',
             'Chromium',
+            'PaleMoon',
             'Pale Moon',
             'Beaker',
             'Lighttpd',
@@ -744,6 +771,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'GCC',
+            'Quarkus',
+            'Raku',
+            'Rakudo',
+            'PyMongo',
+            'libp2p',
             'Markdown',
             'Kuroko',
             'Node-RED',
@@ -770,6 +803,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Viztracer',
             'Git',
             'Kivy',
+            'libbpf',
             'BPF',
             'cSvn',
             'Rust',
@@ -859,6 +893,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'user': {
         'generic': (),
         'specific': (
+            'Trinity Desktop Environment',
             'Shortwave',
             'nnn',
             'COSMIC',
@@ -920,8 +955,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
         ),
     },
     'games': {
-        'generic': (),
+        'generic': (
+            'game',
+            'games',
+        ),
         'specific': (
+            'Godot',
             'Warzone 2100',
             'Cocos Creator',
             'Lutris',
