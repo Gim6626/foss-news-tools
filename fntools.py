@@ -587,7 +587,7 @@ class DigestRecordsCollection:
                                                                                            record.category,
                                                                                            record.subcategory)
                     if current_records_with_similar_categories:
-                        print(f'Are there any duplicates for digest record "{record.title}"? Here is list of possible ones:')
+                        print(f'Are there any duplicates for digest record "{record.title}" ({record.url})? Here is list of possible ones:')
                         i = 1
                         options_indexes = []
                         for option in current_records_with_similar_categories['duplicates']:
