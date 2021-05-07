@@ -645,7 +645,7 @@ class DigestRecordsCollection:
 
     def _ask_option_index_or_no(self, max_index):
         while True:
-            option_index_str = input(f'Please input option number or "n" to skip: ')
+            option_index_str = input(f'Please input option number or "n" to create new one: ')
             if option_index_str.isnumeric():
                 option_index = int(option_index_str)
                 if 0 < option_index <= max_index:
