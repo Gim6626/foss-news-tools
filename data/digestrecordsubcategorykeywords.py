@@ -24,6 +24,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'news': {
         'generic': (),
         'specific': (
+            'DoKC',
+            'Data on Kubernetes Community',
             'Rust Foundation',
             'Open19',
             'Open19 Foundation',
@@ -62,6 +64,14 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'SparkyLinux',
+            'Fuchsia',
+            'Fuchsia OS',
+            'OpenIndiana',
+            'OpenSolaris',
+            'Rocky',
+            'RockyLinux',
+            'Rocky Linux',
             'Calculate Linux',
             'MX Linux',
             'ToaruOS',
@@ -185,6 +195,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'system': {
         'generic': (),
         'specific': (
+            'zsh',
             'X.Org Server',
             'Sway',
             'wlroots',
@@ -198,6 +209,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'systemd',
             'Xorg',
             'Mir',
+            'wayland-protocols',
             'Wayland',
             'XWayland',
             'PowerShell',
@@ -240,6 +252,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'OxiKit',
             'GNU Screen',
             'Finit',
             'iDempiere',
@@ -373,6 +386,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'PostgreSQL',
             'MySQL',
             'SQLite',
+            'Timescale',
             'TimescaleDB',
             'Patroni',
             'Tarantool',
@@ -387,6 +401,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'Enve',
             'Akira',
             'MusE',
             'Open Broadcaster Software',
@@ -479,6 +494,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'vulnerabilities',
         ),
         'specific': (
+            'GnuTLS',
+            'Counterfit',
+            'shadowsocks',
+            'Kubestriker',
             'hola-proxy',
             'opera-proxy',
             'SniperPhish',
@@ -515,6 +534,14 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'Cloud Foundry',
+            'k0s',
+            'Konveyor',
+            'Terrascan',
+            'HAProxy Kubernetes Ingress Controller',
+            'K8ssandra',
+            'Pixie',
+            'KubeLinter',
             'LitmusChaos',
             'Chaos Mesh',
             'OPA',
@@ -595,6 +622,18 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'data science',
         ),
         'specific': (
+            'TrustyAI',
+            'RHVoice',
+            'DINO',
+            'Detectron2',
+            'Flashlight',
+            'Julia DataFrames',
+            'Opacus',
+            'Detection',
+            'Classy Vision',
+            'FastText',
+            'Tensor Comprehensions',
+            'TC',
             'ONNX',
             'EvalML',
             'Avalanche',
@@ -668,6 +707,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'LightAutoML',
             'LAMA',
             'PyTorch',
+            'PyTorch3D',
             'spaCy',
             'AllenAct',
             'SuperAnnotate',
@@ -683,6 +723,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'Stanza',
             'PyG',
             'PyTorch Geometric',
+            'PyTorch Geometric Temporal',
             'PyTorch GeometricTemporal',
             'SciBERT',
             'Julia',
@@ -700,6 +741,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'web': {
         'generic': (),
         'specific': (
+            'Shadow',
+            'Syncthing',
+            'Exim',
+            'Matrix',
             'Postfix',
             'Geary',
             'Nhost',
@@ -771,6 +816,14 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'Turbolift',
+            'Symfony',
+            'TransMaintain',
+            'Qt Creator',
+            'Maven',
+            'Lisp',
+            'GCL',
+            'Meson',
             'GCC',
             'Quarkus',
             'Raku',
@@ -887,12 +940,16 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'менеджмент',
         ),
         'specific': (
+            'OpenProject',
+            'CHAOSS',
             'RunaWFE Free',
         ),
     },
     'user': {
         'generic': (),
         'specific': (
+            'NX Desktop',
+            'Trinity',
             'Trinity Desktop Environment',
             'Shortwave',
             'nnn',
