@@ -64,6 +64,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'Bodhi Linux',
+            'OpenIPC',
+            'Ubuntu RescuePack',
+            'DragonFly BSD',
+            'Android Automotive OS',
+            'Bottlerocket',
             'SparkyLinux',
             'Fuchsia',
             'Fuchsia OS',
@@ -252,8 +258,12 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'Asterisk',
+            'Hyperledger',
+            'PuTTY',
             'OxiKit',
             'GNU Screen',
+            'tmux',
             'Finit',
             'iDempiere',
             'OpenSSH',
@@ -296,7 +306,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'radare2',
             'Rizin',
             'Bareos',
-            'Airflow',
             'Stellarium',
             'lsFusion',
             'BusyBox',
@@ -401,6 +410,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'SonoBus',
             'Enve',
             'Akira',
             'MusE',
@@ -456,6 +466,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'телефон',
         ),
         'specific': (
+            'postmarketOS',
             'LineageOS',
             'Android',
             'Ubuntu Touch',
@@ -468,6 +479,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     },
     'security': {
         'generic': (
+            'cybersecurity',
             'вредоносное',
             'securing',
             'attack',
@@ -494,6 +506,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'vulnerabilities',
         ),
         'specific': (
+            'LinOTP',
             'GnuTLS',
             'Counterfit',
             'shadowsocks',
@@ -534,6 +547,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'Pulp',
+            'Sentry',
+            'HAProxy Data Plane API',
+            'Graylog',
+            'jsPolicy',
             'Cloud Foundry',
             'k0s',
             'Konveyor',
@@ -622,6 +640,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'data science',
         ),
         'specific': (
+            'labelCloud',
+            'Kaolin',
             'TrustyAI',
             'RHVoice',
             'DINO',
@@ -741,9 +761,11 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'web': {
         'generic': (),
         'specific': (
+            'Alpine',
             'Shadow',
             'Syncthing',
             'Exim',
+            'Zulip',
             'Matrix',
             'Postfix',
             'Geary',
@@ -781,7 +803,6 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'BIND',
             'Hubzilla',
             'Laravel',
-            'Django',
             'Cloud Custodian',
             'Brave',
             'Taiga UI',
@@ -816,7 +837,16 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'AWS SaaS Boost',
+            'Nix',
+            'Lura',
+            'KrakenD',
+            'GNUstep',
+            'Pyston',
             'Turbolift',
+            'Mojolicoious',
+            'mojo.js',
+            'Django',
             'Symfony',
             'TransMaintain',
             'Qt Creator',
@@ -887,6 +917,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'React',
             'RESTinio',
             'CIDER',
+            'Autotools',
             'CMake',
             'libmicrohttpd',
             'Tcl/Tk',
@@ -940,6 +971,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'менеджмент',
         ),
         'specific': (
+            'Apache Airflow',
+            'Airflow',
             'OpenProject',
             'CHAOSS',
             'RunaWFE Free',
@@ -948,6 +981,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'user': {
         'generic': (),
         'specific': (
+            'FlameShot',
+            'OutWiker',
+            'Moksha',
             'NX Desktop',
             'Trinity',
             'Trinity Desktop Environment',
@@ -1036,6 +1072,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'hardware': {
         'generic': (),
         'specific': (
+            'Launch',
+            'LibreBMC',
             'Cosmic Pi',
             'Kubuntu Focus',
             'Raspberry Pi',
@@ -1045,6 +1083,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'misc': {
         'generic': (),
         'specific': (
+            'Ttyper',
             'Blanket',
             'Buttplug',
             'xVA-Synth',
