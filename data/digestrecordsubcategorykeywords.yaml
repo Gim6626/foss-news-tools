@@ -1,0 +1,1048 @@
+data_science:
+  generic:
+  - Machine learning
+  - Deep learning
+  - ML
+  - AI
+  - DL
+  - Neural
+  - data science
+  specific:
+  - labelCloud
+  - Kaolin
+  - TrustyAI
+  - RHVoice
+  - DINO
+  - Detectron2
+  - Flashlight
+  - Julia DataFrames
+  - Opacus
+  - Detection
+  - Classy Vision
+  - FastText
+  - Tensor Comprehensions
+  - TC
+  - ONNX
+  - EvalML
+  - Avalanche
+  - skweak
+  - Prophet
+  - LayoutParser
+  - MMDetection
+  - Pandas
+  - Giotto-Time
+  - PyTerrier
+  - Shapash
+  - OpenCV
+  - Pykg2vec
+  - TensorFlow Quantum
+  - TFQ
+  - Featuretools
+  - Giotto-TDA
+  - NeuralTracking
+  - GPT-Neo
+  - NeX
+  - Open3D
+  - HiSD
+  - PaddleSeg
+  - Mayavi
+  - BigGAN
+  - TensorForce
+  - Cesium
+  - Featuretools
+  - TSFRESH
+  - PM4Py
+  - Lux
+  - PyOD
+  - PyFlux
+  - TimeSynth
+  - Sktime
+  - Darts
+  - AmpliGraph
+  - DVC
+  - Neural Body
+  - neuralbody
+  - CoreMLTools
+  - Vowpal Wabbit
+  - SelfTime
+  - Catalyst
+  - THiNC
+  - Spleeter
+  - Orbit
+  - PyKeen
+  - PyVista
+  - Kornia
+  - Real-time Voice Cloning
+  - ELECTRA
+  - Torch-Points3D
+  - Wave
+  - Wave ML
+  - Kubeflow
+  - TensorFlow Extended
+  - TFX
+  - OpenVINO
+  - NlpCraft
+  - TensorFlow
+  - TensorFlow 3D
+  - TF 3D
+  - Keras
+  - MLflow
+  - Apache Kylin
+  - Apache Superset
+  - AI Fairness 360
+  - AIF360
+  - AI Explainability 360
+  - LightAutoML
+  - LAMA
+  - PyTorch
+  - PyTorch3D
+  - spaCy
+  - AllenAct
+  - SuperAnnotate
+  - VISSL
+  - PennyLane
+  - Arm NN
+  - Arm Compute Library
+  - Pyro
+  - Model Search
+  - OpenFL
+  - Open Federated Learning
+  - DALL-E
+  - Stanza
+  - PyG
+  - PyTorch Geometric
+  - PyTorch Geometric Temporal
+  - PyTorch GeometricTemporal
+  - SciBERT
+  - Julia
+  - ALBERT
+  - OpenChat
+  - TensorLy
+  - BoTorch
+  - GPyTorch
+  - ClearML
+  - Dragonfly
+  - KGCNN
+  - Tensor2Tensor
+db:
+  generic:
+  - SQL
+  - СУБД
+  - database
+  specific:
+  - Kubegres
+  - Noisia
+  - Apache Ignite
+  - Ignite
+  - Cassandra
+  - Presto
+  - Apache Pinot
+  - Pinot
+  - TerminusDB
+  - libmdbx
+  - PostgreSQL
+  - MySQL
+  - SQLite
+  - Timescale
+  - TimescaleDB
+  - Patroni
+  - Tarantool
+  - ClickHouse
+  - urm
+  - MariaDB
+  - OrbitDB
+  - MongoDB
+  - Dolt
+dev:
+  generic: []
+  specific:
+  - Numba
+  - Android Studio
+  - Atom
+  - ShellCheck
+  - AWS SaaS Boost
+  - Nix
+  - Lura
+  - KrakenD
+  - GNUstep
+  - Pyston
+  - Turbolift
+  - Mojolicoious
+  - mojo.js
+  - Django
+  - Symfony
+  - TransMaintain
+  - Qt Creator
+  - Maven
+  - Lisp
+  - GCL
+  - Meson
+  - GCC
+  - Quarkus
+  - Raku
+  - Rakudo
+  - PyMongo
+  - libp2p
+  - Markdown
+  - Kuroko
+  - Node-RED
+  - OpenBuilt
+  - Temurin
+  - Dart Code Metrics
+  - LLVM
+  - HPVM
+  - Chipmunk
+  - NativeScript
+  - Ergo
+  - CPython
+  - grex
+  - IPython
+  - Jupyter
+  - QGit
+  - WebKitGTK
+  - Gradle
+  - Crystal
+  - PascalABC.NET
+  - Arrow
+  - PeachPie
+  - WebAssembly
+  - Viztracer
+  - Git
+  - Kivy
+  - libbpf
+  - BPF
+  - cSvn
+  - Rust
+  - Scala
+  - NodeJS
+  - Node.js
+  - JavaScript
+  - Electron
+  - GNU Make
+  - goredo
+  - PHP
+  - Perl
+  - Qt
+  - GTK
+  - SDL
+  - Autoconf
+  - NetBeans
+  - Eclipse
+  - KDevelop
+  - Flutter
+  - NPM
+  - OpenCL
+  - PoCL
+  - OpenJDK
+  - Tizen Studio
+  - Ruby
+  - React
+  - RESTinio
+  - CIDER
+  - Autotools
+  - CMake
+  - libmicrohttpd
+  - Tcl/Tk
+  - C++
+  - PicoLibc
+  - KDE Frameworks
+  - Python
+  - Golang
+  - Java
+  - Go
+  - .NET Core
+  - PVS-Studio
+  - CudaText
+  - Dotenv-linter
+  - Selenium Grid
+  - Callisto
+  - ruleguard
+  - GitLab
+  - D-Bus
+  - Jmix
+  - CUBA Platform
+  - GHC
+  - SmartApp Framework
+  - deno
+  - GitQlient
+  - Haxe
+  - Racket
+  - Vala
+  - bpftrace
+  - Dapr
+  - gdb
+  - nim
+  - Erlang
+  - GoReleaser
+  - G-Profiler
+  - Power Fx
+  - GNU Debugger
+  - Kotlin
+  - Swift
+devops:
+  generic:
+  - DevOps
+  - CI/CD
+  - девопс
+  specific:
+  - Cockpit
+  - Molecule
+  - Pulp
+  - Sentry
+  - HAProxy Data Plane API
+  - Graylog
+  - jsPolicy
+  - Cloud Foundry
+  - k0s
+  - Konveyor
+  - Terrascan
+  - HAProxy Kubernetes Ingress Controller
+  - K8ssandra
+  - Pixie
+  - KubeLinter
+  - LitmusChaos
+  - Chaos Mesh
+  - OPA
+  - Open Policy Agent
+  - emissary-ingress
+  - SigNoz
+  - MicroK8s
+  - OpenSearch
+  - Elasticsearch
+  - Kibana
+  - Mesos
+  - Tinkerbell
+  - Filebeat
+  - Kubestr
+  - OpenNebula
+  - Mirantis Lens
+  - Lens
+  - k6
+  - ossh
+  - Docker
+  - Kubernetes
+  - Terraform
+  - Kafka
+  - Pulsar
+  - RabbitMQ
+  - Prometheus
+  - Vault
+  - Ceph
+  - Ansible
+  - Chef
+  - Puppet
+  - Nomad
+  - werf
+  - Headlamp
+  - OpenShift
+  - CodeReady Containers
+  - Bastille
+  - Consul
+  - Grafana
+  - Periskop
+  - Helm
+  - KubeEdge
+  - Jenkins
+  - Longhorn
+  - Airbyte
+  - Scylla
+  - Redpanda
+  - Argo CD
+  - Hadoop
+  - Hudi
+  - HAProxy
+  - Grafana Tempo
+  - Octopod
+  - SARIF
+  - VictoriaMetrics
+  - Kube-dump
+  - Tekton
+  - Tekton Pipeline
+  - Zabbix
+  - CI CD
+  - Knative
+  - OpenTelemetry
+  - ELK
+  - Cortex
+  - Linkerd
+  - Glances
+  - Istio
+diy:
+  generic: []
+  specific: []
+education:
+  generic:
+  - course
+  - курс
+  specific:
+  - GCompris
+  - Tux Paint
+events:
+  generic:
+  - митап
+  - конференция
+  - встреча
+  specific: []
+games:
+  generic:
+  - game
+  - games
+  specific:
+  - Godot
+  - Warzone 2100
+  - Cocos Creator
+  - Lutris
+  - Verloren
+  - Mindustry
+  - FlightGear
+  - Free Heroes of Might and Magic 2
+  - Free Heroes of Might and Magic II
+  - fheroes2
+  - Bubble Chains
+  - Godot Engine
+  - 0 A.D.
+  - Minetest
+hardware:
+  generic: []
+  specific:
+  - Launch
+  - LibreBMC
+  - Cosmic Pi
+  - Kubuntu Focus
+  - Raspberry Pi
+  - bladeRF-wiphy
+history:
+  generic:
+  - история
+  specific: []
+intros:
+  generic:
+  - внедрение
+  specific: []
+knd:
+  generic:
+  - ОС
+  - дистрибутив
+  - дистрибутива
+  - distributive
+  - distro
+  specific:
+  - DogLinux
+  - NetBSD
+  - Bodhi Linux
+  - OpenIPC
+  - Ubuntu RescuePack
+  - DragonFly BSD
+  - Android Automotive OS
+  - Bottlerocket
+  - SparkyLinux
+  - Fuchsia
+  - Fuchsia OS
+  - OpenIndiana
+  - OpenSolaris
+  - Rocky
+  - RockyLinux
+  - Rocky Linux
+  - Calculate Linux
+  - MX Linux
+  - ToaruOS
+  - Astra Linux
+  - Yunohost
+  - EndeavourOS
+  - Proxmox Backup Server
+  - Hyperbola
+  - LKRG
+  - Slackware
+  - FreeBSD
+  - webOS Open Source Edition
+  - Parrot
+  - Makulu
+  - MakuluLinux
+  - LinDoz
+  - Sculpt
+  - OpenHarmony
+  - Manjaro Linux
+  - Manjaro
+  - Plan9
+  - SONiC
+  - Garuda
+  - Deepin
+  - Deepin Linux
+  - Porteus Kiosk
+  - JingOS
+  - KernelCI
+  - Asahi Linux
+  - GNU Mes
+  - Mes
+  - 4MLinux
+  - Armbian
+  - GhostBSD
+  - MidnightBSD
+  - OpenBSD
+  - KDE Neon
+  - Kubuntu
+  - Ubuntu
+  - Ubuntu Core
+  - Debian
+  - Chrome OS
+  - ChromeOS
+  - Chromium OS
+  - ChromiumOS
+  - Tails
+  - Solaris
+  - Kali Linux
+  - Альт
+  - ELKS
+  - Void Linux
+  - NethServer
+  - OpenWRT
+  - DD-WRT
+  - Raspberry Pi OS
+  - T2 SDE
+  - CentOS
+  - CRUX
+  - SUSE
+  - openSUSE
+  - Linux
+  - FreeRTOS
+  - Q4OS
+  - DentOS
+  - Icaros
+  - Redox OS
+  - Fedora
+  - Kodachi
+  - Embox
+  - Slackel
+  - Gentoo
+  - Slacko Puppy
+  - Linux Mint
+  - AlmaLinux
+  - Alpine Linux
+  - RHEL
+  - RedHat Enterprise Linux
+  - Red Hat Enterprise Linux
+  - OPNsense
+  - pfSense
+  - Oracle Linux
+  - Unbreakable Enterprise Kernel
+  - Zentyal
+  - Nitrux
+  - Clonezilla Live
+  - GParted Live
+  - XigmaNAS
+  - GeckoLinux
+  - JingOS
+  - линукс
+  - Solus
+  - Solus Linux
+  - PCLinuxOS
+  - Sailfish
+  - GNU Guix
+  - Finnix
+  - helloSystem
+  - OpenMandriva Lx
+  - OpenMandriva
+  - Devuan
+  - Siduction
+  - Tiny Core Linux
+  - pfSense
+  - FuzixOS
+  - KaOS
+  - Mageia
+  - Netrunner
+  - Linux From Scratch
+  - Beyond Linux From Scratch
+  - NomadBSD
+  - Qubes OS
+  - Qubes
+  - SystemRescue
+  - Debian ISO FastInstall
+  - Trisquel
+  - Triskel
+  - FreeDOS
+  - ALT
+law:
+  generic: []
+  specific: []
+management:
+  generic:
+  - management
+  - менеджмент
+  specific:
+  - Apache Airflow
+  - Airflow
+  - OpenProject
+  - CHAOSS
+  - RunaWFE Free
+misc:
+  generic: []
+  specific:
+  - Ttyper
+  - Blanket
+  - Buttplug
+  - xVA-Synth
+mobile:
+  generic:
+  - смартфон
+  - телефон
+  specific:
+  - Magisk
+  - postmarketOS
+  - LineageOS
+  - Android
+  - Ubuntu Touch
+  - Plasma Mobile
+  - PinePhone
+  - HarmonyOS
+  - aTox
+  - /e/
+multimedia:
+  generic: []
+  specific:
+  - Vimix
+  - SonoBus
+  - Enve
+  - Akira
+  - MusE
+  - Open Broadcaster Software
+  - OBS Studio
+  - OBS
+  - OpenToonz
+  - FFmpeg
+  - Lyra
+  - digiKam
+  - SAIL
+  - Celluloid
+  - sK1
+  - Audacity
+  - MPV
+  - Ardour
+  - Paint
+  - LazPaint
+  - GIMP
+  - Krita
+  - Blender
+  - xine
+  - LSP Plugins
+  - Guitarix
+  - Kdenlive
+  - Darktable
+  - Parole
+  - mtPaint
+  - AviSynth+
+  - OpenGL
+  - Inkscape
+  - Haruna
+  - VLC
+  - Tilt Brush
+  - Filmulator
+  - Shotcut
+  - Audacious
+  - Flowblade
+  - QMMP
+  - Monado
+  - Cine Encoder
+  - Kodi
+  - Ymuse
+  - MPD
+  - Clapper
+  - Vital
+  - Rend-o-matic
+news:
+  generic: []
+  specific:
+  - DoKC
+  - Data on Kubernetes Community
+  - Rust Foundation
+  - Open19
+  - Open19 Foundation
+  - ГК Astra Linux
+  - Gitpod
+  - FinOps Foundation
+  - GitHub
+  - Red Hat
+  - RedHat
+  - Canonical
+  - Mozilla
+  - Apache Software Foundation
+  - ASF
+  - Linux Foundation
+  - LF Networking
+  - Mobile Native Foundation
+  - MNF
+  - Open Mainframe Project
+  - Eclipse Foundation
+opening:
+  generic:
+  - open-sources
+  - открывает
+  - открывают
+  specific: []
+security:
+  generic:
+  - cybersecurity
+  - вредоносное
+  - securing
+  - attack
+  - атака
+  - VPN
+  - безопасное
+  - безопасность
+  - безопасности
+  - бэкдор
+  - уязвимость
+  - уязвимости
+  - вирус
+  - security
+  - secure
+  - exploit
+  - threat
+  - malware
+  - botnet
+  - эксплойт
+  - zero-day
+  - backdoor
+  - утечка
+  - vulnerability
+  - vulnerable
+  - vulnerabilities
+  specific:
+  - LinOTP
+  - GnuTLS
+  - Counterfit
+  - shadowsocks
+  - Kubestriker
+  - hola-proxy
+  - opera-proxy
+  - SniperPhish
+  - Velociraptor
+  - VeraCrypt
+  - Infection Monkey
+  - Kubesploit
+  - ClamAV
+  - ovpn-admin
+  - OpenSSL
+  - OpenPGP
+  - LibreSSL
+  - WireGuard
+  - CrowdSec
+  - OpenVPN
+  - Mozilla VPN
+  - Snort
+  - Libgcrypt
+  - strongSwan
+  - Kleopatra
+  - GnuPG
+  - GPG
+  - Bitwarden
+  - wolfSSL
+  - CrowdSec
+  - passwdqc
+  - Curiefense
+special:
+  generic: []
+  specific:
+  - ABillS
+  - fail2ban
+  - Lima
+  - Asterisk
+  - Hyperledger
+  - PuTTY
+  - OxiKit
+  - GNU Screen
+  - tmux
+  - Finit
+  - iDempiere
+  - OpenSSH
+  - u2if
+  - EDA
+  - Xen
+  - Sigil
+  - groff
+  - DDSP
+  - L2TP
+  - TeX
+  - TeX Live
+  - Apache Spark
+  - Spark
+  - Cygwin
+  - XRDP
+  - SpamAssassin
+  - lightsquid
+  - RetroArch
+  - FreeCAD
+  - RudderStack
+  - Sphinx Search
+  - Sphinx
+  - Apache OpenMeetings
+  - OpenMeetings
+  - Kooha
+  - LeoCAD
+  - XCP-NG
+  - Proxmox
+  - Coq
+  - KStars
+  - Wine
+  - Vkd3d
+  - Proton
+  - Twake
+  - QEMU
+  - pcem
+  - QVGE
+  - Cutter
+  - radare2
+  - Rizin
+  - Bareos
+  - Stellarium
+  - lsFusion
+  - BusyBox
+  - RDP
+  - BleachBit
+  - VirtualBox
+  - Venus
+  - FileCoin
+  - GNU Radio
+  - ExpressLRS
+  - Flipper Zero
+  - ECharts
+  - SystemTap
+  - PyCubed
+  - SSH
+  - SSHFS
+  - WindTerm
+  - EiskaltDC++
+  - Restic
+  - NumPy
+  - MatPlotLib
+  - Apache CloudStack
+  - Phoronix Test Suite
+  - SFTPGo
+  - Manticore Search
+  - MyCompany
+  - Connman
+  - Firejail
+  - IPCDump
+  - OpenTaxSolver
+  - pgmpy
+  - Cantera
+  - Home Assistant
+  - Moodle
+  - Gobblin
+  - TimeSynth
+  - DXVK
+  - msd
+  - ESPlot
+  - AutoMaker
+  - OroPlatform
+  - OroCommerce
+  - OroCRM
+  - Pastas
+  - FreeRDP
+  - Poke
+  - asciinema
+  - Osmocom
+  - DAML
+  - SAS.Планета
+  - GraphHopper
+  - Daffodil
+  - Yggdrasil
+  - gImageReader
+  - lebowski
+  - MediaGoblin
+  - Vitis HLS
+system:
+  generic: []
+  specific:
+  - zsh
+  - X.Org Server
+  - Sway
+  - wlroots
+  - Monitorix
+  - PF
+  - PulseAudio
+  - zlib
+  - zlib-ng
+  - Grub
+  - Grub2
+  - systemd
+  - Xorg
+  - Mir
+  - wayland-protocols
+  - Wayland
+  - XWayland
+  - PowerShell
+  - Guix
+  - bash
+  - i3wm
+  - ZFS
+  - Btrfs
+  - sysvinit
+  - Coreboot
+  - Mesa
+  - Smartmontools
+  - JuiceFS
+  - tcb
+  - sudo
+  - Panfrost
+  - iptables
+  - nftables
+  - Flatpak
+  - DNF
+  - Yum
+  - APT
+  - Zypper
+  - NFS
+  - Binutils
+  - GParted
+  - Glibc
+  - Paru
+  - inetutils
+  - IPFS
+  - DRBD
+  - fish
+  - labwc
+  - coreutils
+  - journald
+  - syslog
+  - Samba
+user:
+  generic: []
+  specific:
+  - FlameShot
+  - OutWiker
+  - Moksha
+  - NX Desktop
+  - Trinity
+  - Trinity Desktop Environment
+  - Shortwave
+  - nnn
+  - COSMIC
+  - Worker
+  - Getting Things GNOME
+  - moe
+  - NewsFlash
+  - GNOME Commander
+  - KDE Gear
+  - KDE Applications
+  - newsboat
+  - PeaZip
+  - aptitude
+  - gdu
+  - LibreOffice
+  - Cinnamon
+  - Regolith
+  - motd
+  - KDE
+  - Plasma
+  - GNOME
+  - Xfce
+  - LXQt
+  - Budgie
+  - 4Pane
+  - bspwm
+  - IceWM
+  - Camelot
+  - nano
+  - Vim
+  - EMACS
+  - GNU tar
+  - CherryTree
+  - Super Productivity
+  - awk
+  - sed
+  - Argos Translate
+  - gedit
+  - Midnight Commander
+  - Kate
+  - Thunar
+  - MAPS.ME
+  - Windows Terminal
+  - Windows Terminal Preview
+  - OpenOffice
+  - Skrooge
+  - HomeBank
+  - gThumb
+  - CUPS
+  - Sane
+  - Starship
+  - NetworkManager
+  - anacron
+  - SysMonTask
+  - ONLYOFFICE
+  - ONLYOFFICE Docs
+  - KDE Apps
+  - 7-zip
+web:
+  generic: []
+  specific:
+  - Alpine
+  - Shadow
+  - Syncthing
+  - Exim
+  - Zulip
+  - Matrix
+  - Postfix
+  - Geary
+  - Nhost
+  - Seafile
+  - I2P
+  - ArchiveBox
+  - Proxmox Mail Gateway
+  - Mojolicious
+  - RetroShare
+  - links
+  - Apache
+  - Nginx
+  - Nginx Unit
+  - Firefox
+  - Chrome
+  - SeaMonkey
+  - GNUnet
+  - Tor Browser
+  - Tor
+  - Thunderbird
+  - Chromium
+  - PaleMoon
+  - Pale Moon
+  - Beaker
+  - Lighttpd
+  - WordPress
+  - Threema
+  - Otter
+  - Wget
+  - QuiteRSS
+  - Wasmer
+  - PeerTube
+  - Cawbird
+  - BIND
+  - Hubzilla
+  - Laravel
+  - Cloud Custodian
+  - Brave
+  - Taiga UI
+  - Signal
+  - WebRTC
+  - Movim
+  - Zimbra
+  - Zimbra Open-Source
+  - qutebrowser
+  - curl
+  - Rocket.Chat
+  - Rocket Chat
+  - Plausible
+  - Viper
+  - Nextcloud
+  - Nextcloud Hub
+  - ownCloud
+  - Drupal
+  - youtube-dl
+  - Flask
+  - Telegram
+  - Envoy
+  - OnionShare
+  - Apache Arrow Flight
+  - NeoChat
+  - Gemini-клиента
+  - Lagrange
+  - Akash MAINNET 2
+  - qBittorrent

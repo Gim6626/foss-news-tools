@@ -24,7 +24,6 @@ from data.habrposts import *
 from data.digestrecordcategory import *
 from data.digestrecordstate import *
 from data.digestrecordsubcategory import *
-from data.digestrecordsubcategorykeywords import *
 
 
 SCRIPT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
@@ -204,6 +203,15 @@ class DigestRecordsCollection:
 
     def __str__(self):
         return pformat([record.to_dict() for record in self.records])
+
+    @property
+    def _subcategories_keywords(self) -> Dict:
+        subcategories_keywords_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                                   'data',
+                                                   'digestrecordsubcategorykeywords.yaml')
+        with open(subcategories_keywords_path, 'r') as fin:
+            keywords = yaml.safe_load(fin)
+            return keywords
 
     @property
     def api_url(self):
@@ -473,7 +481,7 @@ class DigestRecordsCollection:
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword in title.lower():
                 return DigestRecordCategory.RELEASES
-        for category, keywords_by_type in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
+        for subcategory, keywords_by_type in self._subcategories_keywords.items():
             for keyword in keywords_by_type['specific']:
                 keyword = keyword.replace('+', r'\+')
                 if re.search(keyword + r'\s+v?\d', title, re.IGNORECASE):
@@ -483,21 +491,21 @@ class DigestRecordsCollection:
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
         guessed_subcategories: List[DigestRecordSubcategory] = []
         matched_subcategories_keywords = {}
-        for subcategory_value, keywords_by_type in DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING.items():
+        for subcategory, keywords_by_type in self._subcategories_keywords.items():
             keywords = keywords_by_type['generic'] + keywords_by_type['specific']
             for keyword in keywords:
                 if re.search(rf'\b{re.escape(keyword)}\b', title, re.IGNORECASE):
                     subcategory_already_matched = False
                     for guessed_subcategory in guessed_subcategories:
-                        if guessed_subcategory.value == subcategory_value:
+                        if guessed_subcategory.value == subcategory:
                             subcategory_already_matched = True
                             break
                     if not subcategory_already_matched:
-                        guessed_subcategories.append(DigestRecordSubcategory(subcategory_value))
-                    if subcategory_value in matched_subcategories_keywords:
-                        matched_subcategories_keywords[subcategory_value].append(keyword)
+                        guessed_subcategories.append(DigestRecordSubcategory(subcategory))
+                    if subcategory in matched_subcategories_keywords:
+                        matched_subcategories_keywords[subcategory].append(keyword)
                     else:
-                        matched_subcategories_keywords[subcategory_value] = [keyword]
+                        matched_subcategories_keywords[subcategory] = [keyword]
         return guessed_subcategories, matched_subcategories_keywords
 
     def categorize_interactively(self):
