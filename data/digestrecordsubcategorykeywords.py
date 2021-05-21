@@ -64,6 +64,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'distro',
         ),
         'specific': (
+            'DogLinux',
+            'NetBSD',
             'Bodhi Linux',
             'OpenIPC',
             'Ubuntu RescuePack',
@@ -258,6 +260,9 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'special': {
         'generic': (),
         'specific': (
+            'ABillS',
+            'fail2ban',
+            'Lima',
             'Asterisk',
             'Hyperledger',
             'PuTTY',
@@ -410,6 +415,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'multimedia': {
         'generic': (),
         'specific': (
+            'Vimix',
             'SonoBus',
             'Enve',
             'Akira',
@@ -466,6 +472,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'телефон',
         ),
         'specific': (
+            'Magisk',
             'postmarketOS',
             'LineageOS',
             'Android',
@@ -485,6 +492,7 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'attack',
             'атака',
             'VPN',
+            'безопасное',
             'безопасность',
             'безопасности',
             'бэкдор',
@@ -547,6 +555,8 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
             'девопс',
         ),
         'specific': (
+            'Cockpit',
+            'Molecule',
             'Pulp',
             'Sentry',
             'HAProxy Data Plane API',
@@ -837,6 +847,10 @@ DIGEST_RECORD_SUBCATEGORY_KEYWORDS_MAPPING = {
     'dev': {
         'generic': (),
         'specific': (
+            'Numba',
+            'Android Studio',
+            'Atom',
+            'ShellCheck',
             'AWS SaaS Boost',
             'Nix',
             'Lura',
