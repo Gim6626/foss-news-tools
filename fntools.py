@@ -17,6 +17,7 @@ from pprint import (
     pformat,
     pprint,
 )
+import html
 
 from data.russiansources import *
 from data.releaseskeywords import *
@@ -361,7 +362,9 @@ class DigestRecordsCollection:
         self.records = records_objects
 
     def _clear_title(self, title: str):
-        return re.sub(r'^\[.+?\]\s+', '', title)
+        fixed_title = html.unescape(title)
+        fixed_title = re.sub(r'^\[.+?\]\s+', '', fixed_title)
+        return fixed_title
 
     def _check_url_if_english(self, url):
         for russian_source in RUSSIAN_SOURCES:
