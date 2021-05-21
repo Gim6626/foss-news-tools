@@ -361,7 +361,7 @@ class DigestRecordsCollection:
         self.records = records_objects
 
     def _clear_title(self, title: str):
-        return re.sub(r'^\[.+\]\s+', '', title)
+        return re.sub(r'^\[.+?\]\s+', '', title)
 
     def _check_url_if_english(self, url):
         for russian_source in RUSSIAN_SOURCES:
