@@ -487,7 +487,7 @@ class DigestRecordsCollection:
         for subcategory, keywords_by_type in self._subcategories_keywords.items():
             for keyword in keywords_by_type['specific']:
                 keyword = keyword.replace('+', r'\+')
-                if re.search(keyword + r'\s+v?\d', title, re.IGNORECASE):
+                if re.search(keyword + r',?\s+v?\.?\d', title, re.IGNORECASE):
                     return DigestRecordCategory.RELEASES
         return None
 
