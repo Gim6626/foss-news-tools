@@ -666,7 +666,7 @@ class DigestRecordsCollection:
             elif option_index_str == 'n':
                 return None
             else:
-                print('Invalid index, it should be integer')
+                print('Invalid answer, it should be integer or "n"')
         raise NotImplementedError
 
     def _ask_digest_number(self, record: DigestRecord):
