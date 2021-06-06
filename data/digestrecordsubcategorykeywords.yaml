@@ -8,6 +8,9 @@ data_science:
   - Neural
   - data science
   specific:
+  - PyTouch
+  - Power BI
+  - KotlinDL
   - labelCloud
   - Kaolin
   - TrustyAI
@@ -35,7 +38,6 @@ data_science:
   - Shapash
   - OpenCV
   - Pykg2vec
-  - TensorFlow Quantum
   - TFQ
   - Featuretools
   - Giotto-TDA
@@ -78,10 +80,12 @@ data_science:
   - Wave
   - Wave ML
   - Kubeflow
-  - TensorFlow Extended
   - TFX
   - OpenVINO
   - NlpCraft
+  - TensorFlow Lite
+  - TensorFlow Quantum
+  - TensorFlow Extended
   - TensorFlow
   - TensorFlow 3D
   - TF 3D
@@ -130,6 +134,13 @@ db:
   - СУБД
   - database
   specific:
+  - NocoDB
+  - PolarDB
+  - immudb
+  - pgSCV
+  - Delta Lake
+  - Delta Sharing
+  - Redis
   - Kubegres
   - Noisia
   - Apache Ignite
@@ -156,6 +167,15 @@ db:
 dev:
   generic: []
   specific:
+  - Reaqtor
+  - cache-bench
+  - Qbs
+  - r-test
+  - Til
+  - PCRE2
+  - QtProtobuf
+  - FPC
+  - OpenPyXL
   - Numba
   - Android Studio
   - Atom
@@ -269,7 +289,7 @@ dev:
   - Racket
   - Vala
   - bpftrace
-  - Dapr
+  - Daprs
   - gdb
   - nim
   - Erlang
@@ -285,6 +305,21 @@ devops:
   - CI/CD
   - девопс
   specific:
+  - Calico
+  - osquery
+  - KubeSphere
+  - Kaboxer
+  - Yor
+  - Polaris
+  - Linkerd
+  - Curiefense
+  - openITCOCKPIT
+  - Apache Airflow
+  - Airflow
+  - KubernetesExecutor
+  - Upbound Universal Crossplane
+  - UXP
+  - Crossplane
   - Cockpit
   - Molecule
   - Pulp
@@ -374,6 +409,8 @@ education:
   generic:
   - course
   - курс
+  - exan
+  - exams
   specific:
   - GCompris
   - Tux Paint
@@ -382,6 +419,8 @@ events:
   - митап
   - конференция
   - встреча
+  - event
+  - conference
   specific: []
 games:
   generic:
@@ -418,6 +457,7 @@ history:
 intros:
   generic:
   - внедрение
+  - внедряет
   specific: []
 knd:
   generic:
@@ -427,6 +467,15 @@ knd:
   - distributive
   - distro
   specific:
+  - openSUSE Leap
+  - VzLinux
+  - Simply Linux
+  - OSGeo-Live
+  - PureOS
+  - AV Linux
+  - Floppinux
+  - AntiX
+  - Lakka
   - DogLinux
   - NetBSD
   - Bodhi Linux
@@ -465,6 +514,7 @@ knd:
   - Manjaro
   - Plan9
   - SONiC
+  - Garuda Linux
   - Garuda
   - Deepin
   - Deepin Linux
@@ -499,6 +549,7 @@ knd:
   - DD-WRT
   - Raspberry Pi OS
   - T2 SDE
+  - CentOS Stream
   - CentOS
   - CRUX
   - SUSE
@@ -516,6 +567,8 @@ knd:
   - Gentoo
   - Slacko Puppy
   - Linux Mint
+  - Alma Linux
+  - AlmaLinux OS
   - AlmaLinux
   - Alpine Linux
   - RHEL
@@ -569,14 +622,14 @@ management:
   - management
   - менеджмент
   specific:
-  - Apache Airflow
-  - Airflow
   - OpenProject
   - CHAOSS
   - RunaWFE Free
 misc:
   generic: []
   specific:
+  - Ascii Image Converter
+  - Chia
   - Ttyper
   - Blanket
   - Buttplug
@@ -707,6 +760,8 @@ security:
   - vulnerable
   - vulnerabilities
   specific:
+  - ХPaste
+  - Ugly Duckling
   - LinOTP
   - GnuTLS
   - Counterfit
@@ -725,7 +780,6 @@ security:
   - OpenPGP
   - LibreSSL
   - WireGuard
-  - CrowdSec
   - OpenVPN
   - Mozilla VPN
   - Snort
@@ -742,6 +796,15 @@ security:
 special:
   generic: []
   specific:
+  - tc
+  - iperf
+  - server-fw
+  - OpenRGB
+  - Clustergram
+  - Valhalla
+  - jsVoronoiPCB
+  - Solvespace
+  - pText
   - ABillS
   - fail2ban
   - Lima
@@ -807,6 +870,7 @@ special:
   - ECharts
   - SystemTap
   - PyCubed
+  - ShellHub
   - SSH
   - SSHFS
   - WindTerm
@@ -853,6 +917,19 @@ special:
 system:
   generic: []
   specific:
+  - Hardinfo
+  - CPU-G
+  - CPU-X
+  - Polkit
+  - Util-linux
+  - Windows Package Manager
+  - winget
+  - Pacman
+  - Archinstall
+  - ReiserFS
+  - Reiser4
+  - Libreboot
+  - Bacula
   - zsh
   - X.Org Server
   - Sway
@@ -908,6 +985,11 @@ system:
 user:
   generic: []
   specific:
+  - Ksnip
+  - typos
+  - Gromit-MPX
+  - Diglossa.js
+  - Wayward
   - FlameShot
   - OutWiker
   - Moksha
@@ -975,6 +1057,11 @@ user:
 web:
   generic: []
   specific:
+  - Jami
+  - QUIC
+  - arataga
+  - Nyxt
+  - mailcow
   - Alpine
   - Shadow
   - Syncthing
