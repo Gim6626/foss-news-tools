@@ -69,4 +69,7 @@ HABR_POSTS = {
     68: 'https://habr.com/ru/post/555480/',
     69: 'https://habr.com/ru/post/556516/',
     70: 'https://habr.com/ru/post/557888/',
+    71: 'https://habr.com/ru/post/558868/',
+    72: 'https://habr.com/ru/post/560050/',
+    73: 'https://habr.com/ru/post/561318/',
 }
