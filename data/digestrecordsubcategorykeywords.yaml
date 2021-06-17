@@ -7,7 +7,24 @@ data_science:
   - DL
   - Neural
   - data science
+  - Natural Language Processing
   specific:
+  - MXNet
+  - UQ360
+  - CleanText
+  - Cortex
+  - TorchServe
+  - Triton Inference Server
+  - KFServing
+  - ForestFlow
+  - Multi Model Server
+  - DeepDetect
+  - BentoML
+  - ISAC-SIMO
+  - PostHog
+  - SaluteJS
+  - Plot
+  - GPT Neo
   - PyTouch
   - Power BI
   - KotlinDL
@@ -133,7 +150,9 @@ db:
   - SQL
   - СУБД
   - database
+  - databases
   specific:
+  - rqlite
   - NocoDB
   - PolarDB
   - immudb
@@ -167,6 +186,12 @@ db:
 dev:
   generic: []
   specific:
+  - page-fetch
+  - jq
+  - jo
+  - json_pp
+  - jshon
+  - Zig
   - Reaqtor
   - cache-bench
   - Qbs
@@ -305,6 +330,10 @@ devops:
   - CI/CD
   - девопс
   specific:
+  - Argo Rollouts
+  - Dockle
+  - kube-monkey
+  - Kubevious
   - Calico
   - osquery
   - KubeSphere
@@ -399,7 +428,6 @@ devops:
   - OpenTelemetry
   - ELK
   - Cortex
-  - Linkerd
   - Glances
   - Istio
 diy:
@@ -409,8 +437,9 @@ education:
   generic:
   - course
   - курс
-  - exan
+  - exam
   - exams
+  - teach
   specific:
   - GCompris
   - Tux Paint
@@ -427,6 +456,8 @@ games:
   - game
   - games
   specific:
+  - Veloren
+  - Reskue
   - Godot
   - Warzone 2100
   - Cocos Creator
@@ -448,7 +479,6 @@ hardware:
   - LibreBMC
   - Cosmic Pi
   - Kubuntu Focus
-  - Raspberry Pi
   - bladeRF-wiphy
 history:
   generic:
@@ -467,6 +497,8 @@ knd:
   - distributive
   - distro
   specific:
+  - Redcore
+  - Rescuezilla
   - openSUSE Leap
   - VzLinux
   - Simply Linux
@@ -652,6 +684,9 @@ mobile:
 multimedia:
   generic: []
   specific:
+  - video2midi
+  - QMPlay2
+  - Subtitld
   - Vimix
   - SonoBus
   - Enve
@@ -733,6 +768,7 @@ opening:
   specific: []
 security:
   generic:
+  - checksec
   - cybersecurity
   - вредоносное
   - securing
@@ -796,6 +832,10 @@ security:
 special:
   generic: []
   specific:
+  - Deskreen
+  - Cirq
+  - PicoVGA
+  - GrimoireLab
   - tc
   - iperf
   - server-fw
@@ -917,6 +957,8 @@ special:
 system:
   generic: []
   specific:
+  - Polkit
+  - Homebrew
   - Hardinfo
   - CPU-G
   - CPU-X
@@ -985,6 +1027,10 @@ system:
 user:
   generic: []
   specific:
+  - CuteFish
+  - angelspie
+  - kchmviewer
+  - Helix
   - Ksnip
   - typos
   - Gromit-MPX
@@ -1057,6 +1103,8 @@ user:
 web:
   generic: []
   specific:
+  - Appwrite
+  - vsftpd
   - Jami
   - QUIC
   - arataga
