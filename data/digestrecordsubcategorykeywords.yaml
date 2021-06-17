@@ -324,10 +324,23 @@ dev:
   - GNU Debugger
   - Kotlin
   - Swift
+sysadm:
+  generic: []
+  specific:
+  - ossh
+  - OpenSSH
+  - SSH
+  - SSHFS
+  - Ansible
+  - Chef
+  - Puppet
+  - Zabbix
+  - OpenTelemetry
 devops:
   generic:
   - DevOps
   - CI/CD
+  - CI CD
   - девопс
   specific:
   - Argo Rollouts
@@ -381,8 +394,6 @@ devops:
   - OpenNebula
   - Mirantis Lens
   - Lens
-  - k6
-  - ossh
   - Docker
   - Kubernetes
   - Terraform
@@ -392,9 +403,6 @@ devops:
   - Prometheus
   - Vault
   - Ceph
-  - Ansible
-  - Chef
-  - Puppet
   - Nomad
   - werf
   - Headlamp
@@ -422,10 +430,7 @@ devops:
   - Kube-dump
   - Tekton
   - Tekton Pipeline
-  - Zabbix
-  - CI CD
   - Knative
-  - OpenTelemetry
   - ELK
   - Cortex
   - Glances
@@ -832,6 +837,7 @@ security:
 special:
   generic: []
   specific:
+  - k6
   - Deskreen
   - Cirq
   - PicoVGA
@@ -856,7 +862,6 @@ special:
   - tmux
   - Finit
   - iDempiere
-  - OpenSSH
   - u2if
   - EDA
   - Xen
@@ -911,8 +916,6 @@ special:
   - SystemTap
   - PyCubed
   - ShellHub
-  - SSH
-  - SSHFS
   - WindTerm
   - EiskaltDC++
   - Restic
