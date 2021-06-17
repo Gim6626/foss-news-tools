@@ -548,7 +548,9 @@ class DigestRecordsCollection:
             if record.state in (DigestRecordState.IN_DIGEST,
                                 DigestRecordState.OUTDATED):
                 if record.is_main is None:
-                    record.is_main = self._ask_bool(f'Please input whether or no "{record.title}" is main (y/n): ')
+                    is_main = self._ask_bool(f'Please input whether or no "{record.title}" is main (y/n): ')
+                    logger.info(f'{"Marking" if is_main else "Not marking"} "{record.title}" as one of main records')
+                    record.is_main = is_main
 
                 guessed_category = self._guess_category(record.title)
                 if guessed_category is not None:
