@@ -7,8 +7,13 @@ data_science:
   - DL
   - Neural
   - data science
+  - data analytics
   - Natural Language Processing
   specific:
+  - Open Voice Network
+  - OVN
+  - XGBoost
+  - Cube.js
   - MXNet
   - UQ360
   - CleanText
@@ -186,6 +191,7 @@ db:
 dev:
   generic: []
   specific:
+  - Wasmer
   - page-fetch
   - jq
   - jo
@@ -214,6 +220,8 @@ dev:
   - Turbolift
   - Mojolicoious
   - mojo.js
+  - Flask
+  - FastAPI
   - Django
   - Symfony
   - TransMaintain
@@ -256,6 +264,7 @@ dev:
   - Kivy
   - libbpf
   - BPF
+  - Aya
   - cSvn
   - Rust
   - Scala
@@ -343,6 +352,9 @@ devops:
   - CI CD
   - девопс
   specific:
+  - forklift
+  - forklift-operator
+  - forklift operator
   - Argo Rollouts
   - Dockle
   - kube-monkey
@@ -502,6 +514,8 @@ knd:
   - distributive
   - distro
   specific:
+  - SME Server
+  - Hash Linux
   - Redcore
   - Rescuezilla
   - openSUSE Leap
@@ -744,6 +758,7 @@ multimedia:
 news:
   generic: []
   specific:
+  - Grafana Labs
   - DoKC
   - Data on Kubernetes Community
   - Rust Foundation
@@ -773,8 +788,8 @@ opening:
   specific: []
 security:
   generic:
-  - checksec
   - cybersecurity
+  - safety
   - вредоносное
   - securing
   - attack
@@ -801,6 +816,12 @@ security:
   - vulnerable
   - vulnerabilities
   specific:
+  - ExchangeFilter
+  - Exchange Filter
+  - checksec
+  - kcare-uchecker
+  - kcare uchecker
+  - uchecker
   - ХPaste
   - Ugly Duckling
   - LinOTP
@@ -837,6 +858,7 @@ security:
 special:
   generic: []
   specific:
+  - Qiskit
   - k6
   - Deskreen
   - Cirq
@@ -1030,6 +1052,9 @@ system:
 user:
   generic: []
   specific:
+  - OpenStreetMap
+  - OrganicMaps
+  - CutefishDE
   - CuteFish
   - angelspie
   - kchmviewer
@@ -1106,6 +1131,9 @@ user:
 web:
   generic: []
   specific:
+  - WriteFreely
+  - ZNC
+  - Eleventy
   - Appwrite
   - vsftpd
   - Jami
@@ -1149,7 +1177,6 @@ web:
   - Otter
   - Wget
   - QuiteRSS
-  - Wasmer
   - PeerTube
   - Cawbird
   - BIND
@@ -1174,7 +1201,6 @@ web:
   - ownCloud
   - Drupal
   - youtube-dl
-  - Flask
   - Telegram
   - Envoy
   - OnionShare
