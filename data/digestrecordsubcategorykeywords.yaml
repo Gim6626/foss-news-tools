@@ -10,11 +10,20 @@ data_science:
   - data analytics
   - Natural Language Processing
   specific:
+  - AutoInt
+  - T5
+  - Text-To-Text Transfer Transformer
+  - DeepFace
+  - NeoML
+  - Computer Vision Annotation Tool
+  - CVAT
+  - XBNet
   - Open Voice Network
   - OVN
   - XGBoost
   - Cube.js
   - MXNet
+  - Uncertainty Quantification 360
   - UQ360
   - CleanText
   - Cortex
@@ -157,6 +166,8 @@ db:
   - database
   - databases
   specific:
+  - Couchbase
+  - Liquibase
   - rqlite
   - NocoDB
   - PolarDB
@@ -175,6 +186,7 @@ db:
   - Pinot
   - TerminusDB
   - libmdbx
+  - Postgres
   - PostgreSQL
   - MySQL
   - SQLite
@@ -189,8 +201,14 @@ db:
   - MongoDB
   - Dolt
 dev:
-  generic: []
+  generic:
+  - programming
+  - developing
+  - development
+  - coding
   specific:
+  - Qwik
+  - Tokei
   - Wasmer
   - page-fetch
   - jq
@@ -336,6 +354,9 @@ dev:
 sysadm:
   generic: []
   specific:
+  - ISPConfig
+  - ISPConfig3
+  - osquery
   - ossh
   - OpenSSH
   - SSH
@@ -352,6 +373,8 @@ devops:
   - CI CD
   - девопс
   specific:
+  - Omnia
+  - MinIO
   - forklift
   - forklift-operator
   - forklift operator
@@ -360,7 +383,6 @@ devops:
   - kube-monkey
   - Kubevious
   - Calico
-  - osquery
   - KubeSphere
   - Kaboxer
   - Yor
@@ -457,6 +479,10 @@ education:
   - exam
   - exams
   - teach
+  - training
+  - certification
+  - scholarship
+  - scholarships
   specific:
   - GCompris
   - Tux Paint
@@ -466,6 +492,7 @@ events:
   - конференция
   - встреча
   - event
+  - events
   - conference
   specific: []
 games:
@@ -492,6 +519,8 @@ games:
 hardware:
   generic: []
   specific:
+  - RISC-V
+  - Arduino
   - Launch
   - LibreBMC
   - Cosmic Pi
@@ -500,6 +529,7 @@ hardware:
 history:
   generic:
   - история
+  - history
   specific: []
 intros:
   generic:
@@ -514,6 +544,10 @@ knd:
   - distributive
   - distro
   specific:
+  - Haiku
+  - Arch Linux
+  - ArchLinux
+  - Network Security Toolkit
   - SME Server
   - Hash Linux
   - Redcore
@@ -703,6 +737,8 @@ mobile:
 multimedia:
   generic: []
   specific:
+  - Mixxx
+  - Fotoxx
   - video2midi
   - QMPlay2
   - Subtitld
@@ -788,6 +824,9 @@ opening:
   specific: []
 security:
   generic:
+  - attacked
+  - ransomware
+  - вредоносных
   - cybersecurity
   - safety
   - вредоносное
@@ -816,6 +855,10 @@ security:
   - vulnerable
   - vulnerabilities
   specific:
+  - Scorecards
+  - Suricata
+  - Regula
+  - Trivy
   - ExchangeFilter
   - Exchange Filter
   - checksec
@@ -858,6 +901,9 @@ security:
 special:
   generic: []
   specific:
+  - Dolibarr
+  - Ultimaker Cura
+  - Chatwoot
   - Qiskit
   - k6
   - Deskreen
@@ -877,6 +923,7 @@ special:
   - fail2ban
   - Lima
   - Asterisk
+  - FreePBX
   - Hyperledger
   - PuTTY
   - OxiKit
@@ -913,6 +960,7 @@ special:
   - Coq
   - KStars
   - Wine
+  - Wine Launcher
   - Vkd3d
   - Proton
   - Twake
@@ -943,6 +991,8 @@ special:
   - Restic
   - NumPy
   - MatPlotLib
+  - plotly.py
+  - plotly
   - Apache CloudStack
   - Phoronix Test Suite
   - SFTPGo
@@ -982,6 +1032,9 @@ special:
 system:
   generic: []
   specific:
+  - OpenZFS
+  - Eclipse iceoryx
+  - iceoryx
   - Polkit
   - Homebrew
   - Hardinfo
@@ -1004,6 +1057,7 @@ system:
   - Monitorix
   - PF
   - PulseAudio
+  - PipeWire
   - zlib
   - zlib-ng
   - Grub
@@ -1052,6 +1106,7 @@ system:
 user:
   generic: []
   specific:
+  - KTorrent
   - OpenStreetMap
   - OrganicMaps
   - CutefishDE
@@ -1131,6 +1186,7 @@ user:
 web:
   generic: []
   specific:
+  - Min
   - WriteFreely
   - ZNC
   - Eleventy
@@ -1192,6 +1248,7 @@ web:
   - Zimbra Open-Source
   - qutebrowser
   - curl
+  - grpcurl
   - Rocket.Chat
   - Rocket Chat
   - Plausible
