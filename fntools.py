@@ -279,8 +279,7 @@ class DigestRecordsCollection:
                                              digest_number: int):
         logger.info(f'Getting digest records duplicates for digest number #{digest_number}')
         url = f'{self.api_url}/digest-records-duplicates-detailed/?digest_number={digest_number}'
-        # TODO: Make debug
-        logger.info(f'Getting URL {url}')
+        logger.debug(f'Getting URL {url}')
         result = requests.get(url,
                               headers={
                                   'Authorization': f'Bearer {self._token}',
@@ -730,10 +729,9 @@ class DigestRecordsCollection:
                                 digest_number,
                                 category,
                                 subcategory):
-        logger.info(f'Getting similar records for digest number #{digest_number}, category "{category}" and subcategory "{subcategory}"')
+        logger.debug(f'Getting similar records for digest number #{digest_number}, category "{category}" and subcategory "{subcategory}"')
         url = f'{self.api_url}/similar-digest-records/?digest_number={digest_number}&category={category.name}&subcategory={subcategory.name}'
-        # TODO: Make debug
-        logger.info(f'Getting URL {url}')
+        logger.debug(f'Getting URL {url}')
         result = requests.get(url,
                               headers={
                                   'Authorization': f'Bearer {self._token}',
@@ -774,15 +772,13 @@ class DigestRecordsCollection:
         }
 
     def _add_digest_record_do_duplicate(self, duplicate_id, existing_drids, digest_record_id):
-        # TODO: Make debug
-        logger.info(f'Adding digest record #{digest_record_id} to duplicate #{duplicate_id}')
-        # TODO: Make debug
+        logger.debug(f'Adding digest record #{digest_record_id} to duplicate #{duplicate_id}')
         url = f'{self.api_url}/digest-records-duplicates/{duplicate_id}/'
         data = {
             'id': duplicate_id,
             'digest_records': existing_drids + [digest_record_id],
         }
-        logger.info(f'PATCHing URL {url} with data {data}')
+        logger.debug(f'PATCHing URL {url} with data {data}')
         result = requests.patch(url,
                                 data=json.dumps(data),
                                 headers={
@@ -797,15 +793,13 @@ class DigestRecordsCollection:
                                         digest_number,
                                         digest_records_ids,
                                         ):
-        # TODO: Make debug
-        logger.info(f'Creating digest record duplicate from #{digest_records_ids}')
-        # TODO: Make debug
+        logger.debug(f'Creating digest record duplicate from #{digest_records_ids}')
         url = f'{self.api_url}/digest-records-duplicates/'
         data = {
             'digest_number': digest_number,
             'digest_records': digest_records_ids,
         }
-        logger.info(f'POSTing data {data} to URL {url}')
+        logger.debug(f'POSTing data {data} to URL {url}')
         result = requests.post(url,
                                data=json.dumps(data),
                                headers={
@@ -817,11 +811,9 @@ class DigestRecordsCollection:
             # TODO: Raise exception
 
     def _digest_record_by_id(self, digest_record_id):
-        # TODO: Make debug
-        logger.info(f'Loading digest record #{digest_record_id}')
-        # TODO: Make debug
+        logger.debug(f'Loading digest record #{digest_record_id}')
         url = f'{self.api_url}/digest-records/{digest_record_id}'
-        logger.info(f'Getting URL {url}')
+        logger.debug(f'Getting URL {url}')
         result = requests.get(url,
                               headers = {
                                   'Authorization': f'Bearer {self._token}',
@@ -831,8 +823,7 @@ class DigestRecordsCollection:
             logger.error(f'Failed to retrieve digest record, status code {result.status_code}, response: {result.content}')
             # TODO: Raise exception
             return None
-        # TODO: Make debug
-        logger.info(f'Received response: {result.content}')
+        logger.debug(f'Received response: {result.content}')
         response_str = result.content.decode()
         response = json.loads(response_str)
         if not response:
@@ -842,11 +833,9 @@ class DigestRecordsCollection:
         return response
 
     def _duplicates_by_digest_record(self, digest_record_id):
-        # TODO: Make debug
-        logger.info(f'Checking if there are duplicates for digest record #{digest_record_id}')
+        logger.debug(f'Checking if there are duplicates for digest record #{digest_record_id}')
         url = f'{self.api_url}/duplicates-by-digest-record/?digest_record={digest_record_id}'
-        # TODO: Make debug
-        logger.info(f'Getting URL {url}')
+        logger.debug(f'Getting URL {url}')
         result = requests.get(url,
                               headers={
                                   'Authorization': f'Bearer {self._token}',
@@ -856,12 +845,11 @@ class DigestRecordsCollection:
             logger.error(f'Failed to retrieve similar digest records, status code {result.status_code}, response: {result.content}')
             # TODO: Raise exception
             return None
-        # TODO: Make debug
-        logger.info(f'Received response: {result.content}')
+        logger.debug(f'Received response: {result.content}')
         response_str = result.content.decode()
         response = json.loads(response_str)
         if not response:
-            logger.info(f'No duplicates found for digest record #{digest_record_id}')
+            logger.debug(f'No duplicates found for digest record #{digest_record_id}')
             return None
         return response[0] # TODO: Handle multiple case
 
