@@ -95,23 +95,23 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter):
     def post_statistics(self, number, url):
         response = self._get_with_retries(url)
         content = response.text
-        re_result = re.search('<span class="post-stats__views-count">(.*?)</span>', content)
+        re_result = re.search('<span class="tm-icon-wrapper__value">(.*?)</span>', content)
         if re_result is None:
             logger.error(f'Failed to find statistics in FOSS News #{number} ({url}) on Habr')
             return None
 
         full_statistics_str = re_result.group(1)
         logger.debug(f'Full statistics string for FOSS News #{number}: "{full_statistics_str}"')
-        re_result = re.fullmatch(r'((\d+)(,(\d+))?)k?', full_statistics_str)
+        re_result = re.fullmatch(r'((\d+)(\.(\d+))?)K?', full_statistics_str)
         if re_result is None:
-            logger.error(f'Invalid statistics format in FOSS News #{number} ({url}) on Habr')
+            logger.error(f'Invalid statistics format in FOSS News #{number} ({url}) on Habr: {full_statistics_str}')
             return None
 
         statistics_without_k = re_result.group(1)
         statistics_before_comma = re_result.group(2)
         statistics_after_comma = re_result.group(4)
 
-        if 'k' in full_statistics_str:
+        if 'K' in full_statistics_str:
             views_count = int(statistics_before_comma) * 1000
             if statistics_after_comma is not None:
                 views_count += int(statistics_after_comma) * 100
