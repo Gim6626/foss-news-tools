@@ -20,6 +20,7 @@ class DigestRecordSubcategory(Enum):
     DATA_SCIENCE = 'data_science'
     WEB = 'web'
     DEV = 'dev'
+    TESTING = 'testing'
     HISTORY = 'history'
     MANAGEMENT = 'management'
     USER = 'user'
@@ -48,6 +49,7 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
     'data_science': 'AI & Data Science',
     'web': 'Web',
     'dev': 'Для разработчиков',
+    'testing': 'Тестирование',
     'history': 'История',
     'management': 'Менеджмент',
     'user': 'Пользовательское',
