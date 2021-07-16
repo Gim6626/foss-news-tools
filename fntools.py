@@ -275,7 +275,7 @@ class DigestRecordsCollection:
         self._load_config(yaml_config_path)
         self._login()
         self._basic_load_digest_records_from_server(yaml_config_path,
-                                                    f'http://{self._host}:{self._port}/api/v1/new-digest-records/')
+                                                    f'http://{self._host}:{self._port}/api/v1/new-foss-news-digest-records/')
 
     def _load_duplicates_for_specific_digest(self,
                                              yaml_config_path: str,
