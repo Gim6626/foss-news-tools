@@ -245,7 +245,7 @@ class DigestRecordsCollection:
 
     def _login(self):
         logger.info('Logging in')
-        result = requests.post(f'http://{self._host}:{self._port}/api/v1/token/',
+        result = requests.post(f'{self._protocol}://{self._host}:{self._port}/api/v1/token/',
                                data={'username': self._user, 'password': self._password})
         if result.status_code != 200:
             raise Exception(f'Invalid response code from FNGS login - {result.status_code}: {result.content.decode("utf-8")}')
@@ -258,6 +258,7 @@ class DigestRecordsCollection:
         with open(config_path, 'r') as fin:
             config_data = yaml.safe_load(fin)
             self._host = config_data['host']
+            self._protocol = config_data['protocol']
             self._port = config_data['port']
             self._user = config_data['user']
             self._password = config_data['password']
@@ -271,13 +272,13 @@ class DigestRecordsCollection:
         self._load_duplicates_for_specific_digest(yaml_config_path,
                                                   digest_number)
         self._basic_load_digest_records_from_server(yaml_config_path,
-                                                    f'http://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_number={digest_number}')
+                                                    f'{self._protocol}://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_number={digest_number}')
 
     def load_new_digest_records_from_server(self, yaml_config_path: str):
         self._load_config(yaml_config_path)
         self._login()
         self._basic_load_digest_records_from_server(yaml_config_path,
-                                                    f'http://{self._host}:{self._port}/api/v1/new-foss-news-digest-records/')
+                                                    f'{self._protocol}://{self._host}:{self._port}/api/v1/new-foss-news-digest-records/')
 
     def _load_duplicates_for_specific_digest(self,
                                              yaml_config_path: str,
