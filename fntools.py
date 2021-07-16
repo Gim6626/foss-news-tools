@@ -19,7 +19,6 @@ from pprint import (
 )
 import html
 
-from data.russiansources import *
 from data.releaseskeywords import *
 from data.habrposts import *
 from data.digestrecordcategory import *
@@ -161,7 +160,8 @@ class DigestRecord:
                  subcategory: Enum = None,
                  drid: int = None,
                  is_main: bool = None,
-                 keywords: List[str] = None):
+                 keywords: List[str] = None,
+                 language: str = None):
         self.dt = dt
         self.title = title
         self.url = url
@@ -172,6 +172,7 @@ class DigestRecord:
         self.drid = drid
         self.is_main = is_main
         self.keywords = keywords
+        self.language = language
 
     def __str__(self):
         return pformat(self.to_dict())
@@ -188,6 +189,7 @@ class DigestRecord:
             'category': self.category.value if self.category is not None else None,
             'subcategory': self.subcategory.value if self.subcategory is not None else None,
             'keywords': self.keywords,
+            'language': self.language,
         }
 
 
@@ -318,7 +320,8 @@ class DigestRecordsCollection:
                                           digest_number=record['digest_number'],
                                           drid=record['id'],
                                           is_main=record['is_main'],
-                                          keywords=record['keywords'].split(';') if record['keywords'] else [])
+                                          keywords=record['keywords'].split(';') if record['keywords'] else [],
+                                          language=record['language'])
                 record_obj.state = DigestRecordState(record['state'].lower()) if 'state' in record and record['state'] is not None else None
                 record_obj.category = DigestRecordCategory(record['category'].lower()) if 'category' in record and record['category'] is not None else None
                 if 'subcategory' in record and record['subcategory'] == 'DATABASES':
@@ -354,7 +357,8 @@ class DigestRecordsCollection:
                                          digest_number=record_plain['digest_number'],
                                          drid=record_plain['id'],
                                          is_main=record_plain['is_main'],
-                                         keywords=record_plain['keywords'].split(';') if record_plain['keywords'] else [])
+                                         keywords=record_plain['keywords'].split(';') if record_plain['keywords'] else [],
+                                         language=record_plain['language'])
             record_object.state = DigestRecordState(record_plain['state'].lower()) if 'state' in record_plain and record_plain['state'] is not None else None
             record_object.category = DigestRecordCategory(record_plain['category'].lower()) if 'category' in record_plain and record_plain['category'] is not None else None
             if 'subcategory' in record_plain and record_plain['subcategory'] == 'DATABASES':
@@ -368,14 +372,10 @@ class DigestRecordsCollection:
         fixed_title = re.sub(r'^\[.+?\]\s+', '', fixed_title)
         return fixed_title
 
-    def _check_url_if_english(self, url):
-        for russian_source in RUSSIAN_SOURCES:
-            if russian_source in url:
-                return False
-        return True
-
-    def _build_url_html(self, url: str):
-        return f'<a href="{url}">{url}</a>{" (en)" if self._check_url_if_english(url) else ""}'
+    def _build_url_html(self, url: str, lang: str):
+        if lang not in ('RUSSIAN', 'ENGLISH'):
+            raise NotImplementedError(f'Unsupported language {lang} for url {url}')
+        return f'<a href="{url}">{url}</a>{" (en)" if lang == "ENGLISH" else ""}'
 
     def records_to_html(self, html_path):
         logger.info('Converting records to HTML')
@@ -428,14 +428,14 @@ class DigestRecordsCollection:
             if not isinstance(main_record, list):
                 output += f'<h3>{self._clear_title(main_record.title)}</h3>\n\n'
                 output += f'<i><b>Категория</b>: {DIGEST_RECORD_CATEGORY_RU_MAPPING[main_record.category.value]}/{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[main_record.subcategory.value]}</i><br>\n\n'
-                output += f'Подробности {self._build_url_html(main_record.url)}\n\n'
+                output += f'Подробности {self._build_url_html(main_record.url, main_record.language)}\n\n'
             else:
                 output += f'<h3>{[self._clear_title(r.title) for r in main_record]}</h3>\n\n'
                 output += f'<i><b>Категория</b>: {DIGEST_RECORD_CATEGORY_RU_MAPPING[main_record[0].category.value]}/{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[main_record[0].subcategory.value]}</i><br>\n\n'
                 output += 'Подробности:<br>\n\n'
                 output += '<ol>\n'
                 for r in main_record:
-                    output += f'<li>{r.title} {self._build_url_html(r.url)}</li>\n\n'
+                    output += f'<li>{r.title} {self._build_url_html(r.url, r.language)}</li>\n\n'
                 output += '</ol>\n'
 
         output += '<h2>Короткой строкой</h2>\n\n'
@@ -454,27 +454,27 @@ class DigestRecordsCollection:
                 if len(key_records) == 1:
                     key_record = key_records[0]
                     if not isinstance(key_record, list):
-                        output += f'<p>{self._clear_title(key_record.title)} {self._build_url_html(key_record.url)}</p>\n'
+                        output += f'<p>{self._clear_title(key_record.title)} {self._build_url_html(key_record.url, key_record.language)}</p>\n'
                     else:
-                        output += f'<p>{[self._clear_title(r.title) for r in key_record]} {", ".join([self._build_url_html(r.url) for r in key_record])}</p>\n'
+                        output += f'<p>{[self._clear_title(r.title) for r in key_record]} {", ".join([self._build_url_html(r.url, r.language) for r in key_record])}</p>\n'
                 else:
                     output += '<ol>\n'
                     for key_record in key_records:
                         if not isinstance(key_record, list):
-                            output += f'<li>{self._clear_title(key_record.title)} {self._build_url_html(key_record.url)}</li>\n'
+                            output += f'<li>{self._clear_title(key_record.title)} {self._build_url_html(key_record.url, key_record.language)}</li>\n'
                         else:
-                            output += f'<li>{[self._clear_title(r.title) for r in key_record]} {", ".join([self._build_url_html(r.url) for r in key_record])}</li>\n'
+                            output += f'<li>{[self._clear_title(r.title) for r in key_record]} {", ".join([self._build_url_html(r.url, r.language) for r in key_record])}</li>\n'
                     output += '</ol>\n'
 
         if len(output_records[DigestRecordCategory.OTHER.value]):
             output += '<h2>Что ещё посмотреть</h2>\n\n'
             if len(output_records[DigestRecordCategory.OTHER.value]) == 1:
                 other_record = output_records[DigestRecordCategory.OTHER.value][0]
-                output += f'{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a>{" (en)" if self._check_url_if_english(other_record.url) else ""}<br>\n'
+                output += f'{self._clear_title(other_record.title)} {self._build_url_html(other_record.url, other_record.language)}<br>\n'
             else:
                 output += '<ol>\n'
                 for other_record in output_records[DigestRecordCategory.OTHER.value]:
-                    output += f'<li>{self._clear_title(other_record.title)} <a href="{other_record.url}">{other_record.url}</a>{" (en)" if self._check_url_if_english(other_record.url) else ""}</li>\n'
+                    output += f'<li>{self._clear_title(other_record.title)} {self._build_url_html(other_record.url, other_record.language)}</li>\n'
                 output += '</ol>\n'
 
         logger.info('Converted')
