@@ -10,6 +10,8 @@ data_science:
   - data analytics
   - Natural Language Processing
   specific:
+  - PlantNet
+  - Habitat
   - AutoInt
   - T5
   - Text-To-Text Transfer Transformer
@@ -166,6 +168,7 @@ db:
   - database
   - databases
   specific:
+  - Meltano
   - Couchbase
   - Liquibase
   - rqlite
@@ -207,6 +210,8 @@ dev:
   - development
   - coding
   specific:
+  - West
+  - Cppcheck
   - Qwik
   - Tokei
   - Wasmer
@@ -309,6 +314,7 @@ dev:
   - Tizen Studio
   - Ruby
   - React
+  - Angular
   - RESTinio
   - CIDER
   - Autotools
@@ -319,6 +325,8 @@ dev:
   - PicoLibc
   - KDE Frameworks
   - Python
+  - Celery
+  - Dramatiq
   - Golang
   - Java
   - Go
@@ -354,6 +362,7 @@ dev:
 sysadm:
   generic: []
   specific:
+  - Linstor
   - ISPConfig
   - ISPConfig3
   - osquery
@@ -373,6 +382,7 @@ devops:
   - CI CD
   - девопс
   specific:
+  - LXC
   - Omnia
   - MinIO
   - forklift
@@ -500,6 +510,7 @@ games:
   - game
   - games
   specific:
+  - Proton
   - Veloren
   - Reskue
   - Godot
@@ -517,7 +528,9 @@ games:
   - 0 A.D.
   - Minetest
 hardware:
-  generic: []
+  generic:
+  - PCB
+  - PCBs
   specific:
   - RISC-V
   - Arduino
@@ -544,6 +557,7 @@ knd:
   - distributive
   - distro
   specific:
+  - Virtuozzo Linux
   - Haiku
   - Arch Linux
   - ArchLinux
@@ -552,6 +566,7 @@ knd:
   - Hash Linux
   - Redcore
   - Rescuezilla
+  - SUSE Linux Enterprise Server
   - openSUSE Leap
   - VzLinux
   - Simply Linux
@@ -962,7 +977,6 @@ special:
   - Wine
   - Wine Launcher
   - Vkd3d
-  - Proton
   - Twake
   - QEMU
   - pcem
@@ -1025,6 +1039,7 @@ special:
   - GraphHopper
   - Daffodil
   - Yggdrasil
+  - Yggdrasil Network
   - gImageReader
   - lebowski
   - MediaGoblin
@@ -1073,6 +1088,7 @@ system:
   - bash
   - i3wm
   - ZFS
+  - Oramfs
   - Btrfs
   - sysvinit
   - Coreboot
@@ -1106,6 +1122,8 @@ system:
 user:
   generic: []
   specific:
+  - qpdf
+  - AbiWord
   - KTorrent
   - OpenStreetMap
   - OrganicMaps
@@ -1155,6 +1173,7 @@ user:
   - Camelot
   - nano
   - Vim
+  - Neovim
   - EMACS
   - GNU tar
   - CherryTree
@@ -1186,6 +1205,7 @@ user:
 web:
   generic: []
   specific:
+  - Mutt
   - Min
   - WriteFreely
   - ZNC
@@ -1259,6 +1279,7 @@ web:
   - Drupal
   - youtube-dl
   - Telegram
+  - Element
   - Envoy
   - OnionShare
   - Apache Arrow Flight
@@ -1267,3 +1288,4 @@ web:
   - Lagrange
   - Akash MAINNET 2
   - qBittorrent
+  - Tribler
