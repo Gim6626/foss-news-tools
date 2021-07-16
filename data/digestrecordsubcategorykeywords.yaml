@@ -806,7 +806,7 @@ multimedia:
   - Clapper
   - Vital
   - Rend-o-matic
-news:
+org:
   generic: []
   specific:
   - Grafana Labs

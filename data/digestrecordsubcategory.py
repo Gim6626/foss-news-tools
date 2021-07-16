@@ -4,7 +4,7 @@ class DigestRecordSubcategory(Enum):
     EVENTS = 'events'
     INTROS = 'intros'
     OPENING = 'opening'
-    NEWS = 'news'
+    ORG = 'org'
     DIY = 'diy'
     LAW = 'law'
     KnD = 'knd'
@@ -33,7 +33,7 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
     'events': 'Мероприятия',
     'intros': 'Внедрения',
     'opening': 'Открытие кода и данных',
-    'news': 'Дела организаций',
+    'org': 'Дела организаций',
     'diy': 'DIY',
     'law': 'Юридические вопросы',
     'knd': 'Ядро и дистрибутивы',
