@@ -18,4 +18,5 @@ RUSSIAN_SOURCES = (
     'astralinux.ru',
     'ferra.ru',
     'rbc.ru',
+    'dev.by',
 )
