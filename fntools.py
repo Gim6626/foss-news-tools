@@ -733,7 +733,7 @@ class DigestRecordsCollection:
                                 digest_number,
                                 category,
                                 subcategory):
-        logger.debug(f'Getting similar records for digest number #{digest_number}, category "{category}" and subcategory "{subcategory}"')
+        logger.debug(f'Getting similar records for digest number #{digest_number}, category "{category.value}" and subcategory "{subcategory.value}"')
         url = f'{self.api_url}/similar-digest-records/?digest_number={digest_number}&category={category.name}&subcategory={subcategory.name}'
         logger.debug(f'Getting URL {url}')
         result = requests.get(url,
