@@ -18,6 +18,7 @@ from pprint import (
     pprint,
 )
 import html
+from colorama import Fore, Style
 
 from data.releaseskeywords import *
 from data.habrposts import *
@@ -31,16 +32,59 @@ DIGEST_RECORD_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
 
 days_count = None
 
-LOGGING_SETTINGS = {
-    'level': logging.INFO,
-    'format': '[%(asctime)s] %(levelname)s: %(message)s',
-    'stream': sys.stderr,
-}
 
-logging.basicConfig(**LOGGING_SETTINGS)
+class Formatter(logging.Formatter):
 
-logger = logging.getLogger('fntools')
-logging.getLogger("requests").setLevel(logging.WARNING)
+    def __init__(self, fmt=None):
+        if fmt is None:
+            fmt = self._colorized_fmt()
+        logging.Formatter.__init__(self, fmt)
+
+    def _colorized_fmt(self, color=Fore.RESET):
+        return f'{color}[%(asctime)s] %(levelname)s:{Style.RESET_ALL} %(message)s'
+
+    def format(self, record):
+        # Save the original format configured by the user
+        # when the logger formatter was instantiated
+        format_orig = self._style._fmt
+
+        # Replace the original format with one customized by logging level
+        if record.levelno == logging.DEBUG:
+            color = Fore.CYAN
+        elif record.levelno == logging.INFO:
+            color = Fore.RESET
+        elif record.levelno == logging.WARNING:
+            color = Fore.YELLOW
+        elif record.levelno == logging.ERROR:
+            color = Fore.RED
+        elif record.levelno == logging.CRITICAL:
+            color = Fore.MAGENTA
+        else:
+            color = Fore.WHITE
+        self._style._fmt = self._colorized_fmt(color)
+
+        # Call the original formatter class to do the grunt work
+        result = logging.Formatter.format(self, record)
+
+        # Restore the original format configured by the user
+        self._style._fmt = format_orig
+
+        return result
+
+
+class Logger(logging.Logger):
+
+    def __init__(self):
+        super().__init__('fntools')
+        h = logging.StreamHandler(sys.stderr)
+        f = Formatter()
+        h.setFormatter(f)
+        h.flush = sys.stderr.flush
+        self.addHandler(h)
+        self.setLevel(logging.INFO)
+
+
+logger = Logger()
 
 
 class BasicPostsStatisticsGetter(metaclass=ABCMeta):
