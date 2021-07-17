@@ -10,6 +10,7 @@ data_science:
   - data analytics
   - Natural Language Processing
   specific:
+  - AutoML
   - PlantNet
   - Habitat
   - AutoInt
@@ -210,6 +211,7 @@ dev:
   - development
   - coding
   specific:
+  - jsii
   - West
   - Cppcheck
   - Qwik
@@ -557,6 +559,7 @@ knd:
   - distributive
   - distro
   specific:
+  - EasyNAS
   - Virtuozzo Linux
   - Haiku
   - Arch Linux
@@ -752,6 +755,7 @@ mobile:
 multimedia:
   generic: []
   specific:
+  - Converseen
   - Mixxx
   - Fotoxx
   - video2midi
@@ -916,6 +920,8 @@ security:
 special:
   generic: []
   specific:
+  - AngouriMath
+  - Snoop
   - Dolibarr
   - Ultimaker Cura
   - Chatwoot
@@ -1205,6 +1211,7 @@ user:
 web:
   generic: []
   specific:
+  - claws
   - Mutt
   - Min
   - WriteFreely

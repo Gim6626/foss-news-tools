@@ -221,7 +221,7 @@ class DigestRecordsCollection:
 
     @property
     def api_url(self):
-        return f'http://{self._host}:{self._port}/api/v1'
+        return f'{self._protocol}://{self._host}:{self._port}/api/v1'
 
     def save_to_yaml(self, yaml_path: str):
         records_plain = []
