@@ -527,7 +527,9 @@ class DigestRecordsCollection:
             logger.info(f'Saving output to "{html_path}"')
             fout.write(output)
 
-    def _guess_category(self, title: str) -> DigestRecordCategory:
+    def _guess_category(self, title: str, url: str) -> DigestRecordCategory:
+        if 'https://www.youtube.com' in url:
+            return DigestRecordCategory.VIDEOS
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword in title.lower():
                 return DigestRecordCategory.RELEASES
@@ -599,7 +601,7 @@ class DigestRecordsCollection:
                     logger.info(f'{"Marking" if is_main else "Not marking"} "{record.title}" as one of main records')
                     record.is_main = is_main
 
-                guessed_category = self._guess_category(record.title)
+                guessed_category = self._guess_category(record.title, record.url)
                 if guessed_category is not None:
                     msg = f'Guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}". Accept? y/n: '
                     accepted = self._ask_bool(msg)
