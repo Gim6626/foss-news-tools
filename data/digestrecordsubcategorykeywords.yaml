@@ -10,6 +10,10 @@ data_science:
   - data analytics
   - Natural Language Processing
   specific:
+  - jax
+  - PyCaret
+  - Inception Resnet v2
+  - InceptionResnet_v2
   - AutoML
   - PlantNet
   - Habitat
@@ -211,6 +215,8 @@ dev:
   - development
   - coding
   specific:
+  - Visual Studio Code
+  - VS Code
   - jsii
   - West
   - Cppcheck
@@ -364,6 +370,7 @@ dev:
 sysadm:
   generic: []
   specific:
+  - Keycloak
   - Linstor
   - ISPConfig
   - ISPConfig3
@@ -384,6 +391,7 @@ devops:
   - CI CD
   - девопс
   specific:
+  - KubeVirt
   - LXC
   - Omnia
   - MinIO
@@ -512,6 +520,7 @@ games:
   - game
   - games
   specific:
+  - zsnes
   - Proton
   - Veloren
   - Reskue
@@ -557,8 +566,13 @@ knd:
   - дистрибутив
   - дистрибутива
   - distributive
+  - distributions
+  - distribution
   - distro
   specific:
+  - Clear Linux
+  - EuroLinux
+  - CBL-Mariner
   - EasyNAS
   - Virtuozzo Linux
   - Haiku
@@ -874,6 +888,7 @@ security:
   - vulnerable
   - vulnerabilities
   specific:
+  - tfsec
   - Scorecards
   - Suricata
   - Regula
@@ -920,6 +935,8 @@ security:
 special:
   generic: []
   specific:
+  - OpenCPN
+  - Binwalk
   - AngouriMath
   - Snoop
   - Dolibarr
@@ -1211,7 +1228,10 @@ user:
 web:
   generic: []
   specific:
+  - uBlock Origin
+  - PowerDNS Authoritative Server
   - claws
+  - Claws Mail
   - Mutt
   - Min
   - WriteFreely
