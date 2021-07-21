@@ -682,19 +682,32 @@ class DigestRecordsCollection:
                     logger.info(f'{records_left_to_process} record(s) left to process')
 
             logger.info(f'Uploading record #{record.drid} to FNGS')
-            result = requests.patch(f'{self.api_url}/digest-records/{record.drid}/',
-                                    data=json.dumps({
-                                        'id': record.drid,
-                                        'state': record.state.name if record.state is not None else None,
-                                        'digest_number': record.digest_number,
-                                        'is_main': record.is_main,
-                                        'category': record.category.name if record.category is not None else None,
-                                        'subcategory': record.subcategory.name if record.subcategory is not None else None,
-                                    }),
-                                    headers={
-                                        'Authorization': f'Bearer {self._token}',
-                                        'Content-Type': 'application/json',
-                                    })
+            attempts_count = 5
+            # TODO: Refactoring, replace all network calls with wrappers with retries
+            url = f'{self.api_url}/digest-records/{record.drid}/'
+            logger.debug(f'Patching URL {url}')
+            for attempt_i in range(attempts_count):
+                try:
+                    result = requests.patch(url,
+                                            data=json.dumps({
+                                                'id': record.drid,
+                                                'state': record.state.name if record.state is not None else None,
+                                                'digest_number': record.digest_number,
+                                                'is_main': record.is_main,
+                                                'category': record.category.name if record.category is not None else None,
+                                                'subcategory': record.subcategory.name if record.subcategory is not None else None,
+                                            }),
+                                            headers={
+                                                'Authorization': f'Bearer {self._token}',
+                                                'Content-Type': 'application/json',
+                                            },
+                                            timeout=5)
+                except requests.exceptions.ReadTimeout as e:
+                    if attempt_i < attempts_count - 1:
+                        logger.warning(
+                            f'Timeout reached while trying to patch {url}, trying again, {attempts_count - attempt_i - 1} attempts left, error was: {e}')
+                    else:
+                        raise Exception(f'Timeout reached while trying to patch {url}, retries exceeded, error was: {e}')
             if result.status_code != 200:
                 raise Exception(f'Invalid response code from FNGS patch - {result.status_code}: {result.content.decode("utf-8")}')
             logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_number} to FNGS')
@@ -780,11 +793,21 @@ class DigestRecordsCollection:
         logger.debug(f'Getting similar records for digest number #{digest_number}, category "{category.value}" and subcategory "{subcategory.value}"')
         url = f'{self.api_url}/similar-digest-records/?digest_number={digest_number}&category={category.name}&subcategory={subcategory.name}'
         logger.debug(f'Getting URL {url}')
-        result = requests.get(url,
-                              headers={
-                                  'Authorization': f'Bearer {self._token}',
-                                  'Content-Type': 'application/json',
-                              })
+        attempts_count = 5
+        # TODO: Refactoring, replace all network calls with wrappers with retries
+        for attempt_i in range(attempts_count):
+            try:
+                result = requests.get(url,
+                                      headers={
+                                          'Authorization': f'Bearer {self._token}',
+                                          'Content-Type': 'application/json',
+                                      },
+                                      timeout=5)
+            except requests.exceptions.ReadTimeout as e:
+                if attempt_i < attempts_count - 1:
+                    logger.warning(f'Timeout reached while trying to get {url}, trying again, {attempts_count - attempt_i - 1} attempts left, error was: {e}')
+                else:
+                    raise Exception(f'Timeout reached while trying to get {url}, retries exceeded, error was: {e}')
         if result.status_code != 200:
             logger.error(f'Failed to retrieve similar digest records, status code {result.status_code}, response: {result.content}')
             # TODO: Raise exception
