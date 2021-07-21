@@ -384,6 +384,78 @@ sysadm:
   - Puppet
   - Zabbix
   - OpenTelemetry
+  - OpenZFS
+  - Eclipse iceoryx
+  - iceoryx
+  - Polkit
+  - Homebrew
+  - Hardinfo
+  - CPU-G
+  - CPU-X
+  - Polkit
+  - Util-linux
+  - Windows Package Manager
+  - winget
+  - Pacman
+  - Archinstall
+  - ReiserFS
+  - Reiser4
+  - Libreboot
+  - Bacula
+  - zsh
+  - X.Org Server
+  - Sway
+  - wlroots
+  - Monitorix
+  - PF
+  - PulseAudio
+  - PipeWire
+  - zlib
+  - zlib-ng
+  - Grub
+  - Grub2
+  - systemd
+  - Xorg
+  - Mir
+  - wayland-protocols
+  - Wayland
+  - XWayland
+  - PowerShell
+  - Guix
+  - bash
+  - i3wm
+  - ZFS
+  - Oramfs
+  - Btrfs
+  - sysvinit
+  - Coreboot
+  - Mesa
+  - Smartmontools
+  - JuiceFS
+  - tcb
+  - sudo
+  - Panfrost
+  - iptables
+  - nftables
+  - Flatpak
+  - DNF
+  - Yum
+  - APT
+  - Zypper
+  - NFS
+  - Binutils
+  - GParted
+  - Glibc
+  - Paru
+  - inetutils
+  - IPFS
+  - DRBD
+  - fish
+  - labwc
+  - coreutils
+  - journald
+  - syslog
+  - Samba
 devops:
   generic:
   - DevOps
@@ -1067,81 +1139,6 @@ special:
   - lebowski
   - MediaGoblin
   - Vitis HLS
-system:
-  generic: []
-  specific:
-  - OpenZFS
-  - Eclipse iceoryx
-  - iceoryx
-  - Polkit
-  - Homebrew
-  - Hardinfo
-  - CPU-G
-  - CPU-X
-  - Polkit
-  - Util-linux
-  - Windows Package Manager
-  - winget
-  - Pacman
-  - Archinstall
-  - ReiserFS
-  - Reiser4
-  - Libreboot
-  - Bacula
-  - zsh
-  - X.Org Server
-  - Sway
-  - wlroots
-  - Monitorix
-  - PF
-  - PulseAudio
-  - PipeWire
-  - zlib
-  - zlib-ng
-  - Grub
-  - Grub2
-  - systemd
-  - Xorg
-  - Mir
-  - wayland-protocols
-  - Wayland
-  - XWayland
-  - PowerShell
-  - Guix
-  - bash
-  - i3wm
-  - ZFS
-  - Oramfs
-  - Btrfs
-  - sysvinit
-  - Coreboot
-  - Mesa
-  - Smartmontools
-  - JuiceFS
-  - tcb
-  - sudo
-  - Panfrost
-  - iptables
-  - nftables
-  - Flatpak
-  - DNF
-  - Yum
-  - APT
-  - Zypper
-  - NFS
-  - Binutils
-  - GParted
-  - Glibc
-  - Paru
-  - inetutils
-  - IPFS
-  - DRBD
-  - fish
-  - labwc
-  - coreutils
-  - journald
-  - syslog
-  - Samba
 user:
   generic: []
   specific:

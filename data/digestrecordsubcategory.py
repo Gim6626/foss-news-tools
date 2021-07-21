@@ -8,7 +8,6 @@ class DigestRecordSubcategory(Enum):
     DIY = 'diy'
     LAW = 'law'
     KnD = 'knd'
-    SYSTEM = 'system'
     SPECIAL = 'special'
     EDUCATION = 'education'
     DATABASES = 'db'
@@ -37,7 +36,6 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
     'diy': 'DIY',
     'law': 'Юридические вопросы',
     'knd': 'Ядро и дистрибутивы',
-    'system': 'Системное',
     'special': 'Специальное',
     'education': 'Обучение',
     'db': 'Базы данных',
