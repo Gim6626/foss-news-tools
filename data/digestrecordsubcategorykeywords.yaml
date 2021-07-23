@@ -10,6 +10,8 @@ data_science:
   - data analytics
   - Natural Language Processing
   specific:
+  - PlotlyDash
+  - Streamlit
   - jax
   - PyCaret
   - Inception Resnet v2
@@ -173,6 +175,7 @@ db:
   - database
   - databases
   specific:
+  - CockroachDB
   - Meltano
   - Couchbase
   - Liquibase
@@ -215,6 +218,7 @@ dev:
   - development
   - coding
   specific:
+  - minidjvu-mod
   - Visual Studio Code
   - VS Code
   - jsii
@@ -370,6 +374,7 @@ dev:
 sysadm:
   generic: []
   specific:
+  - FreeType
   - Keycloak
   - Linstor
   - ISPConfig
@@ -463,6 +468,8 @@ devops:
   - CI CD
   - девопс
   specific:
+  - Podman
+  - containerd
   - KubeVirt
   - LXC
   - Omnia
@@ -642,6 +649,7 @@ knd:
   - distribution
   - distro
   specific:
+  - Pop!_OS
   - Clear Linux
   - EuroLinux
   - CBL-Mariner
@@ -841,6 +849,7 @@ mobile:
 multimedia:
   generic: []
   specific:
+  - HandBrake
   - Converseen
   - Mixxx
   - Fotoxx
@@ -929,6 +938,7 @@ opening:
   specific: []
 security:
   generic:
+  - https
   - attacked
   - ransomware
   - вредоносных
@@ -1225,6 +1235,7 @@ user:
 web:
   generic: []
   specific:
+  - uMatrix
   - uBlock Origin
   - PowerDNS Authoritative Server
   - claws
