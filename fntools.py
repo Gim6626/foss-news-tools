@@ -255,15 +255,6 @@ class DigestRecordsCollection:
         return pformat([record.to_dict() for record in self.records])
 
     @property
-    def _subcategories_keywords(self) -> Dict:
-        subcategories_keywords_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                                   'data',
-                                                   'digestrecordsubcategorykeywords.yaml')
-        with open(subcategories_keywords_path, 'r') as fin:
-            keywords = yaml.safe_load(fin)
-            return keywords
-
-    @property
     def api_url(self):
         return f'{self._protocol}://{self._host}:{self._port}/api/v1'
 
@@ -533,31 +524,77 @@ class DigestRecordsCollection:
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword in title.lower():
                 return DigestRecordCategory.RELEASES
-        for subcategory, keywords_by_type in self._subcategories_keywords.items():
-            for keyword in keywords_by_type['specific']:
-                keyword = keyword.replace('+', r'\+')
-                if re.search(keyword + r',?\s+v?\.?\d', title, re.IGNORECASE):
+        for keyword_data in self._keywords():
+            if not keyword_data['is_generic']:
+                keyword_name_fixed = keyword_data['name'].replace('+', r'\+')
+                if re.search(keyword_name_fixed + r',?\s+v?\.?\d', title, re.IGNORECASE):
                     return DigestRecordCategory.RELEASES
         return None
 
+    def _keywords(self):
+        url = f'{self.api_url}/keywords'
+        logger.debug(f'Getting URL {url}')
+        attempts_count = 5
+        # TODO: Refactoring, replace all network calls with wrappers with retries
+        for attempt_i in range(attempts_count):
+            try:
+                result = requests.get(url,
+                                      headers={
+                                          'Authorization': f'Bearer {self._token}',
+                                          'Content-Type': 'application/json',
+                                      },
+                                      timeout=5)
+            except requests.exceptions.ReadTimeout as e:
+                if attempt_i < attempts_count - 1:
+                    logger.warning(
+                        f'Timeout reached while trying to get {url}, trying again, {attempts_count - attempt_i - 1} attempts left, error was: {e}')
+                else:
+                    raise Exception(f'Timeout reached while trying to get {url}, retries exceeded, error was: {e}')
+        if result.status_code != 200:
+            logger.error(
+                f'Failed to retrieve guessed subcategories, status code {result.status_code}, response: {result.content}')
+            # TODO: Raise exception
+            return None
+        response_str = result.content.decode()
+        response = json.loads(response_str)
+        return response
+
+
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
+        url = f'{self.api_url}/guess-category/?title={title}'
+        logger.debug(f'Getting URL {url}')
+        attempts_count = 5
+        # TODO: Refactoring, replace all network calls with wrappers with retries
+        for attempt_i in range(attempts_count):
+            try:
+                result = requests.get(url,
+                                      headers={
+                                          'Authorization': f'Bearer {self._token}',
+                                          'Content-Type': 'application/json',
+                                      },
+                                      timeout=5)
+            except requests.exceptions.ReadTimeout as e:
+                if attempt_i < attempts_count - 1:
+                    logger.warning(f'Timeout reached while trying to get {url}, trying again, {attempts_count - attempt_i - 1} attempts left, error was: {e}')
+                else:
+                    raise Exception(f'Timeout reached while trying to get {url}, retries exceeded, error was: {e}')
+        if result.status_code != 200:
+            logger.error(f'Failed to retrieve guessed subcategories, status code {result.status_code}, response: {result.content}')
+            # TODO: Raise exception
+            return None
+        response_str = result.content.decode()
+        response = json.loads(response_str)
+        # TODO: Check title
+        matches = response['matches']
+
         guessed_subcategories: List[DigestRecordSubcategory] = []
         matched_subcategories_keywords = {}
-        for subcategory, keywords_by_type in self._subcategories_keywords.items():
-            keywords = keywords_by_type['generic'] + keywords_by_type['specific']
-            for keyword in keywords:
-                if re.search(rf'\b{re.escape(keyword)}\b', title, re.IGNORECASE):
-                    subcategory_already_matched = False
-                    for guessed_subcategory in guessed_subcategories:
-                        if guessed_subcategory.value == subcategory:
-                            subcategory_already_matched = True
-                            break
-                    if not subcategory_already_matched:
-                        guessed_subcategories.append(DigestRecordSubcategory(subcategory))
-                    if subcategory in matched_subcategories_keywords:
-                        matched_subcategories_keywords[subcategory].append(keyword)
-                    else:
-                        matched_subcategories_keywords[subcategory] = [keyword]
+
+        for guessed_subcategory_name, matched_keywords in matches.items():
+            subcategory = DigestRecordSubcategory(guessed_subcategory_name.lower())
+            guessed_subcategories.append(subcategory)
+            matched_subcategories_keywords[guessed_subcategory_name.lower()] = matched_keywords
+
         return guessed_subcategories, matched_subcategories_keywords
 
     def categorize_interactively(self):
