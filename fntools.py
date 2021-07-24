@@ -591,6 +591,8 @@ class DigestRecordsCollection:
         matched_subcategories_keywords = {}
 
         for guessed_subcategory_name, matched_keywords in matches.items():
+            if not guessed_subcategory_name or guessed_subcategory_name == 'null':
+                continue
             subcategory = DigestRecordSubcategory(guessed_subcategory_name.lower()
                                                   if guessed_subcategory_name != 'DATABASES'
                                                   else 'db')
