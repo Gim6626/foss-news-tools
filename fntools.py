@@ -591,7 +591,9 @@ class DigestRecordsCollection:
         matched_subcategories_keywords = {}
 
         for guessed_subcategory_name, matched_keywords in matches.items():
-            subcategory = DigestRecordSubcategory(guessed_subcategory_name.lower())
+            subcategory = DigestRecordSubcategory(guessed_subcategory_name.lower()
+                                                  if guessed_subcategory_name != 'DATABASES'
+                                                  else 'db')
             guessed_subcategories.append(subcategory)
             matched_subcategories_keywords[guessed_subcategory_name.lower()] = matched_keywords
 
@@ -650,7 +652,7 @@ class DigestRecordsCollection:
                 if guessed_subcategories:
                     matched_subcategories_keywords_translated = {}
                     for matched_subcategory, keywords in matched_subcategories_keywords.items():
-                        matched_subcategories_keywords_translated[DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[matched_subcategory]] = keywords
+                        matched_subcategories_keywords_translated[DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[matched_subcategory if matched_subcategory != 'databases' else 'db']] = keywords
                     print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
                     if len(guessed_subcategories) == 1:
                         guessed_subcategory = guessed_subcategories[0]
