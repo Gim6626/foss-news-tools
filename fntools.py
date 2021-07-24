@@ -87,11 +87,61 @@ class Logger(logging.Logger):
 logger = Logger()
 
 
-class BasicPostsStatisticsGetter(metaclass=ABCMeta):
-
-    GET_TIMEOUT_SECONDS = 30
+class NetworkingMixin:
     SLEEP_BETWEEN_ATTEMPTS_SECONDS = 5
-    GET_ATTEMPTS = 5
+    NETWORK_TIMEOUT_SECONDS = 5
+    NETWORK_RETRIES_COUNT = 50
+
+    class RequestType(Enum):
+        GET = 'GET'
+        PATCH = 'PATCH'
+        POST = 'POST'
+
+    def get_with_retries(self, url, headers=None):
+        return self.request_with_retries(url, headers=headers, method=self.RequestType.GET, data=None)
+
+    def patch_with_retries(self, url, headers=None, data=None):
+        return self.request_with_retries(url, headers=headers, method=self.RequestType.PATCH, data=data)
+
+    def post_with_retries(self, url, headers=None, data=None):
+        return self.request_with_retries(url, headers=headers, method=self.RequestType.POST, data=data)
+
+    def request_with_retries(self, url, headers=None, method=RequestType.GET, data=None):
+        if headers is None:
+            headers = {}
+        for attempt_i in range(self.NETWORK_RETRIES_COUNT):
+            try:
+                if method == self.RequestType.GET:
+                    logger.debug(f'GETting URL "{url}"')
+                    response = requests.get(url,
+                                            headers=headers,
+                                            timeout=self.NETWORK_TIMEOUT_SECONDS)
+                elif method == self.RequestType.PATCH:
+                    logger.debug(f'PATCHing URL "{url}"')
+                    response = requests.patch(url,
+                                              data=data,
+                                              headers=headers,
+                                              timeout=self.NETWORK_TIMEOUT_SECONDS)
+                elif method == self.RequestType.POST:
+                    logger.debug(f'POSTing URL "{url}"')
+                    response = requests.post(url,
+                                             data=data,
+                                             headers=headers,
+                                             timeout=self.NETWORK_TIMEOUT_SECONDS)
+                else:
+                    raise NotImplementedError
+                return response
+            except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
+                base_timeout_msg = f'Request to url {url} reached timeout of {self.NETWORK_TIMEOUT_SECONDS} seconds'
+                if attempt_i != self.NETWORK_RETRIES_COUNT - 1:
+                    logger.warning(f'{base_timeout_msg}, sleeping {self.SLEEP_BETWEEN_ATTEMPTS_SECONDS} seconds and trying again, {self.NETWORK_RETRIES_COUNT - attempt_i - 1} retries left')
+                    time.sleep(self.SLEEP_BETWEEN_ATTEMPTS_SECONDS)
+                else:
+                    raise Exception(f'{base_timeout_msg}, retries count {self.NETWORK_RETRIES_COUNT} exceeded')
+
+
+class BasicPostsStatisticsGetter(NetworkingMixin,
+                                 metaclass=ABCMeta):
 
     def __init__(self):
         self._posts_urls = {}
@@ -105,19 +155,6 @@ class BasicPostsStatisticsGetter(metaclass=ABCMeta):
             logger.info(f'Views count for {self.source_name} post #{number} ({url}): {views_count}')
             time.sleep(1)
         return posts_statistics
-
-    def _get_with_retries(self, url):
-        for attempt_i in range(self.GET_ATTEMPTS):
-            try:
-                response = requests.get(url, timeout=self.GET_TIMEOUT_SECONDS)
-                return response
-            except requests.exceptions.ReadTimeout:
-                base_timeout_msg = f'Fetching {url} timeout of {self.GET_TIMEOUT_SECONDS} seconds exceeded'
-                if attempt_i != self.GET_ATTEMPTS - 1:
-                    logger.error(f'{base_timeout_msg}, sleeping {self.SLEEP_BETWEEN_ATTEMPTS_SECONDS} seconds and trying again, {self.GET_ATTEMPTS - attempt_i - 1} retries left')
-                    time.sleep(self.SLEEP_BETWEEN_ATTEMPTS_SECONDS)
-                else:
-                    raise Exception(f'{base_timeout_msg}, retries count {self.GET_ATTEMPTS} exceeded')
 
     @abstractmethod
     def post_statistics(self, number, url):
@@ -136,7 +173,7 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter):
         self._posts_urls = HABR_POSTS
 
     def post_statistics(self, number, url):
-        response = self._get_with_retries(url)
+        response = self.get_with_retries(url)
         content = response.text
         re_result = re.search('<span class="post-stats__views-count">(.*?)</span>', content)
         if re_result is None:
@@ -183,7 +220,7 @@ class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
         return self._posts_urls
 
     def post_statistics(self, number, url):
-        response = self._get_with_retries(url)
+        response = self.get_with_retries(url)
         content = response.text
         re_result = re.search(r'<div class="articleView__views_info">(\d+) просмотр', content)
         if re_result is None:
@@ -238,7 +275,7 @@ class DigestRecord:
 
 
 # TODO: Refactor
-class DigestRecordsCollection:
+class DigestRecordsCollection(NetworkingMixin):
 
     def __init__(self,
                  records: List[DigestRecord] = None):
@@ -280,11 +317,13 @@ class DigestRecordsCollection:
 
     def _login(self):
         logger.info('Logging in')
-        result = requests.post(f'{self._protocol}://{self._host}:{self._port}/api/v1/token/',
-                               data={'username': self._user, 'password': self._password})
-        if result.status_code != 200:
-            raise Exception(f'Invalid response code from FNGS login - {result.status_code}: {result.content.decode("utf-8")}')
-        result_data = json.loads(result.content)
+        url = f'{self._protocol}://{self._host}:{self._port}/api/v1/token/'
+        data = {'username': self._user, 'password': self._password}
+        response = self.post_with_retries(url=url,
+                                          data=data)
+        if response.status_code != 200:
+            raise Exception(f'Invalid response code from FNGS login - {response.status_code}: {response.content.decode("utf-8")}')
+        result_data = json.loads(response.content)
         self._token = result_data['access']
         logger.info('Logged in')
 
@@ -320,17 +359,12 @@ class DigestRecordsCollection:
                                              digest_number: int):
         logger.info(f'Getting digest records duplicates for digest number #{digest_number}')
         url = f'{self.api_url}/digest-records-duplicates-detailed/?digest_number={digest_number}'
-        logger.debug(f'Getting URL {url}')
-        result = requests.get(url,
-                              headers={
-                                  'Authorization': f'Bearer {self._token}',
-                                  'Content-Type': 'application/json',
-                              })
-        if result.status_code != 200:
-            logger.error(f'Failed to retrieve digest records duplicates, status code {result.status_code}, response: {result.content}')
-            # TODO: Raise exception
+        response = self.get_with_retries(url, headers=self._auth_headers)
+        if response.status_code != 200:
+            logger.error(f'Failed to retrieve digest records duplicates, status code {response.status_code}, response: {response.content}')
+            # TODO: Raise exception and handle above
             return None
-        response_str = result.content.decode()
+        response_str = response.content.decode()
         response = json.loads(response_str)
         if not response:
             logger.info('No digest records duplicates found')
@@ -371,16 +405,12 @@ class DigestRecordsCollection:
     def _basic_load_digest_records_from_server(self, yaml_config_path: str, url: str):
         records_objects: List[DigestRecord] = []
         logger.info('Getting data')
-        result = requests.get(url,
-                              headers={
-                                  'Authorization': f'Bearer {self._token}',
-                                  'Content-Type': 'application/json',
-                              })
-        if result.status_code != 200:
+        response = self.get_with_retries(url, headers=self._auth_headers)
+        if response.status_code != 200:
             raise Exception(
-                f'Invalid response code from FNGS fetch - {result.status_code}: {result.content.decode("utf-8")}')
+                f'Invalid response code from FNGS fetch - {response.status_code}: {response.content.decode("utf-8")}')
         logger.info('Got data')
-        result_data = json.loads(result.content)
+        result_data = json.loads(response.content)
         for record_plain in result_data:
             if record_plain['dt'] is not None:
                 dt_str = datetime.datetime.strptime(record_plain['dt'],
@@ -531,58 +561,34 @@ class DigestRecordsCollection:
                     return DigestRecordCategory.RELEASES
         return None
 
+    @property
+    def _auth_headers(self):
+        return {
+            'Authorization': f'Bearer {self._token}',
+            'Content-Type': 'application/json',
+        }
+
     def _keywords(self):
         url = f'{self.api_url}/keywords'
-        logger.debug(f'Getting URL {url}')
-        attempts_count = 5
-        # TODO: Refactoring, replace all network calls with wrappers with retries
-        for attempt_i in range(attempts_count):
-            try:
-                result = requests.get(url,
-                                      headers={
-                                          'Authorization': f'Bearer {self._token}',
-                                          'Content-Type': 'application/json',
-                                      },
-                                      timeout=5)
-            except requests.exceptions.ReadTimeout as e:
-                if attempt_i < attempts_count - 1:
-                    logger.warning(
-                        f'Timeout reached while trying to get {url}, trying again, {attempts_count - attempt_i - 1} attempts left, error was: {e}')
-                else:
-                    raise Exception(f'Timeout reached while trying to get {url}, retries exceeded, error was: {e}')
-        if result.status_code != 200:
+        response = self.get_with_retries(url, self._auth_headers)
+        if response.status_code != 200:
             logger.error(
-                f'Failed to retrieve guessed subcategories, status code {result.status_code}, response: {result.content}')
-            # TODO: Raise exception
+                f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
+            # TODO: Raise exception and handle above
             return None
-        response_str = result.content.decode()
+        response_str = response.content.decode()
         response = json.loads(response_str)
         return response
 
 
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
         url = f'{self.api_url}/guess-category/?title={title}'
-        logger.debug(f'Getting URL {url}')
-        attempts_count = 5
-        # TODO: Refactoring, replace all network calls with wrappers with retries
-        for attempt_i in range(attempts_count):
-            try:
-                result = requests.get(url,
-                                      headers={
-                                          'Authorization': f'Bearer {self._token}',
-                                          'Content-Type': 'application/json',
-                                      },
-                                      timeout=5)
-            except requests.exceptions.ReadTimeout as e:
-                if attempt_i < attempts_count - 1:
-                    logger.warning(f'Timeout reached while trying to get {url}, trying again, {attempts_count - attempt_i - 1} attempts left, error was: {e}')
-                else:
-                    raise Exception(f'Timeout reached while trying to get {url}, retries exceeded, error was: {e}')
-        if result.status_code != 200:
-            logger.error(f'Failed to retrieve guessed subcategories, status code {result.status_code}, response: {result.content}')
-            # TODO: Raise exception
+        response = self.get_with_retries(url, self._auth_headers)
+        if response.status_code != 200:
+            logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
+            # TODO: Raise exception and handle above
             return None
-        response_str = result.content.decode()
+        response_str = response.content.decode()
         response = json.loads(response_str)
         # TODO: Check title
         matches = response['matches']
@@ -725,34 +731,20 @@ class DigestRecordsCollection:
                     logger.info(f'{records_left_to_process} record(s) left to process')
 
             logger.info(f'Uploading record #{record.drid} to FNGS')
-            attempts_count = 5
-            # TODO: Refactoring, replace all network calls with wrappers with retries
             url = f'{self.api_url}/digest-records/{record.drid}/'
-            logger.debug(f'Patching URL {url}')
-            for attempt_i in range(attempts_count):
-                try:
-                    result = requests.patch(url,
-                                            data=json.dumps({
-                                                'id': record.drid,
-                                                'state': record.state.name if record.state is not None else None,
-                                                'digest_number': record.digest_number,
-                                                'is_main': record.is_main,
-                                                'category': record.category.name if record.category is not None else None,
-                                                'subcategory': record.subcategory.name if record.subcategory is not None else None,
-                                            }),
-                                            headers={
-                                                'Authorization': f'Bearer {self._token}',
-                                                'Content-Type': 'application/json',
-                                            },
-                                            timeout=5)
-                except requests.exceptions.ReadTimeout as e:
-                    if attempt_i < attempts_count - 1:
-                        logger.warning(
-                            f'Timeout reached while trying to patch {url}, trying again, {attempts_count - attempt_i - 1} attempts left, error was: {e}')
-                    else:
-                        raise Exception(f'Timeout reached while trying to patch {url}, retries exceeded, error was: {e}')
-            if result.status_code != 200:
-                raise Exception(f'Invalid response code from FNGS patch - {result.status_code}: {result.content.decode("utf-8")}')
+            data = json.dumps({
+                'id': record.drid,
+                'state': record.state.name if record.state is not None else None,
+                'digest_number': record.digest_number,
+                'is_main': record.is_main,
+                'category': record.category.name if record.category is not None else None,
+                'subcategory': record.subcategory.name if record.subcategory is not None else None,
+            })
+            response = self.patch_with_retries(url=url,
+                                               headers=self._auth_headers,
+                                               data=data)
+            if response.status_code != 200:
+                raise Exception(f'Invalid response code from FNGS patch - {response.status_code}: {response.content.decode("utf-8")}')
             logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_number} to FNGS')
             logger.info(f'If you want to change some parameters that you\'ve set - go to http://fn.permlug.org/admin/gatherer/digestrecord/{record.drid}/change/')
 
@@ -835,27 +827,12 @@ class DigestRecordsCollection:
                                 subcategory):
         logger.debug(f'Getting similar records for digest number #{digest_number}, category "{category.value}" and subcategory "{subcategory.value}"')
         url = f'{self.api_url}/similar-digest-records/?digest_number={digest_number}&category={category.name}&subcategory={subcategory.name}'
-        logger.debug(f'Getting URL {url}')
-        attempts_count = 5
-        # TODO: Refactoring, replace all network calls with wrappers with retries
-        for attempt_i in range(attempts_count):
-            try:
-                result = requests.get(url,
-                                      headers={
-                                          'Authorization': f'Bearer {self._token}',
-                                          'Content-Type': 'application/json',
-                                      },
-                                      timeout=5)
-            except requests.exceptions.ReadTimeout as e:
-                if attempt_i < attempts_count - 1:
-                    logger.warning(f'Timeout reached while trying to get {url}, trying again, {attempts_count - attempt_i - 1} attempts left, error was: {e}')
-                else:
-                    raise Exception(f'Timeout reached while trying to get {url}, retries exceeded, error was: {e}')
-        if result.status_code != 200:
-            logger.error(f'Failed to retrieve similar digest records, status code {result.status_code}, response: {result.content}')
-            # TODO: Raise exception
+        response = self.get_with_retries(url, headers=self._auth_headers)
+        if response.status_code != 200:
+            logger.error(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
+            # TODO: Raise exception and handle above
             return None
-        response_str = result.content.decode()
+        response_str = response.content.decode()
         response = json.loads(response_str)
         if not response:
             logger.info('No similar records found')
@@ -892,16 +869,12 @@ class DigestRecordsCollection:
             'id': duplicate_id,
             'digest_records': existing_drids + [digest_record_id],
         }
-        logger.debug(f'PATCHing URL {url} with data {data}')
-        result = requests.patch(url,
-                                data=json.dumps(data),
-                                headers={
-                                    'Authorization': f'Bearer {self._token}',
-                                    'Content-Type': 'application/json',
-                                })
-        if result.status_code != 200:
-            logger.error(f'Failed to update digest record duplicate, status code {result.status_code}, response: {result.content}')
-            # TODO: Raise exception
+        response = self.patch_with_retries(url=url,
+                                           data=json.dumps(data),
+                                           headers=self._auth_headers)
+        if response.status_code != 200:
+            logger.error(f'Failed to update digest record duplicate, status code {response.status_code}, response: {response.content}')
+            # TODO: Raise exception and handle above
 
     def _create_digest_record_duplicate(self,
                                         digest_number,
@@ -914,34 +887,26 @@ class DigestRecordsCollection:
             'digest_records': digest_records_ids,
         }
         logger.debug(f'POSTing data {data} to URL {url}')
-        result = requests.post(url,
-                               data=json.dumps(data),
-                               headers={
-                                   'Authorization': f'Bearer {self._token}',
-                                   'Content-Type': 'application/json',
-                               })
-        if result.status_code != 201:
-            logger.error(f'Failed to create digest record duplicate, status code {result.status_code}, response: {result.content}')
-            # TODO: Raise exception
+        response = self.post_with_retries(url,
+                                          data=json.dumps(data),
+                                          headers=self._auth_headers)
+        if response.status_code != 201:
+            logger.error(f'Failed to create digest record duplicate, status code {response.status_code}, response: {response.content}')
+            # TODO: Raise exception and handle above
 
     def _digest_record_by_id(self, digest_record_id):
         logger.debug(f'Loading digest record #{digest_record_id}')
         url = f'{self.api_url}/digest-records/{digest_record_id}'
-        logger.debug(f'Getting URL {url}')
-        result = requests.get(url,
-                              headers = {
-                                  'Authorization': f'Bearer {self._token}',
-                                  'Content-Type': 'application/json',
-                              })
-        if result.status_code != 200:
-            logger.error(f'Failed to retrieve digest record, status code {result.status_code}, response: {result.content}')
-            # TODO: Raise exception
+        response = self.get_with_retries(url, headers=self._auth_headers)
+        if response.status_code != 200:
+            logger.error(f'Failed to retrieve digest record, status code {response.status_code}, response: {response.content}')
+            # TODO: Raise exception and handle above
             return None
-        logger.debug(f'Received response: {result.content}')
-        response_str = result.content.decode()
+        logger.debug(f'Received response: {response.content}')
+        response_str = response.content.decode()
         response = json.loads(response_str)
         if not response:
-            # TODO: Raise exception
+            # TODO: Raise exception and handle above
             logger.error('No digest record in response')
             return None
         return response
@@ -949,18 +914,13 @@ class DigestRecordsCollection:
     def _duplicates_by_digest_record(self, digest_record_id):
         logger.debug(f'Checking if there are duplicates for digest record #{digest_record_id}')
         url = f'{self.api_url}/duplicates-by-digest-record/?digest_record={digest_record_id}'
-        logger.debug(f'Getting URL {url}')
-        result = requests.get(url,
-                              headers={
-                                  'Authorization': f'Bearer {self._token}',
-                                  'Content-Type': 'application/json',
-                              })
-        if result.status_code != 200:
-            logger.error(f'Failed to retrieve similar digest records, status code {result.status_code}, response: {result.content}')
-            # TODO: Raise exception
+        response = self.get_with_retries(url, headers=self._auth_headers)
+        if response.status_code != 200:
+            logger.error(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
+            # TODO: Raise exception and handle above
             return None
-        logger.debug(f'Received response: {result.content}')
-        response_str = result.content.decode()
+        logger.debug(f'Received response: {response.content}')
+        response_str = response.content.decode()
         response = json.loads(response_str)
         if not response:
             logger.debug(f'No duplicates found for digest record #{digest_record_id}')
