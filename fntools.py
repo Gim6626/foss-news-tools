@@ -110,6 +110,7 @@ class NetworkingMixin:
         if headers is None:
             headers = {}
         for attempt_i in range(self.NETWORK_RETRIES_COUNT):
+            begin_datetime = datetime.datetime.now()
             try:
                 if method == self.RequestType.GET:
                     logger.debug(f'GETting URL "{url}"')
@@ -130,6 +131,8 @@ class NetworkingMixin:
                                              timeout=self.NETWORK_TIMEOUT_SECONDS)
                 else:
                     raise NotImplementedError
+                end_datetime = datetime.datetime.now()
+                logger.debug(f'Response time: {end_datetime - begin_datetime}')
                 return response
             except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
                 base_timeout_msg = f'Request to url {url} reached timeout of {self.NETWORK_TIMEOUT_SECONDS} seconds'
