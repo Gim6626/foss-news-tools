@@ -118,6 +118,8 @@ def main():
             elif current_toc_h2_item.title == 'Короткой строкой':
                 if tag.cleared_html_src == 'Новости':
                     label = 'news'
+                elif tag.cleared_html_src == 'Видео':
+                    label = 'videos'
                 elif tag.cleared_html_src == 'Статьи':
                     label = 'articles'
                 elif tag.cleared_html_src == 'Релизы':
@@ -142,6 +144,8 @@ def main():
         elif tag.ttype == TagType.H4:
             if current_toc_h3_item.title == 'Новости':
                 label = f'news-{len(current_toc_h3_item.subitems) + 1}'
+            elif current_toc_h3_item.title == 'Видео':
+                label = f'videos-{len(current_toc_h3_item.subitems) + 1}'
             elif current_toc_h3_item.title == 'Статьи':
                 label = f'articles-{len(current_toc_h3_item.subitems) + 1}'
             elif current_toc_h3_item.title == 'Релизы':
