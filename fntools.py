@@ -559,10 +559,10 @@ class DigestRecordsCollection(NetworkingMixin):
         if 'https://www.youtube.com' in url:
             return DigestRecordCategory.VIDEOS
         for release_keyword in RELEASES_KEYWORDS:
-            if release_keyword in title.lower():
+            if release_keyword.lower() in title.lower():
                 return DigestRecordCategory.RELEASES
         for article_keyword in ARTICLES_KEYWORDS:
-            if article_keyword in title.lower():
+            if article_keyword.lower() in title.lower():
                 return DigestRecordCategory.ARTICLES
 
         for keyword_data in self._keywords():
