@@ -21,6 +21,7 @@ import html
 from colorama import Fore, Style
 
 from data.releaseskeywords import *
+from data.articleskeywords import *
 from data.habrposts import *
 from data.digestrecordcategory import *
 from data.digestrecordstate import *
@@ -560,6 +561,9 @@ class DigestRecordsCollection(NetworkingMixin):
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword in title.lower():
                 return DigestRecordCategory.RELEASES
+        for article_keyword in ARTICLES_KEYWORDS:
+            if article_keyword in title.lower():
+                return DigestRecordCategory.ARTICLES
 
         for keyword_data in self._keywords():
             if not keyword_data['is_generic']:
