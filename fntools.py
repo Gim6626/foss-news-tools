@@ -601,9 +601,11 @@ class DigestRecordsCollection(NetworkingMixin):
         response_str = response.content.decode()
         response = json.loads(response_str)
         if response and 'similar_records_in_previous_digest' in response:
-            logger.info('Similar records in previout digest:')
-            for record_title in response['similar_records_in_previous_digest']:
-                logger.info(f'- {record_title}')
+            similar_records_in_previous_digest = response['similar_records_in_previous_digest']
+            if similar_records_in_previous_digest:
+                logger.info('Similar records in previous digest:')
+                for record_title in similar_records_in_previous_digest:
+                    logger.info(f'- {record_title}')
 
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
         url = f'{self.api_url}/guess-category/?title={title}'
