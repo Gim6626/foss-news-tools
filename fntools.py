@@ -671,7 +671,7 @@ class DigestRecordsCollection(NetworkingMixin):
         for record in self.records:
             # TODO: Rewrite using FSM
             logger.info(f'Processing record "{record.title}" from date {record.dt}')
-            print(record)
+            print(f'New record:\n{record}')
             self._show_similar_from_previous_digest(current_digest_number, record.keywords)
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
