@@ -592,6 +592,9 @@ class DigestRecordsCollection(NetworkingMixin):
         return response
 
     def _show_similar_from_previous_digest(self, current_digest_number: int, keywords: List[str]):
+        if not keywords:
+            logger.debug('Could not search for similar records from previous digest cause keywords list is empty')
+            return
         url = f'{self.api_url}/similar-records-in-previous-digest/?keywords={",".join(keywords)}&current-digest-number={current_digest_number}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
