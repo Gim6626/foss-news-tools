@@ -607,8 +607,17 @@ class DigestRecordsCollection(NetworkingMixin):
             similar_records_in_previous_digest = response['similar_records_in_previous_digest']
             if similar_records_in_previous_digest:
                 logger.info('Similar records in previous digest:')
-                for record_title in similar_records_in_previous_digest:
-                    logger.info(f'- {record_title}')
+                for record in similar_records_in_previous_digest:
+                    is_main_ru = "главная" if record["is_main"] else "не главная"
+                    if record["category"]:
+                        category_ru = DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.from_name(record["category"]).value].lower()
+                    else:
+                        category_ru = None
+                    if record["subcategory"]:
+                        subcategory_ru = DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[DigestRecordSubcategory.from_name(record["subcategory"]).value].lower()
+                    else:
+                        subcategory_ru = None
+                    logger.info(f'- {record["title"]} ({is_main_ru}, {category_ru}, {subcategory_ru})')
 
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
         url = f'{self.api_url}/guess-category/?title={title}'

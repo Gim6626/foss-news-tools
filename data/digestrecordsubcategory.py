@@ -27,6 +27,10 @@ class DigestRecordSubcategory(Enum):
     HARDWARE = 'hardware'
     MISC = 'misc'
 
+    @staticmethod
+    def from_name(name: str):
+        return DigestRecordSubcategory(name.lower() if name.lower() != 'databases' else 'db')
+
 
 DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
     'events': 'Мероприятия',

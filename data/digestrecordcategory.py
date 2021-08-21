@@ -9,6 +9,10 @@ class DigestRecordCategory(Enum):
     RELEASES = 'releases'
     OTHER = 'other'
 
+    @staticmethod
+    def from_name(name: str):
+        return DigestRecordCategory(name.lower())
+
 
 DIGEST_RECORD_CATEGORY_RU_MAPPING = {
     'unknown': 'Неизвестно',
