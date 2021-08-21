@@ -591,6 +591,19 @@ class DigestRecordsCollection(NetworkingMixin):
         response = json.loads(response_str)
         return response
 
+    def _show_similar_from_previous_digest(self, current_digest_number: int, keywords: List[str]):
+        url = f'{self.api_url}/similar-records-in-previous-digest/?keywords={",".join(keywords)}&current-digest-number={current_digest_number}'
+        response = self.get_with_retries(url, self._auth_headers)
+        if response.status_code != 200:
+            logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
+            # TODO: Raise exception and handle above
+            return None
+        response_str = response.content.decode()
+        response = json.loads(response_str)
+        if response and 'similar_records_in_previous_digest' in response:
+            logger.info('Similar records in previout digest:')
+            for record_title in response['similar_records_in_previous_digest']:
+                logger.info(f'- {record_title}')
 
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
         url = f'{self.api_url}/guess-category/?title={title}'
@@ -619,7 +632,6 @@ class DigestRecordsCollection(NetworkingMixin):
         return guessed_subcategories, matched_subcategories_keywords
 
     def categorize_interactively(self):
-        current_digest_number = None
         self._filtered_records = []
         for record in self.records:
             if record.state == DigestRecordState.UNKNOWN:
@@ -641,17 +653,15 @@ class DigestRecordsCollection(NetworkingMixin):
                         continue
         logger.info(f'{len(self._filtered_records)} record(s) left to process')
         records_left_to_process = len(self._filtered_records)
+        current_digest_number = self._ask_digest_number()
         for record in self.records:
             # TODO: Rewrite using FSM
             logger.info(f'Processing record "{record.title}" from date {record.dt}:\n{record}')
+            self._show_similar_from_previous_digest(current_digest_number, record.keywords)
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
             if record.digest_number is None:
-                if current_digest_number is None:
-                    record.digest_number = self._ask_digest_number(record)
-                    current_digest_number = record.digest_number
-                else:
-                    record.digest_number = current_digest_number
+                record.digest_number = current_digest_number
             if record.state in (DigestRecordState.IN_DIGEST,
                                 DigestRecordState.OUTDATED):
                 if record.is_main is None:
@@ -777,12 +787,11 @@ class DigestRecordsCollection(NetworkingMixin):
                 print('Invalid answer, it should be integer or "n"')
         raise NotImplementedError
 
-    def _ask_digest_number(self, record: DigestRecord):
+    def _ask_digest_number(self):
         while True:
-            digest_number_str = input(f'Please input digest number for "{record.title}": ')
+            digest_number_str = input(f'Please input current digest number: ')
             if digest_number_str.isnumeric():
                 digest_number = int(digest_number_str)
-                logger.info(f'Setting digest number of record "{record.title}" to {digest_number}')
                 return digest_number
             else:
                 print('Invalid digest number, it should be integer')
