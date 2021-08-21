@@ -607,7 +607,7 @@ class DigestRecordsCollection(NetworkingMixin):
         if response and 'similar_records_in_previous_digest' in response:
             similar_records_in_previous_digest = response['similar_records_in_previous_digest']
             if similar_records_in_previous_digest:
-                logger.info('Similar records in previous digest:')
+                print(f'{USER_INTERACTION_TEXT_COLOR}Similar records in previous digest:')
                 for record in similar_records_in_previous_digest:
                     is_main_ru = "главная" if record["is_main"] else "не главная"
                     if record["category"]:
@@ -618,7 +618,8 @@ class DigestRecordsCollection(NetworkingMixin):
                         subcategory_ru = DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[DigestRecordSubcategory.from_name(record["subcategory"]).value].lower()
                     else:
                         subcategory_ru = None
-                    logger.info(f'- {record["title"]} ({is_main_ru}, {category_ru}, {subcategory_ru})')
+                    print(f'- {record["title"]} ({is_main_ru}, {category_ru}, {subcategory_ru})')
+                print(Style.RESET_ALL, end='')
 
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
         url = f'{self.api_url}/guess-category/?title={title}'
@@ -671,7 +672,8 @@ class DigestRecordsCollection(NetworkingMixin):
         current_digest_number = self._ask_digest_number()
         for record in self.records:
             # TODO: Rewrite using FSM
-            logger.info(f'Processing record "{record.title}" from date {record.dt}:\n{USER_INTERACTION_TEXT_COLOR}{record}{Style.RESET_ALL}')
+            logger.info(f'Processing record "{record.title}" from date {record.dt}')
+            print(f'{USER_INTERACTION_TEXT_COLOR}{record}{Style.RESET_ALL}')
             self._show_similar_from_previous_digest(current_digest_number, record.keywords)
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
@@ -783,7 +785,7 @@ class DigestRecordsCollection(NetworkingMixin):
             if response.status_code != 200:
                 raise Exception(f'Invalid response code from FNGS patch - {response.status_code}: {response.content.decode("utf-8")}')
             logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_number} to FNGS')
-            logger.info(f'If you want to change some parameters that you\'ve set - go to {USER_INTERACTION_TEXT_COLOR}{self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record.drid}/change/{Style.RESET_ALL}')
+            print(f'{USER_INTERACTION_TEXT_COLOR}If you want to change some parameters that you\'ve set - go to {self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record.drid}/change/{Style.RESET_ALL}')
 
     def _ask_state(self, record: DigestRecord):
         return self._ask_enum('digest record state', DigestRecordState, record)
