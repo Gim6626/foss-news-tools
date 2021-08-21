@@ -938,7 +938,7 @@ class DigestRecordsCollection(NetworkingMixin):
             logger.error(f'Failed to retrieve digest record, status code {response.status_code}, response: {response.content}')
             # TODO: Raise exception and handle above
             return None
-        logger.debug(f'Received response: {response.content}')
+        # logger.debug(f'Received response: {response.content}')  # TODO: Make "super debug" level and enable for it only
         response_str = response.content.decode()
         response = json.loads(response_str)
         if not response:
@@ -955,7 +955,7 @@ class DigestRecordsCollection(NetworkingMixin):
             logger.error(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
             # TODO: Raise exception and handle above
             return None
-        logger.debug(f'Received response: {response.content}')
+        # logger.debug(f'Received response: {response.content}')  # TODO: Make "super debug" level and enable for it only
         response_str = response.content.decode()
         response = json.loads(response_str)
         if not response:
