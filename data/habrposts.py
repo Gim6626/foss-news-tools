@@ -80,4 +80,6 @@ HABR_POSTS = {
     79: 'https://habr.com/ru/post/568348/',
     80: 'https://habr.com/ru/post/569540/',
     81: 'https://habr.com/ru/post/570764/',
+    82: 'https://habr.com/ru/post/571804/',
+    83: 'https://habr.com/ru/post/573056/',
 }
