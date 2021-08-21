@@ -30,6 +30,7 @@ from data.digestrecordsubcategory import *
 
 SCRIPT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 DIGEST_RECORD_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
+USER_INTERACTION_TEXT_COLOR = Fore.BLUE
 
 days_count = None
 
@@ -670,7 +671,7 @@ class DigestRecordsCollection(NetworkingMixin):
         current_digest_number = self._ask_digest_number()
         for record in self.records:
             # TODO: Rewrite using FSM
-            logger.info(f'Processing record "{record.title}" from date {record.dt}:\n{record}')
+            logger.info(f'Processing record "{record.title}" from date {record.dt}:\n{USER_INTERACTION_TEXT_COLOR}{record}{Style.RESET_ALL}')
             self._show_similar_from_previous_digest(current_digest_number, record.keywords)
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
@@ -679,13 +680,13 @@ class DigestRecordsCollection(NetworkingMixin):
             if record.state in (DigestRecordState.IN_DIGEST,
                                 DigestRecordState.OUTDATED):
                 if record.is_main is None:
-                    is_main = self._ask_bool(f'Please input whether or no "{record.title}" is main (y/n): ')
+                    is_main = self._ask_bool(f'{USER_INTERACTION_TEXT_COLOR}Please input whether or no "{record.title}" is main (y/n):{Style.RESET_ALL} ')
                     logger.info(f'{"Marking" if is_main else "Not marking"} "{record.title}" as one of main records')
                     record.is_main = is_main
 
                 guessed_category = self._guess_category(record.title, record.url)
                 if guessed_category is not None:
-                    msg = f'Guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}". Accept? y/n: '
+                    msg = f'{USER_INTERACTION_TEXT_COLOR}Guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}". Accept? y/n: {Style.RESET_ALL}'
                     accepted = self._ask_bool(msg)
                     if accepted:
                         logger.info(f'Setting category of record "{record.title}" to "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
@@ -696,19 +697,19 @@ class DigestRecordsCollection(NetworkingMixin):
                     matched_subcategories_keywords_translated = {}
                     for matched_subcategory, keywords in matched_subcategories_keywords.items():
                         matched_subcategories_keywords_translated[DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[matched_subcategory if matched_subcategory != 'databases' else 'db']] = keywords
-                    print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
+                    print(f'{USER_INTERACTION_TEXT_COLOR}Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}{Style.RESET_ALL}')
                     if len(guessed_subcategories) == 1:
                         guessed_subcategory = guessed_subcategories[0]
-                        msg = f'Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: '
+                        msg = f'{USER_INTERACTION_TEXT_COLOR}Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: {Style.RESET_ALL}'
                         accepted = self._ask_bool(msg)
                         if accepted:
                             logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
                             record.subcategory = guessed_subcategory
                     else:
-                        msg = 'Guessed subcategories are:'
+                        msg = f'{USER_INTERACTION_TEXT_COLOR}Guessed subcategories are:'
                         for guessed_subcategory_i, guessed_subcategory in enumerate(guessed_subcategories):
                             msg += f'\n{guessed_subcategory_i + 1}. {DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}'
-                        msg += '\nType guessed subcategory index or "n" if no match: '
+                        msg += f'\nType guessed subcategory index or "n" if no match: {Style.RESET_ALL}'
                         guessed_subcategory_index = self._ask_guessed_subcategory_index(msg,
                                                                                         len(guessed_subcategories))
                         if guessed_subcategory_index is not None:
@@ -731,7 +732,7 @@ class DigestRecordsCollection(NetworkingMixin):
                                                                                            record.category,
                                                                                            record.subcategory)
                     if current_records_with_similar_categories:
-                        print(f'Are there any duplicates for digest record "{record.title}" ({record.url})? Here is list of possible ones:')
+                        print(f'{USER_INTERACTION_TEXT_COLOR}Are there any duplicates for digest record "{record.title}" ({record.url})? Here is list of possible ones:')
                         i = 1
                         options_indexes = []
                         for option in current_records_with_similar_categories['duplicates']:
@@ -743,6 +744,7 @@ class DigestRecordsCollection(NetworkingMixin):
                             options_indexes.append(option['id'])
                             i += 1
                         option_index = self._ask_option_index_or_no(i - 1)
+                        print(Style.RESET_ALL)
                         if option_index is not None:
                             if option_index <= len(current_records_with_similar_categories['duplicates']):
                                 existing_drids = None
@@ -781,14 +783,14 @@ class DigestRecordsCollection(NetworkingMixin):
             if response.status_code != 200:
                 raise Exception(f'Invalid response code from FNGS patch - {response.status_code}: {response.content.decode("utf-8")}')
             logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_number} to FNGS')
-            logger.info(f'If you want to change some parameters that you\'ve set - go to http://fn.permlug.org/admin/gatherer/digestrecord/{record.drid}/change/')
+            logger.info(f'If you want to change some parameters that you\'ve set - go to {USER_INTERACTION_TEXT_COLOR}{self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record.drid}/change/{Style.RESET_ALL}')
 
     def _ask_state(self, record: DigestRecord):
         return self._ask_enum('digest record state', DigestRecordState, record)
 
     def _ask_option_index_or_no(self, max_index):
         while True:
-            option_index_str = input(f'Please input option number or "n" to create new one: ')
+            option_index_str = input(f'{USER_INTERACTION_TEXT_COLOR}Please input option number or "n" to create new one: {Style.RESET_ALL}')
             if option_index_str.isnumeric():
                 option_index = int(option_index_str)
                 if 0 < option_index <= max_index:
@@ -803,7 +805,7 @@ class DigestRecordsCollection(NetworkingMixin):
 
     def _ask_digest_number(self):
         while True:
-            digest_number_str = input(f'Please input current digest number: ')
+            digest_number_str = input(f'{USER_INTERACTION_TEXT_COLOR}Please input current digest number: {Style.RESET_ALL}')
             if digest_number_str.isnumeric():
                 digest_number = int(digest_number_str)
                 return digest_number
@@ -968,12 +970,12 @@ class DigestRecordsCollection(NetworkingMixin):
                   translations: Dict[str, str] = None):
         while True:
             logger.info(f'Waiting for {enum_name}')
-            logger.info('Available values:')
+            print(f'{USER_INTERACTION_TEXT_COLOR}Available values:')
             enum_options_values = [enum_variant.value for enum_variant in enum_class]
             for enum_option_value_i, enum_option_value in enumerate(enum_options_values):
                 enum_option_value_mod = translations[enum_option_value] if translations is not None else enum_option_value
                 print(f'{enum_option_value_i + 1}. {enum_option_value_mod}')
-            enum_value_index_str = input(f'Please input index of {enum_name} for "{record.title}": ')
+            enum_value_index_str = input(f'Please input index of {enum_name} for "{record.title}":{Style.RESET_ALL} ')
             if enum_value_index_str.isnumeric():
                 enum_value_index = int(enum_value_index_str)
                 if 0 <= enum_value_index <= len(enum_options_values):
