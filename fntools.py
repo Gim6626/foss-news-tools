@@ -240,7 +240,7 @@ class DigestRecord:
                  title: str,
                  url: str,
                  state: DigestRecordState = DigestRecordState.UNKNOWN,
-                 digest_number: int = None,
+                 digest_issue: int = None,
                  category: DigestRecordCategory = DigestRecordCategory.UNKNOWN,
                  subcategory: Enum = None,
                  drid: int = None,
@@ -251,7 +251,7 @@ class DigestRecord:
         self.title = title
         self.url = url
         self.state = state
-        self.digest_number = digest_number
+        self.digest_issue = digest_issue
         self.category = category
         self.subcategory = subcategory
         self.drid = drid
@@ -270,7 +270,7 @@ class DigestRecord:
             'url': self.url,
             'is_main': self.is_main,
             'state': self.state.value if self.state is not None else None,
-            'digest_number': self.digest_number,
+            'digest_issue': self.digest_issue,
             'category': self.category.value if self.category is not None else None,
             'subcategory': self.subcategory.value if self.subcategory is not None else None,
             'keywords': self.keywords,
@@ -310,7 +310,7 @@ class DigestRecordsCollection(NetworkingMixin):
                 'url': record_object.url,
                 'state': record_object.state.value if record_object.state is not None else None,
                 'is_main': record_object.is_main,
-                'digest_number': record_object.digest_number,
+                'digest_issue': record_object.digest_issue,
                 'category': record_object.category.value if record_object.category is not None else None,
                 'subcategory': record_object.subcategory.value if record_object.subcategory is not None else None,
             }
@@ -344,13 +344,13 @@ class DigestRecordsCollection(NetworkingMixin):
 
     def load_specific_digest_records_from_server(self,
                                                  yaml_config_path: str,
-                                                 digest_number: int):
+                                                 digest_issue: int):
         self._load_config(yaml_config_path)
         self._login()
         self._load_duplicates_for_specific_digest(yaml_config_path,
-                                                  digest_number)
+                                                  digest_issue)
         self._basic_load_digest_records_from_server(yaml_config_path,
-                                                    f'{self._protocol}://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_number={digest_number}')
+                                                    f'{self._protocol}://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_issue={digest_issue}')
 
     def load_new_digest_records_from_server(self, yaml_config_path: str):
         self._load_config(yaml_config_path)
@@ -360,9 +360,9 @@ class DigestRecordsCollection(NetworkingMixin):
 
     def _load_duplicates_for_specific_digest(self,
                                              yaml_config_path: str,
-                                             digest_number: int):
-        logger.info(f'Getting digest records duplicates for digest number #{digest_number}')
-        url = f'{self.api_url}/digest-records-duplicates-detailed/?digest_number={digest_number}'
+                                             digest_issue: int):
+        logger.info(f'Getting digest records duplicates for digest number #{digest_issue}')
+        url = f'{self.api_url}/digest-records-duplicates-detailed/?digest_issue={digest_issue}'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve digest records duplicates, status code {response.status_code}, response: {response.content}')
@@ -376,7 +376,7 @@ class DigestRecordsCollection(NetworkingMixin):
         response_converted = []
         for duplicate in response:
             duplicate_converted = {}
-            for key in ('id', 'digest_number'):
+            for key in ('id', 'digest_issue'):
                 duplicate_converted[key] = duplicate[key]
             if not duplicate['digest_records']:
                 logger.warning(f'Empty digest records list in duplicate #{duplicate["id"]}')
@@ -391,7 +391,7 @@ class DigestRecordsCollection(NetworkingMixin):
                 record_obj = DigestRecord(dt_str,
                                           record['title'],
                                           record['url'],
-                                          digest_number=record['digest_number'],
+                                          digest_issue=record['digest_issue'],
                                           drid=record['id'],
                                           is_main=record['is_main'],
                                           keywords=record['keywords'].split(';') if record['keywords'] else [],
@@ -424,7 +424,7 @@ class DigestRecordsCollection(NetworkingMixin):
             record_object = DigestRecord(dt_str,
                                          record_plain['title'],
                                          record_plain['url'],
-                                         digest_number=record_plain['digest_number'],
+                                         digest_issue=record_plain['digest_issue'],
                                          drid=record_plain['id'],
                                          is_main=record_plain['is_main'],
                                          keywords=record_plain['keywords'].split(';') if record_plain['keywords'] else [],
@@ -591,11 +591,11 @@ class DigestRecordsCollection(NetworkingMixin):
         response = json.loads(response_str)
         return response
 
-    def _show_similar_from_previous_digest(self, current_digest_number: int, keywords: List[str]):
+    def _show_similar_from_previous_digest(self, current_digest_issue: int, keywords: List[str]):
         if not keywords:
             logger.debug('Could not search for similar records from previous digest cause keywords list is empty')
             return
-        url = f'{self.api_url}/similar-records-in-previous-digest/?keywords={",".join(keywords)}&current-digest-number={current_digest_number}'
+        url = f'{self.api_url}/similar-records-in-previous-digest/?keywords={",".join(keywords)}&current-digest-number={current_digest_issue}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
@@ -655,7 +655,7 @@ class DigestRecordsCollection(NetworkingMixin):
                 self._filtered_records.append(record)
                 continue
             if record.state == DigestRecordState.IN_DIGEST:
-                if record.digest_number is None:
+                if record.digest_issue is None:
                     self._filtered_records.append(record)
                     continue
                 if record.category == DigestRecordCategory.UNKNOWN:
@@ -667,16 +667,16 @@ class DigestRecordsCollection(NetworkingMixin):
                         continue
         logger.info(f'{len(self._filtered_records)} record(s) left to process')
         records_left_to_process = len(self._filtered_records)
-        current_digest_number = self._ask_digest_number()
+        current_digest_issue = self._ask_digest_issue()
         for record in self.records:
             # TODO: Rewrite using FSM
             logger.info(f'Processing record "{record.title}" from date {record.dt}')
             print(f'New record:\n{record}')
-            self._show_similar_from_previous_digest(current_digest_number, record.keywords)
+            self._show_similar_from_previous_digest(current_digest_issue, record.keywords)
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
-            if record.digest_number is None:
-                record.digest_number = current_digest_number
+            if record.digest_issue is None:
+                record.digest_issue = current_digest_issue
             if record.state in (DigestRecordState.IN_DIGEST,
                                 DigestRecordState.OUTDATED):
                 if record.is_main is None:
@@ -728,7 +728,7 @@ class DigestRecordsCollection(NetworkingMixin):
                 if record.state == DigestRecordState.IN_DIGEST \
                         and record.category is not None \
                         and record.subcategory is not None:
-                    current_records_with_similar_categories = self._similar_digest_records(record.digest_number,
+                    current_records_with_similar_categories = self._similar_digest_records(record.digest_issue,
                                                                                            record.category,
                                                                                            record.subcategory)
                     if current_records_with_similar_categories:
@@ -754,7 +754,7 @@ class DigestRecordsCollection(NetworkingMixin):
                                 self._add_digest_record_do_duplicate(options_indexes[option_index - 1], existing_drids, record.drid)
                                 logger.info('Added to duplicate')  # TODO: More details
                             else:
-                                self._create_digest_record_duplicate(record.digest_number, [options_indexes[option_index - 1], record.drid])
+                                self._create_digest_record_duplicate(record.digest_issue, [options_indexes[option_index - 1], record.drid])
                                 logger.info('New duplicate created')  # TODO: More details
                         else:
                             logger.info('No duplicates specified')
@@ -772,7 +772,7 @@ class DigestRecordsCollection(NetworkingMixin):
             data = json.dumps({
                 'id': record.drid,
                 'state': record.state.name if record.state is not None else None,
-                'digest_number': record.digest_number,
+                'digest_issue': record.digest_issue,
                 'is_main': record.is_main,
                 'category': record.category.name if record.category is not None else None,
                 'subcategory': record.subcategory.name if record.subcategory is not None else None,
@@ -782,7 +782,7 @@ class DigestRecordsCollection(NetworkingMixin):
                                                data=data)
             if response.status_code != 200:
                 raise Exception(f'Invalid response code from FNGS patch - {response.status_code}: {response.content.decode("utf-8")}')
-            logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_number} to FNGS')
+            logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_issue} to FNGS')
             print(f'If you want to change some parameters that you\'ve set - go to {self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record.drid}/change/')
 
     def _ask_state(self, record: DigestRecord):
@@ -803,12 +803,12 @@ class DigestRecordsCollection(NetworkingMixin):
                 print('Invalid answer, it should be integer or "n"')
         raise NotImplementedError
 
-    def _ask_digest_number(self):
+    def _ask_digest_issue(self):
         while True:
-            digest_number_str = input(f'Please input current digest number: ')
-            if digest_number_str.isnumeric():
-                digest_number = int(digest_number_str)
-                return digest_number
+            digest_issue_str = input(f'Please input current digest number: ')
+            if digest_issue_str.isnumeric():
+                digest_issue = int(digest_issue_str)
+                return digest_issue
             else:
                 print('Invalid digest number, it should be integer')
         raise NotImplementedError
@@ -858,11 +858,11 @@ class DigestRecordsCollection(NetworkingMixin):
             raise NotImplementedError
 
     def _similar_digest_records(self,
-                                digest_number,
+                                digest_issue,
                                 category,
                                 subcategory):
-        logger.debug(f'Getting similar records for digest number #{digest_number}, category "{category.value}" and subcategory "{subcategory.value}"')
-        url = f'{self.api_url}/similar-digest-records/?digest_number={digest_number}&category={category.name}&subcategory={subcategory.name}'
+        logger.debug(f'Getting similar records for digest number #{digest_issue}, category "{category.value}" and subcategory "{subcategory.value}"')
+        url = f'{self.api_url}/similar-digest-records/?digest_issue={digest_issue}&category={category.name}&subcategory={subcategory.name}'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
@@ -913,13 +913,13 @@ class DigestRecordsCollection(NetworkingMixin):
             # TODO: Raise exception and handle above
 
     def _create_digest_record_duplicate(self,
-                                        digest_number,
+                                        digest_issue,
                                         digest_records_ids,
                                         ):
         logger.debug(f'Creating digest record duplicate from #{digest_records_ids}')
         url = f'{self.api_url}/digest-records-duplicates/'
         data = {
-            'digest_number': digest_number,
+            'digest_issue': digest_issue,
             'digest_records': digest_records_ids,
         }
         logger.debug(f'POSTing data {data} to URL {url}')
