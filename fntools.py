@@ -427,7 +427,7 @@ class DigestRecordsCollection(NetworkingMixin):
                                          digest_issue=record_plain['digest_issue'],
                                          drid=record_plain['id'],
                                          is_main=record_plain['is_main'],
-                                         keywords=record_plain['keywords'].split(';') if record_plain['keywords'] else [],
+                                         keywords=[k['name'] for k in record_plain['title_keywords']] if record_plain['title_keywords'] else [],
                                          language=record_plain['language'])
             record_object.state = DigestRecordState(record_plain['state'].lower()) if 'state' in record_plain and record_plain['state'] is not None else None
             record_object.category = DigestRecordCategory(record_plain['category'].lower()) if 'category' in record_plain and record_plain['category'] is not None else None
