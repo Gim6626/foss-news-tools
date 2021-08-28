@@ -585,6 +585,8 @@ class DigestRecordsCollection(NetworkingMixin):
     def _guess_category(self, title: str, url: str) -> DigestRecordCategory:
         if 'https://www.youtube.com' in url:
             return DigestRecordCategory.VIDEOS
+        if 'SD Times Open-Source Project of the Week' in title:
+            return DigestRecordCategory.OTHER
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword.lower() in title.lower():
                 return DigestRecordCategory.RELEASES
@@ -795,30 +797,31 @@ class DigestRecordsCollection(NetworkingMixin):
                         logger.info(f'Setting category of record "{record.title}" to "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
                         record.category = guessed_category
 
-                guessed_subcategories, matched_subcategories_keywords = self._guess_subcategory(record.title)
-                if guessed_subcategories:
-                    matched_subcategories_keywords_translated = {}
-                    for matched_subcategory, keywords in matched_subcategories_keywords.items():
-                        matched_subcategories_keywords_translated[DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[matched_subcategory if matched_subcategory != 'databases' else 'db']] = keywords
-                    print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
-                    if len(guessed_subcategories) == 1:
-                        guessed_subcategory = guessed_subcategories[0]
-                        msg = f'Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: '
-                        accepted = self._ask_bool(msg)
-                        if accepted:
-                            logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
-                            record.subcategory = guessed_subcategory
-                    else:
-                        msg = f'Guessed subcategories are:'
-                        for guessed_subcategory_i, guessed_subcategory in enumerate(guessed_subcategories):
-                            msg += f'\n{guessed_subcategory_i + 1}. {DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}'
-                        msg += f'\nType guessed subcategory index or "n" if no match: '
-                        guessed_subcategory_index = self._ask_guessed_subcategory_index(msg,
-                                                                                        len(guessed_subcategories))
-                        if guessed_subcategory_index is not None:
-                            guessed_subcategory = guessed_subcategories[guessed_subcategory_index - 1]
-                            logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
-                            record.subcategory = guessed_subcategory
+                if guessed_category != DigestRecordCategory.OTHER:
+                    guessed_subcategories, matched_subcategories_keywords = self._guess_subcategory(record.title)
+                    if guessed_subcategories:
+                        matched_subcategories_keywords_translated = {}
+                        for matched_subcategory, keywords in matched_subcategories_keywords.items():
+                            matched_subcategories_keywords_translated[DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[matched_subcategory if matched_subcategory != 'databases' else 'db']] = keywords
+                        print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
+                        if len(guessed_subcategories) == 1:
+                            guessed_subcategory = guessed_subcategories[0]
+                            msg = f'Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: '
+                            accepted = self._ask_bool(msg)
+                            if accepted:
+                                logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
+                                record.subcategory = guessed_subcategory
+                        else:
+                            msg = f'Guessed subcategories are:'
+                            for guessed_subcategory_i, guessed_subcategory in enumerate(guessed_subcategories):
+                                msg += f'\n{guessed_subcategory_i + 1}. {DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}'
+                            msg += f'\nType guessed subcategory index or "n" if no match: '
+                            guessed_subcategory_index = self._ask_guessed_subcategory_index(msg,
+                                                                                            len(guessed_subcategories))
+                            if guessed_subcategory_index is not None:
+                                guessed_subcategory = guessed_subcategories[guessed_subcategory_index - 1]
+                                logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
+                                record.subcategory = guessed_subcategory
 
                 if record.category == DigestRecordCategory.UNKNOWN or record.category is None:
                     record.category = self._ask_category(record,
