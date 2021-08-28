@@ -352,14 +352,11 @@ class DigestRecordsCollection(NetworkingMixin):
                                                  digest_issue: int):
         self._load_config(self._config_path)
         self._login()
-        self._load_duplicates_for_specific_digest(self._config_path,
-                                                  digest_issue)
-        self._basic_load_digest_records_from_server(self._config_path,
-                                                    f'{self._protocol}://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_issue={digest_issue}')
+        self._load_duplicates_for_specific_digest(digest_issue)
+        self._basic_load_digest_records_from_server(f'{self._protocol}://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_issue={digest_issue}')
 
     def _load_one_new_digest_record_from_server(self):
-        self._basic_load_digest_records_from_server(self._config_path,
-                                                    f'{self._protocol}://{self._host}:{self._port}/api/v1/one-new-foss-news-digest-record/')
+        self._basic_load_digest_records_from_server(f'{self._protocol}://{self._host}:{self._port}/api/v1/one-new-foss-news-digest-record/')
 
     def _load_tbot_categorization_data(self):
         self.records = []
@@ -432,7 +429,7 @@ class DigestRecordsCollection(NetworkingMixin):
         self.duplicates += response_converted
 
 
-    def _basic_load_digest_records_from_server(self, yaml_config_path: str, url: str):
+    def _basic_load_digest_records_from_server(self, url: str):
         records_objects: List[DigestRecord] = []
         logger.info('Getting data')
         response = self.get_with_retries(url, headers=self._auth_headers)

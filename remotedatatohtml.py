@@ -25,9 +25,9 @@ def parse_command_line_args():
 
 def main():
     args = parse_command_line_args()
-    digest_records_collection = DigestRecordsCollection()
+    digest_records_collection = DigestRecordsCollection(args.FNGS_CONFIG)
     # TODO: Check digest number if it is int
-    digest_records_collection.load_specific_digest_records_from_server(args.FNGS_CONFIG, int(args.DIGEST_NUMBER))
+    digest_records_collection.load_specific_digest_records_from_server(int(args.DIGEST_NUMBER))
     digest_records_collection.records_to_html(args.DESTINATION)
 
 
