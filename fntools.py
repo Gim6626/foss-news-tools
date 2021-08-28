@@ -711,7 +711,7 @@ class DigestRecordsCollection(NetworkingMixin):
                 continue
             ignore_state_votes_count = len([state for state in record.state_estimations if state == DigestRecordState.IGNORED])
             total_state_votes_count = len(record.state_estimations)
-            if ignore_state_votes_count / total_state_votes_count > total_state_votes_count / 2:
+            if ignore_state_votes_count / total_state_votes_count > 0.5:
                 ignore_candidates_records.append(record)
         if ignore_candidates_records:
             print('Candidates to ignore:')
