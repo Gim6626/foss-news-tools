@@ -722,7 +722,7 @@ class DigestRecordsCollection(NetworkingMixin):
                 answer = input('Approve all records ignoring with typing "all" or comma-separated input records indexes which you want to left non-ignored: ')
                 if answer == 'all':
                     do_not_ignore_records_indexes = []
-                elif re.fullmatch(r'[0-9]+(,[0-9]+)+?', answer):
+                elif re.fullmatch(r'[0-9]+(,[0-9]+)*?', answer):
                     do_not_ignore_records_indexes = [int(i) - 1 for i in answer.split(',')]
                 else:
                     print('Invalid answer, please input "all" or comma-separated indexes list')
