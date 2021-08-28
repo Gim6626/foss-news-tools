@@ -678,12 +678,12 @@ class DigestRecordsCollection(NetworkingMixin):
         while True:
             if self._current_digest_issue is None:
                 self._current_digest_issue = self._ask_digest_issue()
-            self._print_non_categorized_digest_records_count()
+            # self._print_non_categorized_digest_records_count()
             self._load_tbot_categorization_data()
             if self.records:
                 # TODO: Think how to process left record in non-conflicting with Tbot usage way
                 self._categorize_records_from_tbot()
-                self._print_non_categorized_digest_records_count()
+                # self._print_non_categorized_digest_records_count()
             if not self.records:
                 self._load_one_new_digest_record_from_server()
             self._categorize_new_records()
