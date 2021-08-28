@@ -24,8 +24,7 @@ def main():
     if args.debug:
         logger.setLevel(logging.DEBUG)
     config_path = args.FNGS_CONFIG
-    records_collection = DigestRecordsCollection()
-    records_collection.load_new_digest_records_from_server(config_path)
+    records_collection = DigestRecordsCollection(config_path)
     records_collection.categorize_interactively()
 
 

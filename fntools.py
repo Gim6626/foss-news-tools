@@ -246,7 +246,8 @@ class DigestRecord:
                  drid: int = None,
                  is_main: bool = None,
                  keywords: List[str] = None,
-                 language: str = None):
+                 language: str = None,
+                 state_estimations: List[DigestRecordState] = None):
         self.dt = dt
         self.title = title
         self.url = url
@@ -258,6 +259,7 @@ class DigestRecord:
         self.is_main = is_main
         self.keywords = keywords
         self.language = language
+        self.state_estimations = state_estimations
 
     def __str__(self):
         return pformat(self.to_dict())
@@ -275,6 +277,7 @@ class DigestRecord:
             'subcategory': self.subcategory.value if self.subcategory is not None else None,
             'keywords': self.keywords,
             'language': self.language,
+            'state_estimations': [state.value for state in self.state_estimations],
         }
 
 
@@ -282,7 +285,9 @@ class DigestRecord:
 class DigestRecordsCollection(NetworkingMixin):
 
     def __init__(self,
+                 config_path: str,
                  records: List[DigestRecord] = None):
+        self._config_path = config_path
         self.records = records if records is not None else []
         self.duplicates = []
         self._filtered_records = []
@@ -291,6 +296,7 @@ class DigestRecordsCollection(NetworkingMixin):
         self._user = None
         self._password = None
         self._token = None
+        self._current_digest_issue = None
 
     def __str__(self):
         return pformat([record.to_dict() for record in self.records])
@@ -343,31 +349,51 @@ class DigestRecordsCollection(NetworkingMixin):
             logger.info('Loaded')
 
     def load_specific_digest_records_from_server(self,
-                                                 yaml_config_path: str,
                                                  digest_issue: int):
-        self._load_config(yaml_config_path)
+        self._load_config(self._config_path)
         self._login()
-        self._load_duplicates_for_specific_digest(yaml_config_path,
+        self._load_duplicates_for_specific_digest(self._config_path,
                                                   digest_issue)
-        self._basic_load_digest_records_from_server(yaml_config_path,
+        self._basic_load_digest_records_from_server(self._config_path,
                                                     f'{self._protocol}://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_issue={digest_issue}')
 
-    def load_new_digest_records_from_server(self, yaml_config_path: str):
-        self._load_config(yaml_config_path)
-        self._login()
-        self._basic_load_digest_records_from_server(yaml_config_path,
-                                                    f'{self._protocol}://{self._host}:{self._port}/api/v1/new-foss-news-digest-records/')
+    def _load_one_new_digest_record_from_server(self):
+        self._basic_load_digest_records_from_server(self._config_path,
+                                                    f'{self._protocol}://{self._host}:{self._port}/api/v1/one-new-foss-news-digest-record/')
+
+    def _load_tbot_categorization_data(self):
+        self.records = []
+        logger.info('Loading TBot categorization data')
+        url = f'{self.api_url}/digest-records-categorized-by-tbot/'
+        response = self.get_with_retries(url, headers=self._auth_headers)
+        if response.status_code != 200:
+            raise Exception(f'Failed to retrieve digest records duplicates, status code {response.status_code}, response: {response.content}')
+        response_str = response.content.decode()
+        response_data = json.loads(response_str)
+        for digest_record_id, digest_record_data in response_data.items():
+            if digest_record_data['dt'] is not None:
+                dt_str = datetime.datetime.strptime(digest_record_data['dt'],
+                                                    '%Y-%m-%dT%H:%M:%SZ')
+            else:
+                dt_str = None
+            record_object = DigestRecord(dt_str,
+                                         digest_record_data['title'],
+                                         digest_record_data['url'],
+                                         digest_issue=digest_record_data['digest_issue'],
+                                         drid=digest_record_id,
+                                         is_main=digest_record_data['is_main'],
+                                         keywords=digest_record_data['title_keywords'],
+                                         state_estimations=[DigestRecordState(s.lower()) for s in digest_record_data['estimations']['state']])
+            self.records.append(record_object)
+
 
     def _load_duplicates_for_specific_digest(self,
-                                             yaml_config_path: str,
                                              digest_issue: int):
         logger.info(f'Getting digest records duplicates for digest number #{digest_issue}')
         url = f'{self.api_url}/digest-records-duplicates-detailed/?digest_issue={digest_issue}'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
-            logger.error(f'Failed to retrieve digest records duplicates, status code {response.status_code}, response: {response.content}')
-            # TODO: Raise exception and handle above
-            return None
+            raise Exception(f'Failed to retrieve digest records duplicates, status code {response.status_code}, response: {response.content}')
         response_str = response.content.decode()
         response = json.loads(response_str)
         if not response:
@@ -394,7 +420,7 @@ class DigestRecordsCollection(NetworkingMixin):
                                           digest_issue=record['digest_issue'],
                                           drid=record['id'],
                                           is_main=record['is_main'],
-                                          keywords=record['keywords'].split(';') if record['keywords'] else [],
+                                          keywords=record['title_keywords'],
                                           language=record['language'])
                 record_obj.state = DigestRecordState(record['state'].lower()) if 'state' in record and record['state'] is not None else None
                 record_obj.category = DigestRecordCategory(record['category'].lower()) if 'category' in record and record['category'] is not None else None
@@ -428,7 +454,8 @@ class DigestRecordsCollection(NetworkingMixin):
                                          drid=record_plain['id'],
                                          is_main=record_plain['is_main'],
                                          keywords=[k['name'] for k in record_plain['title_keywords']] if record_plain['title_keywords'] else [],
-                                         language=record_plain['language'])
+                                         language=record_plain['language'],
+                                         state_estimations=[DigestRecordState(estimation['estimated_state'].lower()) for estimation in record_plain['tbot_estimations']])
             record_object.state = DigestRecordState(record_plain['state'].lower()) if 'state' in record_plain and record_plain['state'] is not None else None
             record_object.category = DigestRecordCategory(record_plain['category'].lower()) if 'category' in record_plain and record_plain['category'] is not None else None
             if 'subcategory' in record_plain and record_plain['subcategory'] == 'DATABASES':
@@ -591,11 +618,11 @@ class DigestRecordsCollection(NetworkingMixin):
         response = json.loads(response_str)
         return response
 
-    def _show_similar_from_previous_digest(self, current_digest_issue: int, keywords: List[str]):
+    def _show_similar_from_previous_digest(self, keywords: List[str]):
         if not keywords:
             logger.debug('Could not search for similar records from previous digest cause keywords list is empty')
             return
-        url = f'{self.api_url}/similar-records-in-previous-digest/?keywords={",".join(keywords)}&current-digest-number={current_digest_issue}'
+        url = f'{self.api_url}/similar-records-in-previous-digest/?keywords={",".join(keywords)}&current-digest-number={self._current_digest_issue}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
@@ -646,6 +673,85 @@ class DigestRecordsCollection(NetworkingMixin):
         return guessed_subcategories, matched_subcategories_keywords
 
     def categorize_interactively(self):
+        self._load_config(self._config_path)
+        self._login()
+        while True:
+            if self._current_digest_issue is None:
+                self._current_digest_issue = self._ask_digest_issue()
+            self._print_non_categorized_digest_records_count()
+            self._load_tbot_categorization_data()
+            if self.records:
+                # TODO: Think how to process left record in non-conflicting with Tbot usage way
+                self._categorize_records_from_tbot()
+                self._print_non_categorized_digest_records_count()
+            if not self.records:
+                self._load_one_new_digest_record_from_server()
+            self._categorize_new_records()
+            self._print_non_categorized_digest_records_count()
+            if self._non_categorized_digest_records_count() == 0:
+                logger.info('No uncategorized digest records left')
+                break
+
+    def _print_non_categorized_digest_records_count(self):
+        left_to_process_count = self._non_categorized_digest_records_count()
+        logger.info(f'Digest record(s) left to process: {left_to_process_count}')
+
+    def _non_categorized_digest_records_count(self):
+        url = f'{self.api_url}/not-categorized-digest-records-count/'
+        response = self.get_with_retries(url=url,
+                                         headers=self._auth_headers)
+        response_str = response.content.decode()
+        response_data = json.loads(response_str)
+        return response_data['count']
+
+    def _categorize_records_from_tbot(self):
+        ignore_candidates_records = []
+        for record in self.records:
+            if not record.state_estimations:
+                continue
+            ignore_state_votes_count = len([state for state in record.state_estimations if state == DigestRecordState.IGNORED])
+            total_state_votes_count = len(record.state_estimations)
+            if ignore_state_votes_count / total_state_votes_count > total_state_votes_count / 2:
+                ignore_candidates_records.append(record)
+        if ignore_candidates_records:
+            print('Candidates to ignore:')
+            for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records):
+                print(f'{ignore_candidate_record_i + 1}. {ignore_candidate_record.title} {ignore_candidate_record.url}')
+            do_not_ignore_records_indexes = []
+            while True:
+                answer = input('Approve all records ignoring with typing "all" or comma-separated input records indexes which you want to left non-ignored: ')
+                if answer == 'all':
+                    do_not_ignore_records_indexes = []
+                elif re.fullmatch(r'[0-9]+(,[0-9]+)+?', answer):
+                    do_not_ignore_records_indexes = [int(i) - 1 for i in answer.split(',')]
+                else:
+                    print('Invalid answer, please input "all" or comma-separated indexes list')
+                    continue
+                break
+            records_to_ignore = [ignore_candidate_record
+                                 for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records)
+                                 if ignore_candidate_record_i not in do_not_ignore_records_indexes]
+            records_left_from_tbot = [ignore_candidate_record
+                                      for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records)
+                                      if ignore_candidate_record_i not in do_not_ignore_records_indexes]
+            if records_to_ignore:
+                logger.info('Setting following records as "ignored":')
+                for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
+                    logger.info(f'{record_to_ignore_i + 1}. {record_to_ignore.title} {record_to_ignore.url} {self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record_to_ignore.drid}/change/')
+                    record_to_ignore.digest_issue = self._current_digest_issue
+                    record_to_ignore.state = DigestRecordState.IGNORED
+                logger.info('Uploading data')
+                for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
+                    self._upload_record(record_to_ignore)
+            records_left_from_tbot = [digest_record
+                                      for digest_record_i, digest_record in
+                                      enumerate(ignore_candidates_records)
+                                      if digest_record_i in do_not_ignore_records_indexes]
+            self.records = records_left_from_tbot
+        else:
+            self.records = []
+
+    def _categorize_new_records(self):
         self._filtered_records = []
         for record in self.records:
             if record.state == DigestRecordState.UNKNOWN:
@@ -665,18 +771,15 @@ class DigestRecordsCollection(NetworkingMixin):
                     if record.category != DigestRecordCategory.OTHER:
                         self._filtered_records.append(record)
                         continue
-        logger.info(f'{len(self._filtered_records)} record(s) left to process')
-        records_left_to_process = len(self._filtered_records)
-        current_digest_issue = self._ask_digest_issue()
         for record in self.records:
             # TODO: Rewrite using FSM
             logger.info(f'Processing record "{record.title}" from date {record.dt}')
             print(f'New record:\n{record}')
-            self._show_similar_from_previous_digest(current_digest_issue, record.keywords)
+            self._show_similar_from_previous_digest(record.keywords)
             if record.state == DigestRecordState.UNKNOWN:
                 record.state = self._ask_state(record)
             if record.digest_issue is None:
-                record.digest_issue = current_digest_issue
+                record.digest_issue = self._current_digest_issue
             if record.state in (DigestRecordState.IN_DIGEST,
                                 DigestRecordState.OUTDATED):
                 if record.is_main is None:
@@ -761,29 +864,27 @@ class DigestRecordsCollection(NetworkingMixin):
                     else:
                         logger.info('Similar digest records not found')
 
+            self._upload_record(record)
 
-            if record in self._filtered_records:
-                records_left_to_process -= 1
-                if records_left_to_process > 0:
-                    logger.info(f'{records_left_to_process} record(s) left to process')
-
-            logger.info(f'Uploading record #{record.drid} to FNGS')
-            url = f'{self.api_url}/digest-records/{record.drid}/'
-            data = json.dumps({
-                'id': record.drid,
-                'state': record.state.name if record.state is not None else None,
-                'digest_issue': record.digest_issue,
-                'is_main': record.is_main,
-                'category': record.category.name if record.category is not None else None,
-                'subcategory': record.subcategory.name if record.subcategory is not None else None,
-            })
-            response = self.patch_with_retries(url=url,
-                                               headers=self._auth_headers,
-                                               data=data)
-            if response.status_code != 200:
-                raise Exception(f'Invalid response code from FNGS patch - {response.status_code}: {response.content.decode("utf-8")}')
-            logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_issue} to FNGS')
-            print(f'If you want to change some parameters that you\'ve set - go to {self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record.drid}/change/')
+    def _upload_record(self, record):
+        logger.info(f'Uploading record #{record.drid} to FNGS')
+        url = f'{self.api_url}/digest-records/{record.drid}/'
+        data = json.dumps({
+            'id': record.drid,
+            'state': record.state.name if record.state is not None else None,
+            'digest_issue': record.digest_issue,
+            'is_main': record.is_main,
+            'category': record.category.name if record.category is not None else None,
+            'subcategory': record.subcategory.name if record.subcategory is not None else None,
+        })
+        response = self.patch_with_retries(url=url,
+                                           headers=self._auth_headers,
+                                           data=data)
+        if response.status_code != 200:
+            raise Exception(
+                f'Invalid response code from FNGS patch - {response.status_code}: {response.content.decode("utf-8")}')
+        logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_issue} to FNGS')
+        logger.info(f'If you want to change some parameters that you\'ve set - go to {self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record.drid}/change/')
 
     def _ask_state(self, record: DigestRecord):
         return self._ask_enum('digest record state', DigestRecordState, record)
