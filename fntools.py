@@ -469,6 +469,12 @@ class DigestRecordsCollection(NetworkingMixin):
     def _build_url_html(self, url: str, lang: str):
         if lang not in ('RUSSIAN', 'ENGLISH'):
             raise NotImplementedError(f'Unsupported language {lang} for url {url}')
+        patterns_to_clear = (
+            '\?rss=1$',
+            r'#ftag=\w+$',
+        )
+        for pattern_to_clear in patterns_to_clear:
+            url = re.sub(pattern_to_clear, '', url)
         return f'<a href="{url}">{url}</a>{" (en)" if lang == "ENGLISH" else ""}'
 
     def records_to_html(self, html_path):
