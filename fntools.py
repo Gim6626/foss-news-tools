@@ -27,6 +27,11 @@ from data.digestrecordcategory import *
 from data.digestrecordstate import *
 from data.digestrecordsubcategory import *
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 SCRIPT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 DIGEST_RECORD_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
@@ -175,19 +180,21 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter):
         super().__init__()
         self.source_name = 'Habr'
         self._posts_urls = HABR_POSTS
+        self.driver = None
+
+    def posts_statistics(self):
+        self.driver = webdriver.Firefox()
+        statistics = super().posts_statistics()
+        self.driver.close()
+        return statistics
 
     def post_statistics(self, number, url):
-        response = self.get_with_retries(url)
-        content = response.text
-        re_result = re.search('<span class="post-stats__views-count">(.*?)</span>', content)
-        if re_result is None:
-            logger.warning(f'Failed to parse views count in FOSS News #{number} ({url}) on Habr, trying another format')
-            re_result = re.search('<span class="tm-icon-counter__value">(.*?)</span>', content)
-            if re_result is None:
-                logger.error(f'Failed to find statistics in FOSS News #{number} ({url}) on Habr')
-                return None
+        self.driver.get(url)
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        xpath = '//div[contains(@class, "tm-page-article__body")]//span[contains(@class, "tm-icon-counter__value")]'
+        element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
 
-        full_statistics_str = re_result.group(1)
+        full_statistics_str = element.text
         logger.debug(f'Full statistics string for FOSS News #{number}: "{full_statistics_str}"')
         re_result = re.fullmatch(r'((\d+)([\.,](\d+))?)[Kk]?', full_statistics_str)
         if re_result is None:

@@ -4,3 +4,4 @@ lxml
 pyyaml
 requests
 colorama
+selenium
