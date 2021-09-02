@@ -244,6 +244,7 @@ class DigestRecord:
 
     def __init__(self,
                  dt: datetime.datetime,
+                 source: str,
                  title: str,
                  url: str,
                  state: DigestRecordState = DigestRecordState.UNKNOWN,
@@ -256,6 +257,7 @@ class DigestRecord:
                  language: str = None,
                  state_estimations: List[DigestRecordState] = None):
         self.dt = dt
+        self.source = source
         self.title = title
         self.url = url
         self.state = state
@@ -275,6 +277,7 @@ class DigestRecord:
         return {
             'drid': self.drid,
             'datetime': self.dt.strftime(DIGEST_RECORD_DATETIME_FORMAT) if self.dt is not None else None,
+            'source': self.source,
             'title': self.title,
             'url': self.url,
             'is_main': self.is_main,
@@ -381,6 +384,7 @@ class DigestRecordsCollection(NetworkingMixin):
             else:
                 dt_str = None
             record_object = DigestRecord(dt_str,
+                                         digest_record_data['source'],
                                          digest_record_data['title'],
                                          digest_record_data['url'],
                                          digest_issue=digest_record_data['digest_issue'],
@@ -419,6 +423,7 @@ class DigestRecordsCollection(NetworkingMixin):
                 else:
                     dt_str = None
                 record_obj = DigestRecord(dt_str,
+                                          record['source']['name'],
                                           record['title'],
                                           record['url'],
                                           digest_issue=record['digest_issue'],
@@ -452,6 +457,7 @@ class DigestRecordsCollection(NetworkingMixin):
             else:
                 dt_str = None
             record_object = DigestRecord(dt_str,
+                                         record_plain['source']['name'],
                                          record_plain['title'],
                                          record_plain['url'],
                                          digest_issue=record_plain['digest_issue'],
