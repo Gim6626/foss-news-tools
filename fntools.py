@@ -423,7 +423,7 @@ class DigestRecordsCollection(NetworkingMixin):
                 else:
                     dt_str = None
                 record_obj = DigestRecord(dt_str,
-                                          record['source']['name'],
+                                          None,
                                           record['title'],
                                           record['url'],
                                           digest_issue=record['digest_issue'],
@@ -443,7 +443,7 @@ class DigestRecordsCollection(NetworkingMixin):
 
     def _basic_load_digest_records_from_server(self, url: str):
         records_objects: List[DigestRecord] = []
-        logger.info('Getting data')
+        logger.info('Getting digest records')
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
             raise Exception(
@@ -457,7 +457,7 @@ class DigestRecordsCollection(NetworkingMixin):
             else:
                 dt_str = None
             record_object = DigestRecord(dt_str,
-                                         record_plain['source']['name'],
+                                         None,
                                          record_plain['title'],
                                          record_plain['url'],
                                          digest_issue=record_plain['digest_issue'],
