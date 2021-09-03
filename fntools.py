@@ -866,7 +866,7 @@ class DigestRecordsCollection(NetworkingMixin):
                             options_indexes.append(option['id'])
                             i += 1
                         option_index = self._ask_option_index_or_no(i - 1)
-                        print(Style.RESET_ALL)
+                        print(Style.RESET_ALL, end='')
                         if option_index is not None:
                             if option_index <= len(current_records_with_similar_categories['duplicates']):
                                 existing_drids = None
