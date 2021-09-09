@@ -255,7 +255,7 @@ class DigestRecord:
                  is_main: bool = None,
                  keywords: List[str] = None,
                  language: str = None,
-                 state_estimations: List[DigestRecordState] = None):
+                 estimations: List = None):
         self.dt = dt
         self.source = source
         self.title = title
@@ -268,7 +268,7 @@ class DigestRecord:
         self.is_main = is_main
         self.keywords = keywords
         self.language = language
-        self.state_estimations = state_estimations
+        self.estimations = estimations
 
     def __str__(self):
         return pformat(self.to_dict())
@@ -287,7 +287,9 @@ class DigestRecord:
             'subcategory': self.subcategory.value if self.subcategory is not None else None,
             'keywords': self.keywords,
             'language': self.language,
-            'state_estimations': [state.value for state in self.state_estimations],
+            'estimations': [{'user': e['user'],
+                             'state': e['state'].value}
+                            for e in self.estimations],
         }
 
 
@@ -391,7 +393,9 @@ class DigestRecordsCollection(NetworkingMixin):
                                          drid=digest_record_id,
                                          is_main=digest_record_data['is_main'],
                                          keywords=digest_record_data['title_keywords'],
-                                         state_estimations=[DigestRecordState(s.lower()) for s in digest_record_data['estimations']['state']])
+                                         estimations=[{'user': e['user'],
+                                                       'state': DigestRecordState(e['state'].lower())}
+                                                      for e in digest_record_data['estimations']])
             self.records.append(record_object)
 
 
@@ -465,7 +469,9 @@ class DigestRecordsCollection(NetworkingMixin):
                                          is_main=record_plain['is_main'],
                                          keywords=[k['name'] for k in record_plain['title_keywords']] if record_plain['title_keywords'] else [],
                                          language=record_plain['language'],
-                                         state_estimations=[DigestRecordState(estimation['estimated_state'].lower()) for estimation in record_plain['tbot_estimations']])
+                                         estimations=[{'user': e['telegram_bot_user']['username'],
+                                                       'state': DigestRecordState(e['estimated_state'].lower())}
+                                                      for e in record_plain['tbot_estimations']])
             record_object.state = DigestRecordState(record_plain['state'].lower()) if 'state' in record_plain and record_plain['state'] is not None else None
             record_object.category = DigestRecordCategory(record_plain['category'].lower()) if 'category' in record_plain and record_plain['category'] is not None else None
             if 'subcategory' in record_plain and record_plain['subcategory'] == 'DATABASES':
@@ -725,11 +731,12 @@ class DigestRecordsCollection(NetworkingMixin):
     def _categorize_records_from_tbot(self):
         ignore_candidates_records = []
         for record in self.records:
-            if not record.state_estimations:
+            if not record.estimations:
                 continue
-            ignore_state_votes_count = len([state for state in record.state_estimations if state == DigestRecordState.IGNORED])
-            total_state_votes_count = len(record.state_estimations)
-            if ignore_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1:
+            ignore_state_votes_count = len([estimation for estimation in record.estimations if estimation['state'] == DigestRecordState.IGNORED])
+            ignore_vote_by_admin = len([estimation for estimation in record.estimations if estimation['user'] == 'gim6626' and estimation['state'] == DigestRecordState.IGNORED]) > 0  # TODO: Replace hardcode with some DB query on backend
+            total_state_votes_count = len(record.estimations)
+            if ignore_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or ignore_vote_by_admin:
                 ignore_candidates_records.append(record)
         if ignore_candidates_records:
             print('Candidates to ignore:')
@@ -749,9 +756,6 @@ class DigestRecordsCollection(NetworkingMixin):
             records_to_ignore = [ignore_candidate_record
                                  for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records)
                                  if ignore_candidate_record_i not in do_not_ignore_records_indexes]
-            records_left_from_tbot = [ignore_candidate_record
-                                      for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records)
-                                      if ignore_candidate_record_i not in do_not_ignore_records_indexes]
             if records_to_ignore:
                 logger.info('Setting following records as "ignored":')
                 for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
