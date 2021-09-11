@@ -95,7 +95,7 @@ logger = Logger()
 
 class NetworkingMixin:
     SLEEP_BETWEEN_ATTEMPTS_SECONDS = 5
-    NETWORK_TIMEOUT_SECONDS = 5
+    NETWORK_TIMEOUT_SECONDS = 10
     NETWORK_RETRIES_COUNT = 50
 
     class RequestType(Enum):
