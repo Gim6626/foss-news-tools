@@ -25,6 +25,7 @@ class DigestRecordSubcategory(Enum):
     USER = 'user'
     GAMES = 'games'
     HARDWARE = 'hardware'
+    MESSENGERS = 'messengers'
     MISC = 'misc'
 
     @staticmethod
@@ -57,6 +58,7 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
     'user': 'Пользовательское',
     'games': 'Игры',
     'hardware': 'Железо',
+    'messengers': 'Мессенджеры',
     'misc': 'Разное',
 }
 
