@@ -718,7 +718,7 @@ class DigestRecordsCollection(NetworkingMixin):
 
     def _print_non_categorized_digest_records_count(self):
         left_to_process_count = self._non_categorized_digest_records_count()
-        logger.info(f'>> Digest record(s) left to process: {left_to_process_count} <<')
+        print(f'Digest record(s) left to process: {left_to_process_count}')
 
     def _non_categorized_digest_records_count(self):
         url = f'{self.api_url}/not-categorized-digest-records-count/'
