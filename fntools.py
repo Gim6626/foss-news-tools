@@ -22,7 +22,6 @@ from colorama import Fore, Style
 
 from data.releaseskeywords import *
 from data.articleskeywords import *
-from data.habrposts import *
 from data.digestrecordcategory import *
 from data.digestrecordstate import *
 from data.digestrecordsubcategory import *
@@ -174,47 +173,6 @@ class BasicPostsStatisticsGetter(NetworkingMixin,
         return self._posts_urls
 
 
-class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter):
-
-    def __init__(self):
-        super().__init__()
-        self.source_name = 'Habr'
-        self._posts_urls = HABR_POSTS
-        self.driver = None
-
-    def posts_statistics(self):
-        self.driver = webdriver.Firefox()
-        statistics = super().posts_statistics()
-        self.driver.close()
-        return statistics
-
-    def post_statistics(self, number, url):
-        self.driver.get(url)
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        xpath = '//div[contains(@class, "tm-page-article__body")]//span[contains(@class, "tm-icon-counter__value")]'
-        element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-
-        full_statistics_str = element.text
-        logger.debug(f'Full statistics string for FOSS News #{number}: "{full_statistics_str}"')
-        re_result = re.fullmatch(r'((\d+)([\.,](\d+))?)[Kk]?', full_statistics_str)
-        if re_result is None:
-            logger.error(f'Invalid statistics format in FOSS News #{number} ({url}) on Habr: {full_statistics_str}')
-            return None
-
-        statistics_without_k = re_result.group(1)
-        statistics_before_comma = re_result.group(2)
-        statistics_after_comma = re_result.group(4)
-
-        if 'K' in full_statistics_str or 'k' in full_statistics_str:
-            views_count = int(statistics_before_comma) * 1000
-            if statistics_after_comma is not None:
-                views_count += int(statistics_after_comma) * 100
-        else:
-            views_count = int(statistics_without_k)
-
-        return views_count
-
-
 class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
 
     def __init__(self):
@@ -293,8 +251,101 @@ class DigestRecord:
         }
 
 
+class ServerConnectionMixin:
+    # Requires NetworkingMixin
+
+    def _load_config(self, config_path):
+        logger.info(f'Loading gathering server connect data from config "{config_path}"')
+        with open(config_path, 'r') as fin:
+            config_data = yaml.safe_load(fin)
+            self._host = config_data['host']
+            self._protocol = config_data['protocol']
+            self._port = config_data['port']
+            self._user = config_data['user']
+            self._password = config_data['password']
+            logger.info('Loaded')
+
+    def _login(self):
+        logger.info('Logging in')
+        url = f'{self._protocol}://{self._host}:{self._port}/api/v1/token/'
+        data = {'username': self._user, 'password': self._password}
+        response = self.post_with_retries(url=url,
+                                          data=data)
+        if response.status_code != 200:
+            raise Exception(f'Invalid response code from FNGS login - {response.status_code}: {response.content.decode("utf-8")}')
+        result_data = json.loads(response.content)
+        self._token = result_data['access']
+        logger.info('Logged in')
+
+    @property
+    def api_url(self):
+        return f'{self._protocol}://{self._host}:{self._port}/api/v1'
+
+    @property
+    def _auth_headers(self):
+        return {
+            'Authorization': f'Bearer {self._token}',
+            'Content-Type': 'application/json',
+        }
+
+
+class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
+                                NetworkingMixin,
+                                ServerConnectionMixin):
+
+    def __init__(self, config_path):
+        super().__init__()
+        self.source_name = 'Habr'
+        self.driver = None
+        self._load_config(config_path)
+        self._login()
+        self._posts_urls = {di['number']: di['habr_url'] for di in self._digest_issues}
+
+    @property
+    def _digest_issues(self):
+        response = self.get_with_retries(f'{self.api_url}/digest-issues/', headers=self._auth_headers)
+        content = response.text
+        if response.status_code != 200:
+            raise Exception(f'Failed to get digest issues info, status code {response.status_code}, response: {content}')
+        content_data = json.loads(content)
+        return content_data
+
+    def posts_statistics(self):
+        self.driver = webdriver.Firefox()
+        statistics = super().posts_statistics()
+        self.driver.close()
+        return statistics
+
+    def post_statistics(self, number, url):
+        self.driver.get(url)
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        xpath = '//div[contains(@class, "tm-page-article__body")]//span[contains(@class, "tm-icon-counter__value")]'
+        element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+
+        full_statistics_str = element.text
+        logger.debug(f'Full statistics string for FOSS News #{number}: "{full_statistics_str}"')
+        re_result = re.fullmatch(r'((\d+)([\.,](\d+))?)[Kk]?', full_statistics_str)
+        if re_result is None:
+            logger.error(f'Invalid statistics format in FOSS News #{number} ({url}) on Habr: {full_statistics_str}')
+            return None
+
+        statistics_without_k = re_result.group(1)
+        statistics_before_comma = re_result.group(2)
+        statistics_after_comma = re_result.group(4)
+
+        if 'K' in full_statistics_str or 'k' in full_statistics_str:
+            views_count = int(statistics_before_comma) * 1000
+            if statistics_after_comma is not None:
+                views_count += int(statistics_after_comma) * 100
+        else:
+            views_count = int(statistics_without_k)
+
+        return views_count
+
+
 # TODO: Refactor
-class DigestRecordsCollection(NetworkingMixin):
+class DigestRecordsCollection(NetworkingMixin,
+                              ServerConnectionMixin):
 
     def __init__(self,
                  config_path: str,
@@ -303,19 +354,11 @@ class DigestRecordsCollection(NetworkingMixin):
         self.records = records if records is not None else []
         self.duplicates = []
         self._filtered_records = []
-        self._host = None
-        self._port = None
-        self._user = None
-        self._password = None
         self._token = None
         self._current_digest_issue = None
 
     def __str__(self):
         return pformat([record.to_dict() for record in self.records])
-
-    @property
-    def api_url(self):
-        return f'{self._protocol}://{self._host}:{self._port}/api/v1'
 
     def save_to_yaml(self, yaml_path: str):
         records_plain = []
@@ -336,29 +379,6 @@ class DigestRecordsCollection(NetworkingMixin):
         with open(yaml_path, 'w') as fout:
             logger.info(f'Saving results to "{yaml_path}"')
             yaml.safe_dump(records_plain, fout)
-
-    def _login(self):
-        logger.info('Logging in')
-        url = f'{self._protocol}://{self._host}:{self._port}/api/v1/token/'
-        data = {'username': self._user, 'password': self._password}
-        response = self.post_with_retries(url=url,
-                                          data=data)
-        if response.status_code != 200:
-            raise Exception(f'Invalid response code from FNGS login - {response.status_code}: {response.content.decode("utf-8")}')
-        result_data = json.loads(response.content)
-        self._token = result_data['access']
-        logger.info('Logged in')
-
-    def _load_config(self, config_path):
-        logger.info(f'Loading gathering server connect data from config "{config_path}"')
-        with open(config_path, 'r') as fin:
-            config_data = yaml.safe_load(fin)
-            self._host = config_data['host']
-            self._protocol = config_data['protocol']
-            self._port = config_data['port']
-            self._user = config_data['user']
-            self._password = config_data['password']
-            logger.info('Loaded')
 
     def load_specific_digest_records_from_server(self,
                                                  digest_issue: int):
@@ -622,13 +642,6 @@ class DigestRecordsCollection(NetworkingMixin):
                 if re.search(keyword_name_fixed + r',?\s+v?\.?\d', title, re.IGNORECASE):
                     return DigestRecordCategory.RELEASES
         return None
-
-    @property
-    def _auth_headers(self):
-        return {
-            'Authorization': f'Bearer {self._token}',
-            'Content-Type': 'application/json',
-        }
 
     def _keywords(self):
         url = f'{self.api_url}/keywords'
