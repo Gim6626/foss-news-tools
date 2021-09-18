@@ -629,6 +629,8 @@ class DigestRecordsCollection(NetworkingMixin,
             return DigestRecordCategory.VIDEOS
         if 'SD Times Open-Source Project of the Week' in title:
             return DigestRecordCategory.OTHER
+        if 'Еженедельник OSM' in title:
+            return DigestRecordCategory.NEWS
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword.lower() in title.lower():
                 return DigestRecordCategory.RELEASES
@@ -684,6 +686,9 @@ class DigestRecordsCollection(NetworkingMixin,
                     print(f'- {record["title"]} ({is_main_ru}, {category_ru}, {subcategory_ru})')
 
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
+        if 'Еженедельник OSM' in title:
+            return [DigestRecordSubcategory.ORG], {}
+
         url = f'{self.api_url}/guess-category/?title={title}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
