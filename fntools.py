@@ -540,6 +540,7 @@ class DigestRecordsCollection(NetworkingMixin,
                 output_records[first_in_duplicate.category.value].append(duplicate_records)
             elif not first_in_duplicate.is_main and first_in_duplicate.category in (DigestRecordCategory.NEWS,
                                                                                     DigestRecordCategory.ARTICLES,
+                                                                                    DigestRecordCategory.VIDEOS,
                                                                                     DigestRecordCategory.RELEASES):
                 if first_in_duplicate.subcategory is not None:
                     output_records[first_in_duplicate.category.value][first_in_duplicate.subcategory.value].append(duplicate_records)
