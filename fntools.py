@@ -683,7 +683,7 @@ class DigestRecordsCollection(NetworkingMixin,
                         subcategory_ru = DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[DigestRecordSubcategory.from_name(record["subcategory"]).value].lower()
                     else:
                         subcategory_ru = None
-                    print(f'- {record["title"]} ({is_main_ru}, {category_ru}, {subcategory_ru})')
+                    print(f'- {record["title"]} ({is_main_ru}, {category_ru}, {subcategory_ru}) - {record["url"]}')
 
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
         if 'Еженедельник OSM' in title:
