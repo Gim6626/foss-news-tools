@@ -191,7 +191,7 @@ class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
     def post_statistics(self, number, url):
         response = self.get_with_retries(url)
         content = response.text
-        re_result = re.search(r'<div class="articleView__views_info">(\d+) просмотр', content)
+        re_result = re.search(r'<div class="articleView__footer_views" style="">(\d+) просмотр', content)
         if re_result is None:
             logger.error(f'Failed to find statistics in FOSS News #{number} ({url}) on VK')
             return None
