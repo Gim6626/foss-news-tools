@@ -50,7 +50,7 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
     'sysadm': 'Системное администрирование',
     'devops': 'DevOps',
     'data_science': 'AI & Data Science',
-    'web': 'Web',
+    'web': 'Web и близкое',
     'dev': 'Для разработчиков',
     'testing': 'Тестирование',
     'history': 'История',
