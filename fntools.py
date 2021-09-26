@@ -317,6 +317,9 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
         return statistics
 
     def post_statistics(self, number, url):
+        if not url:
+            logger.error(f'Empty URL for digest issue #{number}')
+            return None
         self.driver.get(url)
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         xpath = '//div[contains(@class, "tm-page-article__body")]//span[contains(@class, "tm-icon-counter__value")]'
