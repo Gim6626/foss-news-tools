@@ -931,8 +931,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                            headers=self._auth_headers,
                                            data=data)
         if response.status_code != 200:
-            raise Exception(
-                f'Invalid response code from FNGS patch - {response.status_code}: {response.content.decode("utf-8")}')
+            raise Exception(f'Invalid response code from FNGS patch - {response.status_code} (request data was {data}): {response.content.decode("utf-8")}')
         logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_issue} to FNGS')
         logger.info(f'If you want to change some parameters that you\'ve set - go to {self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record.drid}/change/')
 
