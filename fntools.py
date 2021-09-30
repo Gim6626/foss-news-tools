@@ -635,6 +635,8 @@ class DigestRecordsCollection(NetworkingMixin,
             return DigestRecordCategory.OTHER
         if 'Еженедельник OSM' in title:
             return DigestRecordCategory.NEWS
+        if re.search(r'DEF CON \d+ Cloud Village', title):
+            return DigestRecordCategory.VIDEOS
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword.lower() in title.lower():
                 return DigestRecordCategory.RELEASES
@@ -692,6 +694,8 @@ class DigestRecordsCollection(NetworkingMixin,
     def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
         if 'Еженедельник OSM' in title:
             return [DigestRecordSubcategory.ORG], {}
+        if re.search(r'DEF CON \d+ Cloud Village', title):
+            return [DigestRecordSubcategory.SECURITY], {}
 
         url = f'{self.api_url}/guess-category/?title={title}'
         response = self.get_with_retries(url, self._auth_headers)
@@ -842,10 +846,11 @@ class DigestRecordsCollection(NetworkingMixin,
                 if guessed_category != DigestRecordCategory.OTHER:
                     guessed_subcategories, matched_subcategories_keywords = self._guess_subcategory(record.title)
                     if guessed_subcategories:
-                        matched_subcategories_keywords_translated = {}
-                        for matched_subcategory, keywords in matched_subcategories_keywords.items():
-                            matched_subcategories_keywords_translated[DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[matched_subcategory if matched_subcategory != 'databases' else 'db']] = keywords
-                        print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
+                        if matched_subcategories_keywords:
+                            matched_subcategories_keywords_translated = {}
+                            for matched_subcategory, keywords in matched_subcategories_keywords.items():
+                                matched_subcategories_keywords_translated[DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[matched_subcategory if matched_subcategory != 'databases' else 'db']] = keywords
+                            print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
                         if len(guessed_subcategories) == 1:
                             guessed_subcategory = guessed_subcategories[0]
                             msg = f'Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: '
