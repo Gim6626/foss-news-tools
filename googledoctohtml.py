@@ -94,7 +94,7 @@ def main():
                 label = 'shorts'
             elif tag.cleared_html_src == 'Что ещё посмотреть':
                 label = 'more'
-            elif tag.cleared_html_src == 'Заключение':
+            elif tag.cleared_html_src == 'Полезные ссылки':
                 label = 'end'
             else:
                 raise NotImplementedError
