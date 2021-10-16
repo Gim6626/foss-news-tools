@@ -14,6 +14,7 @@ class DigestRecordSubcategory(Enum):
     MULTIMEDIA = 'multimedia'
     MOBILE = 'mobile'
     SECURITY = 'security'
+    SYSTEM = 'system'
     SYSADM = 'sysadm'
     DEVOPS = 'devops'
     DATA_SCIENCE = 'data_science'
@@ -47,6 +48,7 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
     'multimedia': 'Мультимедиа',
     'mobile': 'Мобильные',
     'security': 'Безопасность',
+    'system': 'Системное',
     'sysadm': 'Системное администрирование',
     'devops': 'DevOps',
     'data_science': 'AI & Data Science',
