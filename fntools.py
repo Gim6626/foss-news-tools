@@ -532,11 +532,12 @@ class DigestRecordsCollection(NetworkingMixin,
         digest_records_ids_from_duplicates = []
         for duplicate in self.duplicates:
             duplicate_records = duplicate['digest_records']
-            first_in_duplicate = duplicate_records[0]
-            if first_in_duplicate.state != DigestRecordState.IN_DIGEST:
+            duplicate_records_to_digest = [dr for dr in duplicate_records if dr.state == DigestRecordState.IN_DIGEST]
+            if not duplicate_records_to_digest:
                 continue
             for duplicate_record in duplicate_records:
                 digest_records_ids_from_duplicates.append(duplicate_record.drid)
+            first_in_duplicate = duplicate_records_to_digest[0]
             if first_in_duplicate.is_main:
                 output_records['main'].append(duplicate_records)
             elif first_in_duplicate.category == DigestRecordCategory.OTHER:
