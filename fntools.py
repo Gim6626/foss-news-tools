@@ -538,7 +538,7 @@ class DigestRecordsCollection(NetworkingMixin,
             for duplicate_record in duplicate_records:
                 digest_records_ids_from_duplicates.append(duplicate_record.drid)
             first_in_duplicate = duplicate_records_to_digest[0]
-            if first_in_duplicate.is_main:
+            if [dr.is_main for dr in duplicate_records_to_digest]:
                 output_records['main'].append(duplicate_records)
             elif first_in_duplicate.category == DigestRecordCategory.OTHER:
                 output_records[first_in_duplicate.category.value].append(duplicate_records)
