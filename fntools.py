@@ -383,6 +383,7 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
         super().__init__(records, duplicates)
 
     def _process_url(self, digest_record):
+        # TODO: Find better solution of marking things that needs attention
         if 'opennet' in digest_record.url:
             return '!!! ' + digest_record.url
         elif digest_record.additional_url:
