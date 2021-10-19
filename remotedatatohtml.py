@@ -6,6 +6,7 @@ import sys
 
 from fntools import (
     logger,
+    HtmlFormat,
     DigestRecordsCollection,
 )
 
@@ -15,6 +16,9 @@ def parse_command_line_args():
                         description='FOSS News Converter')
     parser.add_argument('FNGS_CONFIG',
                         help='Config with data for access to remote FOSS News Gathering Server server')
+    parser.add_argument('FORMAT',
+                        help='Output format',
+                        choices=[f.name for f in HtmlFormat])
     parser.add_argument('DIGEST_NUMBER',
                         help='Digest number')
     parser.add_argument('DESTINATION',
@@ -28,7 +32,7 @@ def main():
     digest_records_collection = DigestRecordsCollection(args.FNGS_CONFIG)
     # TODO: Check digest number if it is int
     digest_records_collection.load_specific_digest_records_from_server(int(args.DIGEST_NUMBER))
-    digest_records_collection.records_to_html(args.DESTINATION)
+    digest_records_collection.records_to_html(args.FORMAT, args.DESTINATION)
 
 
 if __name__ == "__main__":

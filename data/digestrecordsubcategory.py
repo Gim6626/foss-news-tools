@@ -65,4 +65,35 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
 }
 
 
+DIGEST_RECORD_SUBCATEGORY_EN_MAPPING = {
+    'events': 'Events',
+    'intros': 'Introductions',
+    'opening': 'Code and data opening',
+    'org': 'Organizations related',
+    'diy': 'DIY',
+    'law': 'Law',
+    'knd': 'Linux Kernel, Distributions Based on It and other OS',
+    'special': 'Special',
+    'education': 'Education',
+    'db': 'Databases',
+    'multimedia': 'Multimedia',
+    'mobile': 'Mobile',
+    'security': 'Security',
+    'system': 'System',
+    'sysadm': 'System Administration',
+    'devops': 'DevOps',
+    'data_science': 'AI & Data Science',
+    'web': 'Web and Related',
+    'dev': 'For Developers',
+    'testing': 'Testing',
+    'history': 'History',
+    'management': 'Management',
+    'user': 'Basic User Things',
+    'games': 'Games',
+    'hardware': 'Hardware',
+    'messengers': 'Messengers',
+    'misc': 'Miscellaneous',
+}
+
+
 DIGEST_RECORD_SUBCATEGORY_VALUES = [category.value for category in DigestRecordSubcategory]

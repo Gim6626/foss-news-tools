@@ -24,4 +24,14 @@ DIGEST_RECORD_CATEGORY_RU_MAPPING = {
 }
 
 
+DIGEST_RECORD_CATEGORY_EN_MAPPING = {
+    'unknown': 'Unknown',
+    'news': 'News',
+    'articles': 'Articles',
+    'videos': 'Videos',
+    'releases': 'Releases',
+    'other': 'Other',
+}
+
+
 DIGEST_RECORD_CATEGORY_VALUES = [category.value for category in DigestRecordCategory]
