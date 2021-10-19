@@ -1,6 +1,7 @@
 from enum import Enum
 
-class DigestRecordSubcategory(Enum):
+
+class DigestRecordContentCategory(Enum):
     EVENTS = 'events'
     INTROS = 'intros'
     OPENING = 'opening'
@@ -31,10 +32,10 @@ class DigestRecordSubcategory(Enum):
 
     @staticmethod
     def from_name(name: str):
-        return DigestRecordSubcategory(name.lower() if name.lower() != 'databases' else 'db')
+        return DigestRecordContentCategory(name.lower() if name.lower() != 'databases' else 'db')
 
 
-DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
+DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING = {
     'events': 'Мероприятия',
     'intros': 'Внедрения',
     'opening': 'Открытие кода и данных',
@@ -65,7 +66,7 @@ DIGEST_RECORD_SUBCATEGORY_RU_MAPPING = {
 }
 
 
-DIGEST_RECORD_SUBCATEGORY_EN_MAPPING = {
+DIGEST_RECORD_CONTENT_CATEGORY_EN_MAPPING = {
     'events': 'Events',
     'intros': 'Introductions',
     'opening': 'Code and data opening',
@@ -96,4 +97,4 @@ DIGEST_RECORD_SUBCATEGORY_EN_MAPPING = {
 }
 
 
-DIGEST_RECORD_SUBCATEGORY_VALUES = [category.value for category in DigestRecordSubcategory]
+DIGEST_RECORD_CONTENT_CATEGORY_VALUES = [category.value for category in DigestRecordContentCategory]

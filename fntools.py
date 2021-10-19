@@ -22,9 +22,9 @@ from colorama import Fore, Style
 
 from data.releaseskeywords import *
 from data.articleskeywords import *
-from data.digestrecordcategory import *
+from data.digestrecordcontenttype import *
 from data.digestrecordstate import *
-from data.digestrecordsubcategory import *
+from data.digestrecordcontentcategory import *
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -218,8 +218,8 @@ class DigestRecord:
                  additional_url: str,
                  state: DigestRecordState = DigestRecordState.UNKNOWN,
                  digest_issue: int = None,
-                 category: DigestRecordCategory = DigestRecordCategory.UNKNOWN,
-                 subcategory: Enum = None,
+                 content_type: DigestRecordContentType = DigestRecordContentType.UNKNOWN,
+                 content_category: Enum = None,
                  drid: int = None,
                  is_main: bool = None,
                  keywords: List[str] = None,
@@ -232,8 +232,8 @@ class DigestRecord:
         self.additional_url = additional_url
         self.state = state
         self.digest_issue = digest_issue
-        self.category = category
-        self.subcategory = subcategory
+        self.content_type = content_type
+        self.content_category = content_category
         self.drid = drid
         self.is_main = is_main
         self.keywords = keywords
@@ -253,8 +253,8 @@ class DigestRecord:
             'is_main': self.is_main,
             'state': self.state.value if self.state is not None else None,
             'digest_issue': self.digest_issue,
-            'category': self.category.value if self.category is not None else None,
-            'subcategory': self.subcategory.value if self.subcategory is not None else None,
+            'content_type': self.content_type.value if self.content_type is not None else None,
+            'content_category': self.content_category.value if self.content_category is not None else None,
             'keywords': self.keywords,
             'language': self.language,
             'estimations': [{'user': e['user'],
@@ -396,15 +396,15 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
         # TODO: Refactor additional_url and OpenNET related code
         output_records = {
             'main': [],
-            DigestRecordCategory.NEWS.value: {subcategory_value: [] for subcategory_value in
-                                              DIGEST_RECORD_SUBCATEGORY_VALUES},
-            DigestRecordCategory.VIDEOS.value: {subcategory_value: [] for subcategory_value in
-                                                DIGEST_RECORD_SUBCATEGORY_VALUES},
-            DigestRecordCategory.ARTICLES.value: {subcategory_value: [] for subcategory_value in
-                                                  DIGEST_RECORD_SUBCATEGORY_VALUES},
-            DigestRecordCategory.RELEASES.value: {subcategory_value: [] for subcategory_value in
-                                                  DIGEST_RECORD_SUBCATEGORY_VALUES},
-            DigestRecordCategory.OTHER.value: [],
+            DigestRecordContentType.NEWS.value: {content_category: [] for content_category in
+                                                 DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
+            DigestRecordContentType.VIDEOS.value: {content_category: [] for content_category in
+                                                   DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
+            DigestRecordContentType.ARTICLES.value: {content_category: [] for content_category in
+                                                     DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
+            DigestRecordContentType.RELEASES.value: {content_category: [] for content_category in
+                                                     DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
+            DigestRecordContentType.OTHER.value: [],
         }
         digest_records_ids_from_duplicates = []
         for duplicate in self._duplicates:
@@ -417,14 +417,14 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
             first_in_duplicate = duplicate_records_to_digest[0]
             if [dr for dr in duplicate_records_to_digest if dr.is_main]:
                 output_records['main'].append(duplicate_records)
-            elif first_in_duplicate.category == DigestRecordCategory.OTHER:
-                output_records[first_in_duplicate.category.value].append(duplicate_records)
-            elif not first_in_duplicate.is_main and first_in_duplicate.category in (DigestRecordCategory.NEWS,
-                                                                                    DigestRecordCategory.ARTICLES,
-                                                                                    DigestRecordCategory.VIDEOS,
-                                                                                    DigestRecordCategory.RELEASES):
-                if first_in_duplicate.subcategory is not None:
-                    output_records[first_in_duplicate.category.value][first_in_duplicate.subcategory.value].append(duplicate_records)
+            elif first_in_duplicate.content_type == DigestRecordContentType.OTHER:
+                output_records[first_in_duplicate.content_type.value].append(duplicate_records)
+            elif not first_in_duplicate.is_main and first_in_duplicate.content_type in (DigestRecordContentType.NEWS,
+                                                                                        DigestRecordContentType.ARTICLES,
+                                                                                        DigestRecordContentType.VIDEOS,
+                                                                                        DigestRecordContentType.RELEASES):
+                if first_in_duplicate.content_category is not None:
+                    output_records[first_in_duplicate.content_type.value][first_in_duplicate.content_category.value].append(duplicate_records)
             else:
                 pprint(duplicate)
                 raise NotImplementedError
@@ -437,16 +437,16 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
                 continue
             if digest_record.is_main:
                 output_records['main'].append(digest_record)
-            elif digest_record.category == DigestRecordCategory.OTHER:
-                output_records[digest_record.category.value].append(digest_record)
-            elif not digest_record.is_main and digest_record.category in (DigestRecordCategory.NEWS,
-                                                                          DigestRecordCategory.ARTICLES,
-                                                                          DigestRecordCategory.VIDEOS,
-                                                                          DigestRecordCategory.RELEASES):
-                if digest_record.subcategory is not None:
-                    output_records[digest_record.category.value][digest_record.subcategory.value].append(digest_record)
+            elif digest_record.content_type == DigestRecordContentType.OTHER:
+                output_records[digest_record.content_type.value].append(digest_record)
+            elif not digest_record.is_main and digest_record.content_type in (DigestRecordContentType.NEWS,
+                                                                              DigestRecordContentType.ARTICLES,
+                                                                              DigestRecordContentType.VIDEOS,
+                                                                              DigestRecordContentType.RELEASES):
+                if digest_record.content_category is not None:
+                    output_records[digest_record.content_type.value][digest_record.content_category.value].append(digest_record)
             else:
-                print(digest_record.title, digest_record.category, digest_record.is_main)
+                print(digest_record.title, digest_record.content_type, digest_record.is_main)
                 raise NotImplementedError
         output = '<h2>Main</h2>\n\n'
         # pprint([([r.title for r in rs] if isinstance(rs, list) else rs.title) for rs in output_records['main']])
@@ -455,7 +455,7 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
                 if main_record.language != Language.ENGLISH and 'opennet' not in main_record.url:
                     continue
                 output += f'<h3>{DigestRecordsCollection.clear_title(main_record.title)}</h3>\n\n'
-                output += f'<i><b>Category</b>: {DIGEST_RECORD_CATEGORY_EN_MAPPING[main_record.category.value]}/{DIGEST_RECORD_SUBCATEGORY_EN_MAPPING[main_record.subcategory.value]}</i><br>\n\n'
+                output += f'<i><b>Category</b>: {DIGEST_RECORD_CONTENT_TYPE_EN_MAPPING[main_record.content_type.value]}/{DIGEST_RECORD_CONTENT_CATEGORY_EN_MAPPING[main_record.content_category.value]}</i><br>\n\n'
                 output += f'Details {DigestRecordsCollection.build_url_html(self._process_url(main_record), main_record.language, True)}\n\n'
             else:
                 only_english_records = []
@@ -467,7 +467,7 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
                 if not only_english_records:
                     continue
                 output += f'<h3>{[DigestRecordsCollection.clear_title(r.title) for r in only_english_records]}</h3>\n\n'
-                output += f'<i><b>Category</b>: {DIGEST_RECORD_CATEGORY_EN_MAPPING[main_record[0].category.value]}/{DIGEST_RECORD_SUBCATEGORY_EN_MAPPING[main_record[0].subcategory.value]}</i><br>\n\n'
+                output += f'<i><b>Category</b>: {DIGEST_RECORD_CONTENT_TYPE_EN_MAPPING[main_record[0].content_type.value]}/{DIGEST_RECORD_CONTENT_CATEGORY_EN_MAPPING[main_record[0].content_category.value]}</i><br>\n\n'
                 output += 'Details:<br>\n\n'
                 output += '<ol>\n'
                 for r in only_english_records:
@@ -477,17 +477,17 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
         output += '<h2>Briefly</h2>\n\n'
 
         keys = (
-            DigestRecordCategory.NEWS.value,
-            DigestRecordCategory.VIDEOS.value,
-            DigestRecordCategory.ARTICLES.value,
-            DigestRecordCategory.RELEASES.value,
+            DigestRecordContentType.NEWS.value,
+            DigestRecordContentType.VIDEOS.value,
+            DigestRecordContentType.ARTICLES.value,
+            DigestRecordContentType.RELEASES.value,
         )
         for key in keys:
-            output += f'<h3>{DIGEST_RECORD_CATEGORY_EN_MAPPING[key]}</h3>\n\n'
-            for key_record_subcategory, key_records in output_records[key].items():
+            output += f'<h3>{DIGEST_RECORD_CONTENT_TYPE_EN_MAPPING[key]}</h3>\n\n'
+            for key_record_content_category, key_records in output_records[key].items():
                 if not key_records:
                     continue
-                output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_EN_MAPPING[key_record_subcategory]}</h4>\n\n'
+                output += f'<h4>{DIGEST_RECORD_CONTENT_CATEGORY_EN_MAPPING[key_record_content_category]}</h4>\n\n'
                 if len(key_records) == 1:
                     key_record = key_records[0]
                     if not isinstance(key_record, list):
@@ -503,14 +503,14 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
                             output += f'<li>{[DigestRecordsCollection.clear_title(r.title) for r in key_record]} {", ".join([DigestRecordsCollection.build_url_html(self._process_url(r), r.language, True) for r in key_record])}</li>\n'
                     output += '</ol>\n'
 
-        if len(output_records[DigestRecordCategory.OTHER.value]):
+        if len(output_records[DigestRecordContentType.OTHER.value]):
             output += '<h2>More links</h2>\n\n'
-            if len(output_records[DigestRecordCategory.OTHER.value]) == 1:
-                other_record = output_records[DigestRecordCategory.OTHER.value][0]
+            if len(output_records[DigestRecordContentType.OTHER.value]) == 1:
+                other_record = output_records[DigestRecordContentType.OTHER.value][0]
                 output += f'{DigestRecordsCollection.clear_title(other_record.title)} {DigestRecordsCollection.build_url_html(self._process_url(other_record), other_record.language, True)}<br>\n'
             else:
                 output += '<ol>\n'
-                for other_record in output_records[DigestRecordCategory.OTHER.value]:
+                for other_record in output_records[DigestRecordContentType.OTHER.value]:
                     output += f'<li>{DigestRecordsCollection.clear_title(other_record.title)} {DigestRecordsCollection.build_url_html(self._process_url(other_record), other_record.language, True)}</li>\n'
                 output += '</ol>\n'
         return output
@@ -525,15 +525,15 @@ class HabrDbToHtmlConverter(DbToHtmlConverter):
     def _convert(self) -> str:
         output_records = {
             'main': [],
-            DigestRecordCategory.NEWS.value: {subcategory_value: [] for subcategory_value in
-                                              DIGEST_RECORD_SUBCATEGORY_VALUES},
-            DigestRecordCategory.VIDEOS.value: {subcategory_value: [] for subcategory_value in
-                                                DIGEST_RECORD_SUBCATEGORY_VALUES},
-            DigestRecordCategory.ARTICLES.value: {subcategory_value: [] for subcategory_value in
-                                                  DIGEST_RECORD_SUBCATEGORY_VALUES},
-            DigestRecordCategory.RELEASES.value: {subcategory_value: [] for subcategory_value in
-                                                  DIGEST_RECORD_SUBCATEGORY_VALUES},
-            DigestRecordCategory.OTHER.value: [],
+            DigestRecordContentType.NEWS.value: {content_category: [] for content_category in
+                                                 DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
+            DigestRecordContentType.VIDEOS.value: {content_category: [] for content_category in
+                                                   DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
+            DigestRecordContentType.ARTICLES.value: {content_category: [] for content_category in
+                                                     DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
+            DigestRecordContentType.RELEASES.value: {content_category: [] for content_category in
+                                                     DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
+            DigestRecordContentType.OTHER.value: [],
         }
         digest_records_ids_from_duplicates = []
         for duplicate in self._duplicates:
@@ -546,14 +546,14 @@ class HabrDbToHtmlConverter(DbToHtmlConverter):
             first_in_duplicate = duplicate_records_to_digest[0]
             if [dr for dr in duplicate_records_to_digest if dr.is_main]:
                 output_records['main'].append(duplicate_records)
-            elif first_in_duplicate.category == DigestRecordCategory.OTHER:
-                output_records[first_in_duplicate.category.value].append(duplicate_records)
-            elif not first_in_duplicate.is_main and first_in_duplicate.category in (DigestRecordCategory.NEWS,
-                                                                                    DigestRecordCategory.ARTICLES,
-                                                                                    DigestRecordCategory.VIDEOS,
-                                                                                    DigestRecordCategory.RELEASES):
-                if first_in_duplicate.subcategory is not None:
-                    output_records[first_in_duplicate.category.value][first_in_duplicate.subcategory.value].append(
+            elif first_in_duplicate.content_type == DigestRecordContentType.OTHER:
+                output_records[first_in_duplicate.content_type.value].append(duplicate_records)
+            elif not first_in_duplicate.is_main and first_in_duplicate.content_type in (DigestRecordContentType.NEWS,
+                                                                                        DigestRecordContentType.ARTICLES,
+                                                                                        DigestRecordContentType.VIDEOS,
+                                                                                        DigestRecordContentType.RELEASES):
+                if first_in_duplicate.content_category is not None:
+                    output_records[first_in_duplicate.content_type.value][first_in_duplicate.content_category.value].append(
                         duplicate_records)
             else:
                 pprint(duplicate)
@@ -565,26 +565,26 @@ class HabrDbToHtmlConverter(DbToHtmlConverter):
                 continue
             if digest_record.is_main:
                 output_records['main'].append(digest_record)
-            elif digest_record.category == DigestRecordCategory.OTHER:
-                output_records[digest_record.category.value].append(digest_record)
-            elif not digest_record.is_main and digest_record.category in (DigestRecordCategory.NEWS,
-                                                                          DigestRecordCategory.ARTICLES,
-                                                                          DigestRecordCategory.VIDEOS,
-                                                                          DigestRecordCategory.RELEASES):
-                if digest_record.subcategory is not None:
-                    output_records[digest_record.category.value][digest_record.subcategory.value].append(digest_record)
+            elif digest_record.content_type == DigestRecordContentType.OTHER:
+                output_records[digest_record.content_type.value].append(digest_record)
+            elif not digest_record.is_main and digest_record.content_type in (DigestRecordContentType.NEWS,
+                                                                              DigestRecordContentType.ARTICLES,
+                                                                              DigestRecordContentType.VIDEOS,
+                                                                              DigestRecordContentType.RELEASES):
+                if digest_record.content_category is not None:
+                    output_records[digest_record.content_type.value][digest_record.content_category.value].append(digest_record)
             else:
-                print(digest_record.title, digest_record.category, digest_record.is_main)
+                print(digest_record.title, digest_record.content_type, digest_record.is_main)
                 raise NotImplementedError
         output = '<h2>Главное</h2>\n\n'
         for main_record in output_records['main']:
             if not isinstance(main_record, list):
                 output += f'<h3>{DigestRecordsCollection.clear_title(main_record.title)}</h3>\n\n'
-                output += f'<i><b>Категория</b>: {DIGEST_RECORD_CATEGORY_RU_MAPPING[main_record.category.value]}/{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[main_record.subcategory.value]}</i><br>\n\n'
+                output += f'<i><b>Категория</b>: {DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[main_record.content_type.value]}/{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[main_record.content_category.value]}</i><br>\n\n'
                 output += f'Подробности {DigestRecordsCollection.build_url_html(main_record.url, main_record.language)}\n\n'
             else:
                 output += f'<h3>{[DigestRecordsCollection.clear_title(r.title) for r in main_record]}</h3>\n\n'
-                output += f'<i><b>Категория</b>: {DIGEST_RECORD_CATEGORY_RU_MAPPING[main_record[0].category.value]}/{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[main_record[0].subcategory.value]}</i><br>\n\n'
+                output += f'<i><b>Категория</b>: {DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[main_record[0].content_type.value]}/{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[main_record[0].content_category.value]}</i><br>\n\n'
                 output += 'Подробности:<br>\n\n'
                 output += '<ol>\n'
                 for r in main_record:
@@ -594,17 +594,17 @@ class HabrDbToHtmlConverter(DbToHtmlConverter):
         output += '<h2>Короткой строкой</h2>\n\n'
 
         keys = (
-            DigestRecordCategory.NEWS.value,
-            DigestRecordCategory.VIDEOS.value,
-            DigestRecordCategory.ARTICLES.value,
-            DigestRecordCategory.RELEASES.value,
+            DigestRecordContentType.NEWS.value,
+            DigestRecordContentType.VIDEOS.value,
+            DigestRecordContentType.ARTICLES.value,
+            DigestRecordContentType.RELEASES.value,
         )
         for key in keys:
-            output += f'<h3>{DIGEST_RECORD_CATEGORY_RU_MAPPING[key]}</h3>\n\n'
-            for key_record_subcategory, key_records in output_records[key].items():
+            output += f'<h3>{DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[key]}</h3>\n\n'
+            for key_record_content_category, key_records in output_records[key].items():
                 if not key_records:
                     continue
-                output += f'<h4>{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[key_record_subcategory]}</h4>\n\n'
+                output += f'<h4>{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[key_record_content_category]}</h4>\n\n'
                 if len(key_records) == 1:
                     key_record = key_records[0]
                     if not isinstance(key_record, list):
@@ -620,14 +620,14 @@ class HabrDbToHtmlConverter(DbToHtmlConverter):
                             output += f'<li>{[DigestRecordsCollection.clear_title(r.title) for r in key_record]} {", ".join([DigestRecordsCollection.build_url_html(r.url, r.language) for r in key_record])}</li>\n'
                     output += '</ol>\n'
 
-        if len(output_records[DigestRecordCategory.OTHER.value]):
+        if len(output_records[DigestRecordContentType.OTHER.value]):
             output += '<h2>Что ещё посмотреть</h2>\n\n'
-            if len(output_records[DigestRecordCategory.OTHER.value]) == 1:
-                other_record = output_records[DigestRecordCategory.OTHER.value][0]
+            if len(output_records[DigestRecordContentType.OTHER.value]) == 1:
+                other_record = output_records[DigestRecordContentType.OTHER.value][0]
                 output += f'{DigestRecordsCollection.clear_title(other_record.title)} {DigestRecordsCollection.build_url_html(other_record.url, other_record.language)}<br>\n'
             else:
                 output += '<ol>\n'
-                for other_record in output_records[DigestRecordCategory.OTHER.value]:
+                for other_record in output_records[DigestRecordContentType.OTHER.value]:
                     output += f'<li>{DigestRecordsCollection.clear_title(other_record.title)} {DigestRecordsCollection.build_url_html(other_record.url, other_record.language)}</li>\n'
                 output += '</ol>\n'
         return output
@@ -662,8 +662,8 @@ class DigestRecordsCollection(NetworkingMixin,
                 'state': record_object.state.value if record_object.state is not None else None,
                 'is_main': record_object.is_main,
                 'digest_issue': record_object.digest_issue,
-                'category': record_object.category.value if record_object.category is not None else None,
-                'subcategory': record_object.subcategory.value if record_object.subcategory is not None else None,
+                'content_type': record_object.content_type.value if record_object.content_type is not None else None,
+                'content_category': record_object.content_category.value if record_object.content_category is not None else None,
             }
             records_plain.append(record_plain)
         with open(yaml_path, 'w') as fout:
@@ -748,10 +748,10 @@ class DigestRecordsCollection(NetworkingMixin,
                                           keywords=record['title_keywords'],
                                           language=record['language'])
                 record_obj.state = DigestRecordState(record['state'].lower()) if 'state' in record and record['state'] is not None else None
-                record_obj.category = DigestRecordCategory(record['category'].lower()) if 'category' in record and record['category'] is not None else None
-                if 'subcategory' in record and record['subcategory'] == 'DATABASES':
-                    record['subcategory'] = 'db'
-                record_obj.subcategory = DigestRecordSubcategory(record['subcategory'].lower()) if 'subcategory' in record and record['subcategory'] is not None else None
+                record_obj.content_type = DigestRecordContentType(record['content_type'].lower()) if 'content_type' in record and record['content_type'] is not None else None
+                if 'content_category' in record and record['content_category'] == 'DATABASES':
+                    record['content_category'] = 'db'
+                record_obj.content_category = DigestRecordContentCategory(record['content_category'].lower()) if 'content_category' in record and record['content_category'] is not None else None
                 duplicate_converted['digest_records'].append(record_obj)
             response_converted.append(duplicate_converted)
         self.duplicates += response_converted
@@ -786,10 +786,10 @@ class DigestRecordsCollection(NetworkingMixin,
                                                        'state': DigestRecordState(e['estimated_state'].lower())}
                                                       for e in record_plain['tbot_estimations']])
             record_object.state = DigestRecordState(record_plain['state'].lower()) if 'state' in record_plain and record_plain['state'] is not None else None
-            record_object.category = DigestRecordCategory(record_plain['category'].lower()) if 'category' in record_plain and record_plain['category'] is not None else None
-            if 'subcategory' in record_plain and record_plain['subcategory'] == 'DATABASES':
-                record_plain['subcategory'] = 'db'
-            record_object.subcategory = DigestRecordSubcategory(record_plain['subcategory'].lower()) if 'subcategory' in record_plain and record_plain['subcategory'] is not None else None
+            record_object.content_type = DigestRecordContentType(record_plain['content_type'].lower()) if 'content_type' in record_plain and record_plain['content_type'] is not None else None
+            if 'content_category' in record_plain and record_plain['content_category'] == 'DATABASES':
+                record_plain['content_category'] = 'db'
+            record_object.content_category = DigestRecordContentCategory(record_plain['content_category'].lower()) if 'content_category' in record_plain and record_plain['content_category'] is not None else None
             records_objects.append(record_object)
         self.records = records_objects
 
@@ -820,27 +820,27 @@ class DigestRecordsCollection(NetworkingMixin,
             raise NotImplementedError
         converter.convert(html_path)
 
-    def _guess_category(self, title: str, url: str) -> DigestRecordCategory:
+    def _guess_category(self, title: str, url: str) -> DigestRecordContentType:
         if 'https://www.youtube.com' in url:
-            return DigestRecordCategory.VIDEOS
+            return DigestRecordContentType.VIDEOS
         if 'SD Times Open-Source Project of the Week' in title:
-            return DigestRecordCategory.OTHER
+            return DigestRecordContentType.OTHER
         if 'Еженедельник OSM' in title:
-            return DigestRecordCategory.NEWS
+            return DigestRecordContentType.NEWS
         if re.search(r'DEF CON \d+ Cloud Village', title):
-            return DigestRecordCategory.VIDEOS
+            return DigestRecordContentType.VIDEOS
         for release_keyword in RELEASES_KEYWORDS:
             if release_keyword.lower() in title.lower():
-                return DigestRecordCategory.RELEASES
+                return DigestRecordContentType.RELEASES
         for article_keyword in ARTICLES_KEYWORDS:
             if article_keyword.lower() in title.lower():
-                return DigestRecordCategory.ARTICLES
+                return DigestRecordContentType.ARTICLES
 
         for keyword_data in self._keywords():
             if not keyword_data['is_generic']:
                 keyword_name_fixed = keyword_data['name'].replace('+', r'\+')
                 if re.search(keyword_name_fixed + r',?\s+v?\.?\d', title, re.IGNORECASE):
-                    return DigestRecordCategory.RELEASES
+                    return DigestRecordContentType.RELEASES
         return None
 
     def _keywords(self):
@@ -873,23 +873,23 @@ class DigestRecordsCollection(NetworkingMixin,
                 print(f'Similar records in previous digest:')
                 for record in similar_records_in_previous_digest:
                     is_main_ru = "главная" if record["is_main"] else "не главная"
-                    if record["category"]:
-                        category_ru = DIGEST_RECORD_CATEGORY_RU_MAPPING[DigestRecordCategory.from_name(record["category"]).value].lower()
+                    if record["content_type"]:
+                        content_type_ru = DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[DigestRecordContentType.from_name(record["content_type"]).value].lower()
                     else:
-                        category_ru = None
-                    if record["subcategory"]:
-                        subcategory_ru = DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[DigestRecordSubcategory.from_name(record["subcategory"]).value].lower()
+                        content_type_ru = None
+                    if record["content_category"]:
+                        content_category_ru = DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[DigestRecordContentCategory.from_name(record["content_category"]).value].lower()
                     else:
-                        subcategory_ru = None
-                    print(f'- {record["title"]} ({is_main_ru}, {category_ru}, {subcategory_ru}) - {record["url"]}')
+                        content_category_ru = None
+                    print(f'- {record["title"]} ({is_main_ru}, {content_type_ru}, {content_category_ru}) - {record["url"]}')
 
-    def _guess_subcategory(self, title: str) -> (List[DigestRecordSubcategory], Dict):
+    def _guess_subcategory(self, title: str) -> (List[DigestRecordContentCategory], Dict):
         if 'Еженедельник OSM' in title:
-            return [DigestRecordSubcategory.ORG], {}
+            return [DigestRecordContentCategory.ORG], {}
         if re.search(r'DEF CON \d+ Cloud Village', title):
-            return [DigestRecordSubcategory.SECURITY], {}
+            return [DigestRecordContentCategory.SECURITY], {}
 
-        url = f'{self.api_url}/guess-category/?title={title}'
+        url = f'{self.api_url}/guess-content_type/?title={title}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
@@ -900,19 +900,19 @@ class DigestRecordsCollection(NetworkingMixin,
         # TODO: Check title
         matches = response['matches']
 
-        guessed_subcategories: List[DigestRecordSubcategory] = []
+        guessed_content_categories: List[DigestRecordContentCategory] = []
         matched_subcategories_keywords = {}
 
-        for guessed_subcategory_name, matched_keywords in matches.items():
-            if not guessed_subcategory_name or guessed_subcategory_name == 'null':
+        for guessed_content_category_name, matched_keywords in matches.items():
+            if not guessed_content_category_name or guessed_content_category_name == 'null':
                 continue
-            subcategory = DigestRecordSubcategory(guessed_subcategory_name.lower()
-                                                  if guessed_subcategory_name != 'DATABASES'
+            subcategory = DigestRecordContentCategory(guessed_content_category_name.lower()
+                                                  if guessed_content_category_name != 'DATABASES'
                                                   else 'db')
-            guessed_subcategories.append(subcategory)
-            matched_subcategories_keywords[guessed_subcategory_name.lower()] = matched_keywords
+            guessed_content_categories.append(subcategory)
+            matched_subcategories_keywords[guessed_content_category_name.lower()] = matched_keywords
 
-        return guessed_subcategories, matched_subcategories_keywords
+        return guessed_content_categories, matched_subcategories_keywords
 
     def categorize_interactively(self):
         self._load_config(self._config_path)
@@ -1004,11 +1004,11 @@ class DigestRecordsCollection(NetworkingMixin,
                 if record.digest_issue is None:
                     self._filtered_records.append(record)
                     continue
-                if record.category == DigestRecordCategory.UNKNOWN:
+                if record.content_type == DigestRecordContentType.UNKNOWN:
                     self._filtered_records.append(record)
                     continue
-                if record.subcategory is None:
-                    if record.category != DigestRecordCategory.OTHER:
+                if record.content_category is None:
+                    if record.content_type != DigestRecordContentType.OTHER:
                         self._filtered_records.append(record)
                         continue
         for record in self.records:
@@ -1027,55 +1027,55 @@ class DigestRecordsCollection(NetworkingMixin,
                     logger.info(f'{"Marking" if is_main else "Not marking"} "{record.title}" as one of main records')
                     record.is_main = is_main
 
-                guessed_category = self._guess_category(record.title, record.url)
-                if guessed_category is not None:
-                    msg = f'Guessed category is "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}". Accept? y/n: '
+                guessed_content_type = self._guess_category(record.title, record.url)
+                if guessed_content_type is not None:
+                    msg = f'Guessed content_type is "{DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[guessed_content_type.value]}". Accept? y/n: '
                     accepted = self._ask_bool(msg)
                     if accepted:
-                        logger.info(f'Setting category of record "{record.title}" to "{DIGEST_RECORD_CATEGORY_RU_MAPPING[guessed_category.value]}"')
-                        record.category = guessed_category
+                        logger.info(f'Setting content_type of record "{record.title}" to "{DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[guessed_content_type.value]}"')
+                        record.content_type = guessed_content_type
 
-                if guessed_category != DigestRecordCategory.OTHER:
-                    guessed_subcategories, matched_subcategories_keywords = self._guess_subcategory(record.title)
-                    if guessed_subcategories:
+                if guessed_content_type != DigestRecordContentType.OTHER:
+                    guessed_content_categories, matched_subcategories_keywords = self._guess_subcategory(record.title)
+                    if guessed_content_categories:
                         if matched_subcategories_keywords:
                             matched_subcategories_keywords_translated = {}
-                            for matched_subcategory, keywords in matched_subcategories_keywords.items():
-                                matched_subcategories_keywords_translated[DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[matched_subcategory if matched_subcategory != 'databases' else 'db']] = keywords
+                            for matched_content_category, keywords in matched_subcategories_keywords.items():
+                                matched_subcategories_keywords_translated[DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[matched_content_category if matched_content_category != 'databases' else 'db']] = keywords
                             print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
-                        if len(guessed_subcategories) == 1:
-                            guessed_subcategory = guessed_subcategories[0]
-                            msg = f'Guessed subcategory is "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}". Accept? y/n: '
+                        if len(guessed_content_categories) == 1:
+                            guessed_content_category = guessed_content_categories[0]
+                            msg = f'Guessed content_category is "{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}". Accept? y/n: '
                             accepted = self._ask_bool(msg)
                             if accepted:
-                                logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
-                                record.subcategory = guessed_subcategory
+                                logger.info(f'Setting content_category of record "{record.title}" to "{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}"')
+                                record.content_category = guessed_content_category
                         else:
                             msg = f'Guessed subcategories are:'
-                            for guessed_subcategory_i, guessed_subcategory in enumerate(guessed_subcategories):
-                                msg += f'\n{guessed_subcategory_i + 1}. {DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}'
-                            msg += f'\nType guessed subcategory index or "n" if no match: '
-                            guessed_subcategory_index = self._ask_guessed_subcategory_index(msg,
-                                                                                            len(guessed_subcategories))
-                            if guessed_subcategory_index is not None:
-                                guessed_subcategory = guessed_subcategories[guessed_subcategory_index - 1]
-                                logger.info(f'Setting subcategory of record "{record.title}" to "{DIGEST_RECORD_SUBCATEGORY_RU_MAPPING[guessed_subcategory.value]}"')
-                                record.subcategory = guessed_subcategory
+                            for guessed_content_category_i, guessed_content_category in enumerate(guessed_content_categories):
+                                msg += f'\n{guessed_content_category_i + 1}. {DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}'
+                            msg += f'\nType guessed content_category index or "n" if no match: '
+                            guessed_content_category_index = self._ask_guessed_content_category_index(msg,
+                                                                                            len(guessed_content_categories))
+                            if guessed_content_category_index is not None:
+                                guessed_content_category = guessed_content_categories[guessed_content_category_index - 1]
+                                logger.info(f'Setting content_category of record "{record.title}" to "{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}"')
+                                record.content_category = guessed_content_category
 
-                if record.category == DigestRecordCategory.UNKNOWN or record.category is None:
-                    record.category = self._ask_category(record,
-                                                         DIGEST_RECORD_CATEGORY_RU_MAPPING)
-                if record.subcategory is None:
-                    if record.category != DigestRecordCategory.OTHER:
-                        record.subcategory = self._ask_subcategory(record,
-                                                                   DIGEST_RECORD_SUBCATEGORY_RU_MAPPING)
+                if record.content_type == DigestRecordContentType.UNKNOWN or record.content_type is None:
+                    record.content_type = self._ask_content_type(record,
+                                                             DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING)
+                if record.content_category is None:
+                    if record.content_type != DigestRecordContentType.OTHER:
+                        record.content_category = self._ask_content_category(record,
+                                                                        DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING)
 
                 if record.state == DigestRecordState.IN_DIGEST \
-                        and record.category is not None \
-                        and record.subcategory is not None:
+                        and record.content_type is not None \
+                        and record.content_category is not None:
                     current_records_with_similar_categories = self._similar_digest_records(record.digest_issue,
-                                                                                           record.category,
-                                                                                           record.subcategory)
+                                                                                           record.content_type,
+                                                                                           record.content_category)
                     if current_records_with_similar_categories:
                         print(f'Are there any duplicates for digest record "{record.title}" ({record.url})? Here is list of possible ones:')
                         i = 1
@@ -1116,8 +1116,8 @@ class DigestRecordsCollection(NetworkingMixin,
             'state': record.state.name if record.state is not None else None,
             'digest_issue': record.digest_issue,
             'is_main': record.is_main,
-            'category': record.category.name if record.category is not None else None,
-            'subcategory': record.subcategory.name if record.subcategory is not None else None,
+            'content_type': record.content_type.name if record.content_type is not None else None,
+            'content_category': record.content_category.name if record.content_category is not None else None,
         })
         response = self.patch_with_retries(url=url,
                                            headers=self._auth_headers,
@@ -1155,7 +1155,7 @@ class DigestRecordsCollection(NetworkingMixin,
                 print('Invalid digest number, it should be integer')
         raise NotImplementedError
 
-    def _ask_guessed_subcategory_index(self,
+    def _ask_guessed_content_category_index(self,
                                        question: str,
                                        indexes_count: int):
         while True:
@@ -1185,26 +1185,26 @@ class DigestRecordsCollection(NetworkingMixin,
                 print('Invalid boolean, it should be "y" or "n"')
         raise NotImplementedError
 
-    def _ask_category(self,
+    def _ask_content_type(self,
                       record: DigestRecord,
                       translations: Dict[str, str] = None):
-        return self._ask_enum('digest record category', DigestRecordCategory, record, translations)
+        return self._ask_enum('digest record content_type', DigestRecordContentType, record, translations)
 
-    def _ask_subcategory(self,
+    def _ask_content_category(self,
                          record: DigestRecord,
                          translations: Dict[str, str] = None):
-        enum_name = 'digest record subcategory'
-        if record.category != DigestRecordCategory.UNKNOWN and record.category != DigestRecordCategory.OTHER:
-            return self._ask_enum(enum_name, DigestRecordSubcategory, record, translations)
+        enum_name = 'digest record content_category'
+        if record.content_type != DigestRecordContentType.UNKNOWN and record.content_type != DigestRecordContentType.OTHER:
+            return self._ask_enum(enum_name, DigestRecordContentCategory, record, translations)
         else:
             raise NotImplementedError
 
     def _similar_digest_records(self,
                                 digest_issue,
-                                category,
-                                subcategory):
-        logger.debug(f'Getting similar records for digest number #{digest_issue}, category "{category.value}" and subcategory "{subcategory.value}"')
-        url = f'{self.api_url}/similar-digest-records/?digest_issue={digest_issue}&category={category.name}&subcategory={subcategory.name}'
+                                content_type,
+                                content_category):
+        logger.debug(f'Getting similar records for digest number #{digest_issue}, content_type "{content_type.value}" and content_category "{content_category.value}"')
+        url = f'{self.api_url}/similar-digest-records/?digest_issue={digest_issue}&content_type={content_type.name}&content_category={content_category.name}'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')

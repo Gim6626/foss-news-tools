@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class DigestRecordCategory(Enum):
+class DigestRecordContentType(Enum):
     UNKNOWN = 'unknown'
     NEWS = 'news'
     ARTICLES = 'articles'
@@ -11,10 +11,10 @@ class DigestRecordCategory(Enum):
 
     @staticmethod
     def from_name(name: str):
-        return DigestRecordCategory(name.lower())
+        return DigestRecordContentType(name.lower())
 
 
-DIGEST_RECORD_CATEGORY_RU_MAPPING = {
+DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING = {
     'unknown': 'Неизвестно',
     'news': 'Новости',
     'articles': 'Статьи',
@@ -24,7 +24,7 @@ DIGEST_RECORD_CATEGORY_RU_MAPPING = {
 }
 
 
-DIGEST_RECORD_CATEGORY_EN_MAPPING = {
+DIGEST_RECORD_CONTENT_TYPE_EN_MAPPING = {
     'unknown': 'Unknown',
     'news': 'News',
     'articles': 'Articles',
@@ -34,4 +34,4 @@ DIGEST_RECORD_CATEGORY_EN_MAPPING = {
 }
 
 
-DIGEST_RECORD_CATEGORY_VALUES = [category.value for category in DigestRecordCategory]
+DIGEST_RECORD_CONTENT_TYPE_VALUES = [category.value for category in DigestRecordContentType]
