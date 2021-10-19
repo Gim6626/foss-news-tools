@@ -377,6 +377,7 @@ class DbToHtmlConverter:
         pass
 
 
+# TODO: Extract common code from here and HabrDbToHtmlConverter
 class RedditDbToHtmlConverter(DbToHtmlConverter):
 
     def __init__(self, records, duplicates):
@@ -515,6 +516,7 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
         return output
 
 
+# TODO: Extract common code from here and RedditDbToHtmlConverter
 class HabrDbToHtmlConverter(DbToHtmlConverter):
 
     def __init__(self, records, duplicates):
