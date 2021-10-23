@@ -887,13 +887,13 @@ class DigestRecordsCollection(NetworkingMixin,
                         content_category_ru = None
                     print(f'- {record["title"]} ({is_main_ru}, {content_type_ru}, {content_category_ru}) - {record["url"]}')
 
-    def _guess_content_category(self, title: str, url: str) -> (List[DigestRecordContentCategory], Dict):
-        if 'weeklyOSM' in title:
+    def _guess_content_category(self, record_title: str, record_url: str) -> (List[DigestRecordContentCategory], Dict):
+        if 'weeklyOSM' in record_title:
             return [DigestRecordContentCategory.ORG], {}
-        if re.search(r'DEF CON \d+ Cloud Village', title):
+        if re.search(r'DEF CON \d+ Cloud Village', record_title):
             return [DigestRecordContentCategory.SECURITY], {}
 
-        url = f'{self.api_url}/guess-content-category/?title={title}'
+        url = f'{self.api_url}/guess-content-category/?title={record_title}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve guessed content categories, status code {response.status_code}, response: {response.content}')
@@ -917,7 +917,7 @@ class DigestRecordsCollection(NetworkingMixin,
             matched_subcategories_keywords[guessed_content_category_name.lower()] = matched_keywords
 
         diy_category = DigestRecordContentCategory('diy')
-        if 'https://hackaday.com' in url and diy_category not in guessed_content_categories:
+        if 'https://hackaday.com' in record_url and diy_category not in guessed_content_categories:
             guessed_content_categories.append(diy_category)
 
         return guessed_content_categories, matched_subcategories_keywords
