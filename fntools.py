@@ -678,7 +678,7 @@ class DigestRecordsCollection(NetworkingMixin,
         self._basic_load_digest_records_from_server(f'{self._protocol}://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_issue={digest_issue}')
 
     def _load_one_new_digest_record_from_server(self):
-        self._basic_load_digest_records_from_server(f'{self._protocol}://{self._host}:{self._port}/api/v1/one-new-foss-news-digest-record/')
+        self._basic_load_digest_records_from_server(f'{self._protocol}://{self._host}:{self._port}/api/v1/one-new-foss-news-digest-record-from-tbot/')
 
     def _load_tbot_categorization_data(self):
         self.records = []
@@ -940,7 +940,7 @@ class DigestRecordsCollection(NetworkingMixin,
         print(f'Digest record(s) left to process: {left_to_process_count}')
 
     def _non_categorized_digest_records_count(self):
-        url = f'{self.api_url}/not-categorized-digest-records-count/'
+        url = f'{self.api_url}/not-categorized-digest-records-from-tbot-count/'
         response = self.get_with_retries(url=url,
                                          headers=self._auth_headers)
         response_str = response.content.decode()
