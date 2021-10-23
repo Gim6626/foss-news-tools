@@ -824,7 +824,7 @@ class DigestRecordsCollection(NetworkingMixin,
             raise NotImplementedError
         converter.convert(html_path)
 
-    def _guess_category(self, title: str, url: str) -> DigestRecordContentType:
+    def _guess_content_type(self, title: str, url: str) -> DigestRecordContentType:
         if 'https://www.youtube.com' in url:
             return DigestRecordContentType.VIDEOS
         if 'SD Times Open-Source Project of the Week' in title:
@@ -1035,7 +1035,7 @@ class DigestRecordsCollection(NetworkingMixin,
                     logger.info(f'{"Marking" if is_main else "Not marking"} "{record.title}" as one of main records')
                     record.is_main = is_main
 
-                guessed_content_type = self._guess_category(record.title, record.url)
+                guessed_content_type = self._guess_content_type(record.title, record.url)
                 if guessed_content_type is not None:
                     msg = f'Guessed content_type is "{DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[guessed_content_type.value]}". Accept? y/n: '
                     accepted = self._ask_bool(msg)
