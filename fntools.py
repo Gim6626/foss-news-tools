@@ -222,7 +222,7 @@ class DigestRecord:
                  content_category: Enum = None,
                  drid: int = None,
                  is_main: bool = None,
-                 keywords: List[str] = None,
+                 keywords: List = None,
                  language: str = None,
                  estimations: List = None):
         self.dt = dt
@@ -237,6 +237,8 @@ class DigestRecord:
         self.drid = drid
         self.is_main = is_main
         self.keywords = keywords
+        self.proprietary_keywords_names = [k['name'] for k in keywords if k['proprietary']] if keywords else []
+        self.not_proprietary_keywords_names = [k['name'] for k in keywords if not k['proprietary']] if keywords else []
         self.language = Language(language.lower())
         self.estimations = estimations
 
@@ -255,7 +257,8 @@ class DigestRecord:
             'digest_issue': self.digest_issue,
             'content_type': self.content_type.value if self.content_type is not None else None,
             'content_category': self.content_category.value if self.content_category is not None else None,
-            'keywords': self.keywords,
+            'proprietary_keywords_names': self.proprietary_keywords_names,
+            'not_proprietary_keywords_names': self.not_proprietary_keywords_names,
             'language': self.language,
             'estimations': [{'user': e['user'],
                              'state': e['state'].value}
@@ -781,7 +784,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                          digest_issue=record_plain['digest_issue'],
                                          drid=record_plain['id'],
                                          is_main=record_plain['is_main'],
-                                         keywords=[k['name'] for k in record_plain['title_keywords']] if record_plain['title_keywords'] else [],
+                                         keywords=record_plain['title_keywords'],
                                          language=record_plain['language'],
                                          estimations=[{'user': e['telegram_bot_user']['username'],
                                                        'state': DigestRecordState(e['estimated_state'].lower())}
@@ -856,11 +859,11 @@ class DigestRecordsCollection(NetworkingMixin,
         response = json.loads(response_str)
         return response
 
-    def _show_similar_from_previous_digest(self, keywords: List[str]):
+    def _show_similar_from_previous_digest(self, keywords: List[Dict]):
         if not keywords:
             logger.debug('Could not search for similar records from previous digest cause keywords list is empty')
             return
-        url = f'{self.api_url}/similar-records-in-previous-digest/?keywords={",".join(keywords)}&current-digest-number={self._current_digest_issue}'
+        url = f'{self.api_url}/similar-records-in-previous-digest/?keywords={",".join([k["name"] for k in keywords])}&current-digest-number={self._current_digest_issue}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
