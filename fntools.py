@@ -826,7 +826,7 @@ class DigestRecordsCollection(NetworkingMixin,
             return DigestRecordContentType.VIDEOS
         if 'SD Times Open-Source Project of the Week' in title:
             return DigestRecordContentType.OTHER
-        if 'Еженедельник OSM' in title:
+        if 'weeklyOSM' in title:
             return DigestRecordContentType.NEWS
         if re.search(r'DEF CON \d+ Cloud Village', title):
             return DigestRecordContentType.VIDEOS
@@ -885,7 +885,7 @@ class DigestRecordsCollection(NetworkingMixin,
                     print(f'- {record["title"]} ({is_main_ru}, {content_type_ru}, {content_category_ru}) - {record["url"]}')
 
     def _guess_content_category(self, title: str) -> (List[DigestRecordContentCategory], Dict):
-        if 'Еженедельник OSM' in title:
+        if 'weeklyOSM' in title:
             return [DigestRecordContentCategory.ORG], {}
         if re.search(r'DEF CON \d+ Cloud Village', title):
             return [DigestRecordContentCategory.SECURITY], {}
