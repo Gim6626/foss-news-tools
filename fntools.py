@@ -259,7 +259,7 @@ class DigestRecord:
             'content_category': self.content_category.value if self.content_category is not None else None,
             'proprietary_keywords_names': self.proprietary_keywords_names,
             'not_proprietary_keywords_names': self.not_proprietary_keywords_names,
-            'language': self.language,
+            'language': self.language.value,
             'estimations': [{'user': e['user'],
                              'state': e['state'].value}
                             for e in self.estimations],
