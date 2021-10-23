@@ -238,7 +238,7 @@ class DigestRecord:
         self.is_main = is_main
         self.keywords = keywords
         self.proprietary_keywords_names = [k['name'] for k in keywords if k['proprietary']] if keywords else []
-        self.not_proprietary_keywords_names = [k['name'] for k in keywords if not k['proprietary']] if keywords else []
+        self.not_proprietary_keywords_names = [k['name'] for k in keywords if not k['proprietary'] and not k['is_generic']] if keywords else []
         self.language = Language(language.lower())
         self.estimations = estimations
 
