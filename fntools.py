@@ -884,7 +884,7 @@ class DigestRecordsCollection(NetworkingMixin,
                         content_category_ru = None
                     print(f'- {record["title"]} ({is_main_ru}, {content_type_ru}, {content_category_ru}) - {record["url"]}')
 
-    def _guess_content_category(self, title: str) -> (List[DigestRecordContentCategory], Dict):
+    def _guess_content_category(self, title: str, url: str) -> (List[DigestRecordContentCategory], Dict):
         if 'weeklyOSM' in title:
             return [DigestRecordContentCategory.ORG], {}
         if re.search(r'DEF CON \d+ Cloud Village', title):
@@ -908,10 +908,14 @@ class DigestRecordsCollection(NetworkingMixin,
             if not guessed_content_category_name or guessed_content_category_name == 'null':
                 continue
             subcategory = DigestRecordContentCategory(guessed_content_category_name.lower()
-                                                  if guessed_content_category_name != 'DATABASES'
-                                                  else 'db')
+                                                      if guessed_content_category_name != 'DATABASES'
+                                                      else 'db')
             guessed_content_categories.append(subcategory)
             matched_subcategories_keywords[guessed_content_category_name.lower()] = matched_keywords
+
+        diy_category = DigestRecordContentCategory('diy')
+        if 'https://hackaday.com' in url and diy_category not in guessed_content_categories:
+            guessed_content_categories.append(diy_category)
 
         return guessed_content_categories, matched_subcategories_keywords
 
@@ -1037,7 +1041,7 @@ class DigestRecordsCollection(NetworkingMixin,
                         record.content_type = guessed_content_type
 
                 if guessed_content_type != DigestRecordContentType.OTHER:
-                    guessed_content_categories, matched_subcategories_keywords = self._guess_content_category(record.title)
+                    guessed_content_categories, matched_subcategories_keywords = self._guess_content_category(record.title, record.url)
                     if guessed_content_categories:
                         if matched_subcategories_keywords:
                             matched_subcategories_keywords_translated = {}
