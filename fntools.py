@@ -884,16 +884,16 @@ class DigestRecordsCollection(NetworkingMixin,
                         content_category_ru = None
                     print(f'- {record["title"]} ({is_main_ru}, {content_type_ru}, {content_category_ru}) - {record["url"]}')
 
-    def _guess_subcategory(self, title: str) -> (List[DigestRecordContentCategory], Dict):
+    def _guess_content_category(self, title: str) -> (List[DigestRecordContentCategory], Dict):
         if 'Еженедельник OSM' in title:
             return [DigestRecordContentCategory.ORG], {}
         if re.search(r'DEF CON \d+ Cloud Village', title):
             return [DigestRecordContentCategory.SECURITY], {}
 
-        url = f'{self.api_url}/guess-content_type/?title={title}'
+        url = f'{self.api_url}/guess-content-category/?title={title}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
-            logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
+            logger.error(f'Failed to retrieve guessed content categories, status code {response.status_code}, response: {response.content}')
             # TODO: Raise exception and handle above
             return None
         response_str = response.content.decode()
@@ -1037,7 +1037,7 @@ class DigestRecordsCollection(NetworkingMixin,
                         record.content_type = guessed_content_type
 
                 if guessed_content_type != DigestRecordContentType.OTHER:
-                    guessed_content_categories, matched_subcategories_keywords = self._guess_subcategory(record.title)
+                    guessed_content_categories, matched_subcategories_keywords = self._guess_content_category(record.title)
                     if guessed_content_categories:
                         if matched_subcategories_keywords:
                             matched_subcategories_keywords_translated = {}
