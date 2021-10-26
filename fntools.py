@@ -692,7 +692,9 @@ class DigestRecordsCollection(NetworkingMixin,
             raise Exception(f'Failed to retrieve digest records duplicates, status code {response.status_code}, response: {response.content}')
         response_str = response.content.decode()
         response_data = json.loads(response_str)
-        for digest_record_id, digest_record_data in response_data.items():
+        for digest_record_id, digest_record_data_and_estimations in response_data.items():
+            digest_record_data = digest_record_data_and_estimations['record']
+            estimations = digest_record_data_and_estimations['estimations']
             if digest_record_data['dt'] is not None:
                 dt_str = datetime.datetime.strptime(digest_record_data['dt'],
                                                     '%Y-%m-%dT%H:%M:%SZ')
@@ -710,7 +712,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                          keywords=digest_record_data['title_keywords'],
                                          estimations=[{'user': e['user'],
                                                        'state': DigestRecordState(e['state'].lower())}
-                                                      for e in digest_record_data['estimations']])
+                                                      for e in estimations])
             self.records.append(record_object)
 
 
