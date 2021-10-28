@@ -52,7 +52,7 @@ DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING = {
     'system': 'Системное',
     'sysadm': 'Системное администрирование',
     'devops': 'DevOps',
-    'data_science': 'AI & Data Science',
+    'data_science': 'AI, ML и Data Science',
     'web': 'Web и подобное',
     'dev': 'Для разработчиков',
     'testing': 'Тестирование',
