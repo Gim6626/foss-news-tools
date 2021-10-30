@@ -282,7 +282,7 @@ class ServerConnectionMixin:
 
     def _login(self):
         logger.info('Logging in')
-        url = f'{self._protocol}://{self._host}:{self._port}/api/v1/token/'
+        url = f'{self.api_url}/token/'
         data = {'username': self._user, 'password': self._password}
         response = self.post_with_retries(url=url,
                                           data=data)
@@ -642,10 +642,12 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def __init__(self,
                  config_path: str,
-                 records: List[DigestRecord] = None):
+                 records: List[DigestRecord] = None,
+                 bot_only: bool = True):
         self._config_path = config_path
         self.records = records if records is not None else []
         self.duplicates = []
+        self._bot_only = bot_only
         self._filtered_records = []
         self._token = None
         self._current_digest_issue = None
@@ -678,10 +680,24 @@ class DigestRecordsCollection(NetworkingMixin,
         self._load_config(self._config_path)
         self._login()
         self._load_duplicates_for_specific_digest(digest_issue)
-        self._basic_load_digest_records_from_server(f'{self._protocol}://{self._host}:{self._port}/api/v1/specific-digest-records/?digest_issue={digest_issue}')
+        self._basic_load_digest_records_from_server(f'{self.api_url}/specific-digest-records/?digest_issue={digest_issue}')
+
+    @property
+    def _unsorted_digest_record_endpoint(self):
+        if self._bot_only:
+            return f'{self.api_url}/one-new-foss-news-digest-record-from-tbot/'
+        else:
+            return f'{self.api_url}/one-new-foss-news-digest-record/'
+
+    @property
+    def _unsorted_digest_records_count_endpoint(self):
+        if self._bot_only:
+            return f'{self.api_url}/not-categorized-digest-records-from-tbot-count/'
+        else:
+            return f'{self.api_url}/not-categorized-digest-records-count/'
 
     def _load_one_new_digest_record_from_server(self):
-        self._basic_load_digest_records_from_server(f'{self._protocol}://{self._host}:{self._port}/api/v1/one-new-foss-news-digest-record-from-tbot/')
+        self._basic_load_digest_records_from_server(self._unsorted_digest_record_endpoint)
 
     def _load_tbot_categorization_data(self):
         self.records = []
@@ -949,8 +965,7 @@ class DigestRecordsCollection(NetworkingMixin,
         print(f'Digest record(s) left to process: {left_to_process_count}')
 
     def _non_categorized_digest_records_count(self):
-        url = f'{self.api_url}/not-categorized-digest-records-from-tbot-count/'
-        response = self.get_with_retries(url=url,
+        response = self.get_with_retries(url=self._unsorted_digest_records_count_endpoint,
                                          headers=self._auth_headers)
         response_str = response.content.decode()
         response_data = json.loads(response_str)
@@ -987,7 +1002,7 @@ class DigestRecordsCollection(NetworkingMixin,
             if records_to_ignore:
                 logger.info('Setting following records as "ignored":')
                 for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
-                    logger.info(f'{record_to_ignore_i + 1}. {record_to_ignore.title} {record_to_ignore.url} {self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record_to_ignore.drid}/change/')
+                    logger.info(f'{record_to_ignore_i + 1}. {record_to_ignore.title} {record_to_ignore.url} {self.api_url}/admin/gatherer/digestrecord/{record_to_ignore.drid}/change/')
                     record_to_ignore.digest_issue = self._current_digest_issue
                     record_to_ignore.state = DigestRecordState.IGNORED
                 logger.info('Uploading data')
@@ -1135,7 +1150,7 @@ class DigestRecordsCollection(NetworkingMixin,
         if response.status_code != 200:
             raise Exception(f'Invalid response code from FNGS patch - {response.status_code} (request data was {data}): {response.content.decode("utf-8")}')
         logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_issue} to FNGS')
-        logger.info(f'If you want to change some parameters that you\'ve set - go to {self._protocol}://{self._host}:{self._port}/admin/gatherer/digestrecord/{record.drid}/change/')
+        logger.info(f'If you want to change some parameters that you\'ve set - go to {self.api_url}/admin/gatherer/digestrecord/{record.drid}/change/')
 
     def _ask_state(self, record: DigestRecord):
         return self._ask_enum('digest record state', DigestRecordState, record)
