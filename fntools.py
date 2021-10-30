@@ -648,7 +648,6 @@ class DigestRecordsCollection(NetworkingMixin,
         self.records = records if records is not None else []
         self.duplicates = []
         self._bot_only = bot_only
-        self._filtered_records = []
         self._token = None
         self._current_digest_issue = None
 
@@ -1060,25 +1059,6 @@ class DigestRecordsCollection(NetworkingMixin,
             self.records = []
 
     def _categorize_new_records(self):
-        self._filtered_records = []
-        for record in self.records:
-            if record.state == DigestRecordState.UNKNOWN:
-                self._filtered_records.append(record)
-                continue
-            if record.is_main is None:
-                self._filtered_records.append(record)
-                continue
-            if record.state == DigestRecordState.IN_DIGEST:
-                if record.digest_issue is None:
-                    self._filtered_records.append(record)
-                    continue
-                if record.content_type == DigestRecordContentType.UNKNOWN:
-                    self._filtered_records.append(record)
-                    continue
-                if record.content_category is None:
-                    if record.content_type != DigestRecordContentType.OTHER:
-                        self._filtered_records.append(record)
-                        continue
         for record in self.records:
             # TODO: Rewrite using FSM
             logger.info(f'Processing record "{record.title}" from date {record.dt}')
