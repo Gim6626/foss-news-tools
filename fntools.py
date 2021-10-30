@@ -231,7 +231,7 @@ class DigestRecord:
         self.url = url
         self.additional_url = additional_url
         self.state = state
-        self.digest_issue = digest_issue
+        self.digest_issue = digest_issue['number'] if isinstance(digest_issue, dict) else digest_issue
         self.content_type = content_type
         self.content_category = content_category
         self.drid = drid
