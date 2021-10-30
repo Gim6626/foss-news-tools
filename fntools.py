@@ -973,6 +973,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _categorize_records_from_tbot(self):
         ignore_candidates_records = []
+        approve_candidates_records = []
         for record in self.records:
             if not record.estimations:
                 continue
@@ -981,37 +982,79 @@ class DigestRecordsCollection(NetworkingMixin,
             total_state_votes_count = len(record.estimations)
             if ignore_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or ignore_vote_by_admin:
                 ignore_candidates_records.append(record)
-        if ignore_candidates_records:
-            print('Candidates to ignore:')
-            for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records):
-                print(f'{ignore_candidate_record_i + 1}. {ignore_candidate_record.title} {ignore_candidate_record.url}')
-            do_not_ignore_records_indexes = []
-            while True:
-                answer = input('Approve all records ignoring with typing "all" or comma-separated input records indexes which you want to left non-ignored: ')
-                if answer == 'all':
-                    do_not_ignore_records_indexes = []
-                elif re.fullmatch(r'[0-9]+(,[0-9]+)*?', answer):
-                    do_not_ignore_records_indexes = [int(i) - 1 for i in answer.split(',')]
-                else:
-                    print('Invalid answer, please input "all" or comma-separated indexes list')
-                    continue
-                break
-            records_to_ignore = [ignore_candidate_record
-                                 for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records)
-                                 if ignore_candidate_record_i not in do_not_ignore_records_indexes]
-            if records_to_ignore:
-                logger.info('Setting following records as "ignored":')
-                for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
-                    logger.info(f'{record_to_ignore_i + 1}. {record_to_ignore.title} {record_to_ignore.url} {self.api_url}/admin/gatherer/digestrecord/{record_to_ignore.drid}/change/')
-                    record_to_ignore.digest_issue = self._current_digest_issue
-                    record_to_ignore.state = DigestRecordState.IGNORED
-                logger.info('Uploading data')
-                for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
-                    self._upload_record(record_to_ignore)
-            records_left_from_tbot = [digest_record
-                                      for digest_record_i, digest_record in
-                                      enumerate(ignore_candidates_records)
-                                      if digest_record_i in do_not_ignore_records_indexes]
+            approve_state_votes_count = len([estimation for estimation in record.estimations if estimation['state'] == DigestRecordState.IN_DIGEST])
+            approve_vote_by_admin = len([estimation for estimation in record.estimations if estimation['user'] == 'gim6626' and estimation['state'] == DigestRecordState.IN_DIGEST]) > 0  # TODO: Replace hardcode with some DB query on backend
+            total_state_votes_count = len(record.estimations)
+            if approve_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or approve_vote_by_admin:
+                approve_candidates_records.append(record)
+        if ignore_candidates_records or approve_candidates_records:
+            records_left_from_tbot = []
+            if ignore_candidates_records:
+                print('Candidates to ignore:')
+                for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records):
+                    print(f'{ignore_candidate_record_i + 1}. {ignore_candidate_record.title} {ignore_candidate_record.url}')
+                do_not_ignore_records_indexes = []
+                while True:
+                    answer = input('Approve all records ignoring with typing "all" or comma-separated input records indexes which you want to left non-ignored: ')
+                    if answer == 'all':
+                        do_not_ignore_records_indexes = []
+                    elif re.fullmatch(r'[0-9]+(,[0-9]+)*?', answer):
+                        do_not_ignore_records_indexes = [int(i) - 1 for i in answer.split(',')]
+                    else:
+                        print('Invalid answer, please input "all" or comma-separated indexes list')
+                        continue
+                    break
+                records_to_ignore = [ignore_candidate_record
+                                     for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records)
+                                     if ignore_candidate_record_i not in do_not_ignore_records_indexes]
+                if records_to_ignore:
+                    logger.info('Setting following records as "ignored":')
+                    for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
+                        logger.info(f'{record_to_ignore_i + 1}. {record_to_ignore.title} {record_to_ignore.url} {self.api_url}/admin/gatherer/digestrecord/{record_to_ignore.drid}/change/')
+                        record_to_ignore.digest_issue = self._current_digest_issue
+                        record_to_ignore.state = DigestRecordState.IGNORED
+                    logger.info('Uploading data')
+                    for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
+                        self._upload_record(record_to_ignore)
+
+                records_left_from_tbot += [digest_record
+                                           for digest_record_i, digest_record in
+                                           enumerate(ignore_candidates_records)
+                                           if digest_record_i in do_not_ignore_records_indexes]
+
+            if approve_candidates_records:
+                print('Candidates to approve:')
+                for approve_candidate_record_i, approve_candidate_record in enumerate(approve_candidates_records):
+                    print(f'{approve_candidate_record_i + 1}. {approve_candidate_record.title} {approve_candidate_record.url}')
+                do_not_approve_records_indexes = []
+                while True:
+                    answer = input('Approve all records inclusion in digest with typing "all" or comma-separated input records indexes which you want to left to be processed separately: ')
+                    if answer == 'all':
+                        do_not_approve_records_indexes = []
+                    elif re.fullmatch(r'[0-9]+(,[0-9]+)*?', answer):
+                        do_not_approve_records_indexes = [int(i) - 1 for i in answer.split(',')]
+                    else:
+                        print('Invalid answer, please input "all" or comma-separated indexes list')
+                        continue
+                    break
+                records_to_approve = [approve_candidate_record
+                                      for approve_candidate_record_i, approve_candidate_record in enumerate(approve_candidates_records)
+                                      if approve_candidate_record_i not in do_not_approve_records_indexes]
+                if records_to_approve:
+                    logger.info('Setting following records as "in digest":')
+                    for record_to_approve_i, record_to_approve in enumerate(records_to_approve):
+                        logger.info(f'{record_to_approve_i + 1}. {record_to_approve.title} {record_to_approve.url} {self.api_url}/admin/gatherer/digestrecord/{record_to_approve.drid}/change/')
+                        record_to_approve.digest_issue = self._current_digest_issue
+                        record_to_approve.state = DigestRecordState.IN_DIGEST
+                    logger.info('Uploading data')
+                    for record_to_approve_i, record_to_approve in enumerate(records_to_approve):
+                        self._upload_record(record_to_approve)
+
+                records_left_from_tbot += [digest_record
+                                           for digest_record_i, digest_record in
+                                           enumerate(approve_candidates_records)
+                                           if digest_record_i in do_not_approve_records_indexes]
+
             self.records = records_left_from_tbot
         else:
             self.records = []
