@@ -297,6 +297,10 @@ class ServerConnectionMixin:
         return f'{self._protocol}://{self._host}:{self._port}/api/v1'
 
     @property
+    def admin_url(self):
+        return f'{self._protocol}://{self._host}:{self._port}/admin'
+
+    @property
     def _auth_headers(self):
         return {
             'Authorization': f'Bearer {self._token}',
@@ -1009,7 +1013,7 @@ class DigestRecordsCollection(NetworkingMixin,
                 if records_to_ignore:
                     logger.info('Setting following records as "ignored":')
                     for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
-                        logger.info(f'{record_to_ignore_i + 1}. {record_to_ignore.title} {record_to_ignore.url} {self.api_url}/admin/gatherer/digestrecord/{record_to_ignore.drid}/change/')
+                        logger.info(f'{record_to_ignore_i + 1}. {record_to_ignore.title} {record_to_ignore.url} {self.admin_url}/gatherer/digestrecord/{record_to_ignore.drid}/change/')
                         record_to_ignore.digest_issue = self._current_digest_issue
                         record_to_ignore.state = DigestRecordState.IGNORED
                     logger.info('Uploading data')
@@ -1042,7 +1046,7 @@ class DigestRecordsCollection(NetworkingMixin,
                 if records_to_approve:
                     logger.info('Setting following records as "in digest":')
                     for record_to_approve_i, record_to_approve in enumerate(records_to_approve):
-                        logger.info(f'{record_to_approve_i + 1}. {record_to_approve.title} {record_to_approve.url} {self.api_url}/admin/gatherer/digestrecord/{record_to_approve.drid}/change/')
+                        logger.info(f'{record_to_approve_i + 1}. {record_to_approve.title} {record_to_approve.url} {self.admin_url}/gatherer/digestrecord/{record_to_approve.drid}/change/')
                         record_to_approve.digest_issue = self._current_digest_issue
                         record_to_approve.state = DigestRecordState.IN_DIGEST
                     logger.info('Uploading data')
@@ -1173,7 +1177,7 @@ class DigestRecordsCollection(NetworkingMixin,
         if response.status_code != 200:
             raise Exception(f'Invalid response code from FNGS patch - {response.status_code} (request data was {data}): {response.content.decode("utf-8")}')
         logger.info(f'Uploaded record #{record.drid} for digest #{record.digest_issue} to FNGS')
-        logger.info(f'If you want to change some parameters that you\'ve set - go to {self.api_url}/admin/gatherer/digestrecord/{record.drid}/change/')
+        logger.info(f'If you want to change some parameters that you\'ve set - go to {self.admin_url}/gatherer/digestrecord/{record.drid}/change/')
 
     def _ask_state(self, record: DigestRecord):
         return self._ask_enum('digest record state', DigestRecordState, record)
