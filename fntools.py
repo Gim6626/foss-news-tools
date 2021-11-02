@@ -392,7 +392,7 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
 
     def _process_url(self, digest_record):
         # TODO: Find better solution of marking things that needs attention
-        if 'opennet' in digest_record.url:
+        if digest_record.language == Language.RUSSIAN:
             return '!!! ' + digest_record.url
         elif digest_record.additional_url:
             return '!!! ' + digest_record.additional_url
@@ -440,8 +440,6 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
                 continue
             if digest_record.drid in digest_records_ids_from_duplicates:
                 continue
-            if digest_record.language != Language.ENGLISH and 'opennet' not in digest_record.url:
-                continue
             if digest_record.is_main:
                 output_records['main'].append(digest_record)
             elif digest_record.content_type == DigestRecordContentType.OTHER:
@@ -459,25 +457,15 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
         # pprint([([r.title for r in rs] if isinstance(rs, list) else rs.title) for rs in output_records['main']])
         for main_record in output_records['main']:
             if not isinstance(main_record, list):
-                if main_record.language != Language.ENGLISH and 'opennet' not in main_record.url:
-                    continue
                 output += f'<h3>{DigestRecordsCollection.clear_title(main_record.title)}</h3>\n\n'
                 output += f'<i><b>Category</b>: {DIGEST_RECORD_CONTENT_TYPE_EN_MAPPING[main_record.content_type.value]}/{DIGEST_RECORD_CONTENT_CATEGORY_EN_MAPPING[main_record.content_category.value]}</i><br>\n\n'
                 output += f'Details {DigestRecordsCollection.build_url_html(self._process_url(main_record), main_record.language, True)}\n\n'
             else:
-                only_english_records = []
-                for r in main_record:
-                    if r.language != Language.ENGLISH and 'opennet' not in r.url:
-                        continue
-                    else:
-                        only_english_records.append(r)
-                if not only_english_records:
-                    continue
-                output += f'<h3>{[DigestRecordsCollection.clear_title(r.title) for r in only_english_records]}</h3>\n\n'
+                output += f'<h3>{[DigestRecordsCollection.clear_title(r.title) for r in main_record]}</h3>\n\n'
                 output += f'<i><b>Category</b>: {DIGEST_RECORD_CONTENT_TYPE_EN_MAPPING[main_record[0].content_type.value]}/{DIGEST_RECORD_CONTENT_CATEGORY_EN_MAPPING[main_record[0].content_category.value]}</i><br>\n\n'
                 output += 'Details:<br>\n\n'
                 output += '<ol>\n'
-                for r in only_english_records:
+                for r in main_record:
                     output += f'<li>{r.title} {DigestRecordsCollection.build_url_html(self._process_url(r), r.language, True)}</li>\n\n'
                 output += '</ol>\n'
 
