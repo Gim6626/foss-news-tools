@@ -1129,7 +1129,7 @@ class DigestRecordsCollection(NetworkingMixin,
                             options_indexes.append(option['id'])
                             i += 1
                         if len(current_records_with_similar_categories['duplicates']) + len(current_records_with_similar_categories['records']) == 1:
-                            confirmation = self._ask_bool('Confirm (y/n):')
+                            confirmation = self._ask_bool('Confirm (y/n): ')
                             if confirmation:
                                 option_index = 0
                             else:
