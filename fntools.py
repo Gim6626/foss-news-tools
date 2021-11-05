@@ -1117,24 +1117,29 @@ class DigestRecordsCollection(NetworkingMixin,
                                                                                            record.content_type,
                                                                                            record.content_category)
                     if current_records_with_similar_categories:
-                        print(f'Are there any duplicates for digest record "{record.title}" ({record.url})? Here is list of possible ones:')
-                        i = 1
-                        options_indexes = []
-                        for option in current_records_with_similar_categories['duplicates']:
-                            print(f'{i}. {"; ".join([dr["title"] + " " + dr["url"] for dr in option["digest_records"]])}')
-                            options_indexes.append(option['id'])
-                            i += 1
-                        for option in current_records_with_similar_categories['records']:
-                            print(f'{i}. {option["title"]} {option["url"]}')
-                            options_indexes.append(option['id'])
-                            i += 1
                         if len(current_records_with_similar_categories['duplicates']) + len(current_records_with_similar_categories['records']) == 1:
-                            confirmation = self._ask_bool('Confirm (y/n): ')
+                            if current_records_with_similar_categories['duplicates']:
+                                dr = current_records_with_similar_categories['duplicates'][0]
+                            else:
+                                dr = current_records_with_similar_categories['records'][0]
+                            question = f'Is the record "{dr["title"]}" {dr["url"]} similar to current (y/n)? '
+                            confirmation = self._ask_bool(question)
                             if confirmation:
                                 option_index = 0
                             else:
                                 option_index = None
                         else:
+                            print(f'Are there any duplicates for digest record "{record.title}" ({record.url})? Here is list of possible ones:')
+                            i = 1
+                            options_indexes = []
+                            for option in current_records_with_similar_categories['duplicates']:
+                                print(f'{i}. {"; ".join([dr["title"] + " " + dr["url"] for dr in option["digest_records"]])}')
+                                options_indexes.append(option['id'])
+                                i += 1
+                            for option in current_records_with_similar_categories['records']:
+                                print(f'{i}. {option["title"]} {option["url"]}')
+                                options_indexes.append(option['id'])
+                                i += 1
                             option_index = self._ask_option_index_or_no(i - 1)
                         print(Style.RESET_ALL, end='')
                         if option_index is not None:
