@@ -1122,6 +1122,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                 dr = current_records_with_similar_categories['duplicates'][0]
                             else:
                                 dr = current_records_with_similar_categories['records'][0]
+                            options_indexes = [dr['id']]
                             question = f'Is the record "{dr["title"]}" {dr["url"]} similar to current (y/n)? '
                             confirmation = self._ask_bool(question)
                             if confirmation:
@@ -1143,8 +1144,8 @@ class DigestRecordsCollection(NetworkingMixin,
                             option_index = self._ask_option_index_or_no(i - 1)
                         print(Style.RESET_ALL, end='')
                         if option_index is not None:
-                            if option_index <= len(current_records_with_similar_categories['duplicates']):
-                                existing_drids = None
+                            if current_records_with_similar_categories['duplicates'] and option_index <= len(current_records_with_similar_categories['duplicates']):
+                                existing_drids = []
                                 for option in current_records_with_similar_categories['duplicates']:
                                     if option['id'] == options_indexes[option_index - 1]:
                                         existing_drids = [dr['id'] for dr in option['digest_records']]
