@@ -1128,7 +1128,14 @@ class DigestRecordsCollection(NetworkingMixin,
                             print(f'{i}. {option["title"]} {option["url"]}')
                             options_indexes.append(option['id'])
                             i += 1
-                        option_index = self._ask_option_index_or_no(i - 1)
+                        if len(current_records_with_similar_categories['duplicates']) + len(current_records_with_similar_categories['records']) == 1:
+                            confirmation = self._ask_bool('Confirm (y/n):')
+                            if confirmation:
+                                option_index = 0
+                            else:
+                                option_index = None
+                        else:
+                            option_index = self._ask_option_index_or_no(i - 1)
                         print(Style.RESET_ALL, end='')
                         if option_index is not None:
                             if option_index <= len(current_records_with_similar_categories['duplicates']):
