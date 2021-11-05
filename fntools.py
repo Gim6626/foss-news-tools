@@ -937,6 +937,7 @@ class DigestRecordsCollection(NetworkingMixin,
         while True:
             if self._current_digest_issue is None:
                 self._current_digest_issue = self._ask_digest_issue()
+            self._print_non_categorized_digest_records_count()
             # self._print_non_categorized_digest_records_count()
             self._load_tbot_categorization_data()
             if self.records:
@@ -946,7 +947,6 @@ class DigestRecordsCollection(NetworkingMixin,
             if not self.records:
                 self._load_one_new_digest_record_from_server()
             self._categorize_new_records()
-            self._print_non_categorized_digest_records_count()
             if self._non_categorized_digest_records_count() == 0:
                 logger.info('No uncategorized digest records left')
                 break
