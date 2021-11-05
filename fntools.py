@@ -1119,11 +1119,13 @@ class DigestRecordsCollection(NetworkingMixin,
                     if current_records_with_similar_categories:
                         if len(current_records_with_similar_categories['duplicates']) + len(current_records_with_similar_categories['records']) == 1:
                             if current_records_with_similar_categories['duplicates']:
-                                dr = current_records_with_similar_categories['duplicates'][0]
+                                obj = current_records_with_similar_categories['duplicates'][0]
+                                text = f'[{"; ".join([dr["title"] + " " + dr["url"] for dr in obj["digest_records"]])}]'
                             else:
-                                dr = current_records_with_similar_categories['records'][0]
-                            options_indexes = [dr['id']]
-                            question = f'Is the record "{dr["title"]}" {dr["url"]} similar to current (y/n)? '
+                                obj = current_records_with_similar_categories['records'][0]
+                                text = f'"{obj["title"]}" {obj["url"]}'
+                            options_indexes = [obj['id']]
+                            question = f'Is the record(s) {text} similar to current (y/n)? '
                             confirmation = self._ask_bool(question)
                             if confirmation:
                                 option_index = 0
