@@ -340,8 +340,7 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
             logger.error(f'Empty URL for digest issue #{number}')
             return None
         self.driver.get(url)
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        xpath = '//div[contains(@class, "tm-page-article__body")]//span[contains(@class, "tm-icon-counter__value")]'
+        xpath = '//div[contains(@class, "tm-page__main tm-page__main_has-sidebar")]//div[contains(@class, "tm-data-icons tm-article-sticky-panel__icons")]//span[contains(@class, "tm-icon-counter tm-data-icons__item")]/span'
         element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
 
         full_statistics_str = element.text
