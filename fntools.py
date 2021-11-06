@@ -10,7 +10,10 @@ import re
 import datetime
 import yaml
 import json
+from multiprocessing.pool import ThreadPool
+import threading
 from enum import Enum
+import random
 from typing import List, Dict
 import os
 from pprint import (
@@ -112,70 +115,82 @@ class NetworkingMixin:
         PATCH = 'PATCH'
         POST = 'POST'
 
-    def get_with_retries(self, url, headers=None):
-        return self.request_with_retries(url, headers=headers, method=self.RequestType.GET, data=None)
+    @staticmethod
+    def get_with_retries(url, headers=None):
+        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.GET, data=None)
 
-    def patch_with_retries(self, url, headers=None, data=None):
-        return self.request_with_retries(url, headers=headers, method=self.RequestType.PATCH, data=data)
+    @staticmethod
+    def patch_with_retries(url, headers=None, data=None):
+        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.PATCH, data=data)
 
-    def post_with_retries(self, url, headers=None, data=None):
-        return self.request_with_retries(url, headers=headers, method=self.RequestType.POST, data=data)
+    @staticmethod
+    def post_with_retries(url, headers=None, data=None):
+        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.POST, data=data)
 
-    def request_with_retries(self, url, headers=None, method=RequestType.GET, data=None):
+    @staticmethod
+    def request_with_retries(url, headers=None, method=RequestType.GET, data=None):
         if headers is None:
             headers = {}
-        for attempt_i in range(self.NETWORK_RETRIES_COUNT):
+        for attempt_i in range(NetworkingMixin.NETWORK_RETRIES_COUNT):
             begin_datetime = datetime.datetime.now()
             try:
-                if method == self.RequestType.GET:
+                if method == NetworkingMixin.RequestType.GET:
                     logger.debug(f'GETting URL "{url}"')
                     response = requests.get(url,
                                             headers=headers,
-                                            timeout=self.NETWORK_TIMEOUT_SECONDS)
-                elif method == self.RequestType.PATCH:
+                                            timeout=NetworkingMixin.NETWORK_TIMEOUT_SECONDS)
+                elif method == NetworkingMixin.RequestType.PATCH:
                     logger.debug(f'PATCHing URL "{url}"')
                     response = requests.patch(url,
                                               data=data,
                                               headers=headers,
-                                              timeout=self.NETWORK_TIMEOUT_SECONDS)
-                elif method == self.RequestType.POST:
+                                              timeout=NetworkingMixin.NETWORK_TIMEOUT_SECONDS)
+                elif method == NetworkingMixin.RequestType.POST:
                     logger.debug(f'POSTing URL "{url}"')
                     response = requests.post(url,
                                              data=data,
                                              headers=headers,
-                                             timeout=self.NETWORK_TIMEOUT_SECONDS)
+                                             timeout=NetworkingMixin.NETWORK_TIMEOUT_SECONDS)
                 else:
                     raise NotImplementedError
                 end_datetime = datetime.datetime.now()
                 logger.debug(f'Response time: {end_datetime - begin_datetime}')
                 return response
             except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
-                base_timeout_msg = f'Request to url {url} reached timeout of {self.NETWORK_TIMEOUT_SECONDS} seconds'
-                if attempt_i != self.NETWORK_RETRIES_COUNT - 1:
-                    logger.warning(f'{base_timeout_msg}, sleeping {self.SLEEP_BETWEEN_ATTEMPTS_SECONDS} seconds and trying again, {self.NETWORK_RETRIES_COUNT - attempt_i - 1} retries left')
-                    time.sleep(self.SLEEP_BETWEEN_ATTEMPTS_SECONDS)
+                base_timeout_msg = f'Request to url {url} reached timeout of {NetworkingMixin.NETWORK_TIMEOUT_SECONDS} seconds'
+                if attempt_i != NetworkingMixin.NETWORK_RETRIES_COUNT - 1:
+                    logger.warning(f'{base_timeout_msg}, sleeping {NetworkingMixin.SLEEP_BETWEEN_ATTEMPTS_SECONDS} seconds and trying again, {NetworkingMixin.NETWORK_RETRIES_COUNT - attempt_i - 1} retries left')
+                    time.sleep(NetworkingMixin.SLEEP_BETWEEN_ATTEMPTS_SECONDS)
                 else:
-                    raise Exception(f'{base_timeout_msg}, retries count {self.NETWORK_RETRIES_COUNT} exceeded')
+                    raise Exception(f'{base_timeout_msg}, retries count {NetworkingMixin.NETWORK_RETRIES_COUNT} exceeded')
 
 
 class BasicPostsStatisticsGetter(NetworkingMixin,
                                  metaclass=ABCMeta):
 
-    def __init__(self):
+    def __init__(self, sessions_count):
+        self.sessions_count = sessions_count
         self._posts_urls = {}
         self.source_name = None
+        self._posts_statistics = {}
+        self._lock = threading.Lock()
 
-    def posts_statistics(self):
-        posts_statistics = {}
-        for number, url in self.posts_urls.items():
-            views_count = self.post_statistics(number, url)
-            posts_statistics[number] = views_count
-            logger.info(f'Views count for {self.source_name} post #{number} ({url}): {views_count}')
-            time.sleep(1)
-        return posts_statistics
+    def gather_posts_statistics(self):
+        threads_pool = ThreadPool(self.sessions_count)
+        self._posts_statistics = {}
+        threads_pool.map(self._gather_post_statistics, [(self, number, url, self._lock) for number, url in self.posts_urls.items()])
+        return self._posts_statistics
+
+    def _gather_post_statistics(self, data):
+        obj, number, url, lock = data
+        views_count = obj._internal_gather_post_statistics(number, url)
+        logger.info(f'Views count for {obj.source_name} post #{number} ({url}): {views_count}')
+        obj._lock.acquire()
+        obj._posts_statistics[number] = views_count
+        obj._lock.release()
 
     @abstractmethod
-    def post_statistics(self, number, url):
+    def _internal_gather_post_statistics(self, number, url):
         pass
 
     @property
@@ -185,8 +200,8 @@ class BasicPostsStatisticsGetter(NetworkingMixin,
 
 class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, sessions_count):
+        super().__init__(sessions_count)
         self.source_name = 'VK'
         self._posts_urls = {}
         self._posts_count = 1
@@ -198,8 +213,8 @@ class VkPostsStatisticsGetter(BasicPostsStatisticsGetter):
                 self._posts_urls[i] = f'https://vk.com/@permlug-foss-news-{i}'
         return self._posts_urls
 
-    def post_statistics(self, number, url):
-        response = self.get_with_retries(url)
+    def _internal_gather_post_statistics(self, number, url):
+        response = NetworkingMixin.get_with_retries(url)
         content = response.text
         re_result = re.search(r'<div class="articleView__footer_views" style="">(\d+) просмотр', content)
         if re_result is None:
@@ -309,16 +324,24 @@ class ServerConnectionMixin:
 
 
 class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
-                                NetworkingMixin,
                                 ServerConnectionMixin):
 
-    def __init__(self, config_path):
-        super().__init__()
+    def __init__(self, config_path, sessions_count):
+        super().__init__(sessions_count)
         self.source_name = 'Habr'
-        self.driver = None
+        self.sessions_count = sessions_count
+        self._drivers = []
+        self._locks: List[threading.Lock] = []
         self._load_config(config_path)
         self._login()
         self._posts_urls = {di['number']: di['habr_url'] for di in self._digest_issues}
+
+    def gather_posts_statistics(self):
+        self._drivers = [webdriver.Firefox() for _ in range(self.sessions_count)]
+        self._locks = [threading.Lock() for _ in range(self.sessions_count)]
+        stats = super().gather_posts_statistics()
+        [driver.close() for driver in self._drivers]
+        return stats
 
     @property
     def _digest_issues(self):
@@ -329,19 +352,18 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
         content_data = json.loads(content)
         return content_data
 
-    def posts_statistics(self):
-        self.driver = webdriver.Firefox()
-        statistics = super().posts_statistics()
-        self.driver.close()
-        return statistics
-
-    def post_statistics(self, number, url):
+    def _internal_gather_post_statistics(self, number, url):
         if not url:
             logger.error(f'Empty URL for digest issue #{number}')
             return None
-        self.driver.get(url)
+        job_index = random.randint(0, self.sessions_count - 1)
+        driver = self._drivers[job_index]
+        lock = self._locks[job_index]
+        lock.acquire()
+        # driver = webdriver.Firefox()
+        driver.get(url)
         xpath = '//div[contains(@class, "tm-page__main tm-page__main_has-sidebar")]//div[contains(@class, "tm-data-icons tm-article-sticky-panel__icons")]//span[contains(@class, "tm-icon-counter tm-data-icons__item")]/span'
-        element = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+        element = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, xpath)))
 
         full_statistics_str = element.text
         logger.debug(f'Full statistics string for FOSS News #{number}: "{full_statistics_str}"')
@@ -361,6 +383,8 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
         else:
             views_count = int(statistics_without_k)
 
+        lock.release()
+        # driver.close()
         return views_count
 
 
