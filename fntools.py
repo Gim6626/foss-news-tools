@@ -390,9 +390,9 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
 
 class DbToHtmlConverter:
 
-    def __init__(self, records, duplicates):
+    def __init__(self, records, similar_records):
         self._records = records
-        self._duplicates = duplicates
+        self._similar_records = similar_records
 
     def convert(self, html_path):
         logger.info('Converting DB records to HTML')
@@ -410,8 +410,8 @@ class DbToHtmlConverter:
 # TODO: Extract common code from here and HabrDbToHtmlConverter
 class RedditDbToHtmlConverter(DbToHtmlConverter):
 
-    def __init__(self, records, duplicates):
-        super().__init__(records, duplicates)
+    def __init__(self, records, similar_records):
+        super().__init__(records, similar_records)
 
     def _process_url(self, digest_record):
         # TODO: Find better solution of marking things that needs attention
@@ -436,32 +436,32 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
                                                      DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
             DigestRecordContentType.OTHER.value: [],
         }
-        digest_records_ids_from_duplicates = []
-        for duplicate in self._duplicates:
-            duplicate_records = duplicate['digest_records']
-            duplicate_records_to_digest = [dr for dr in duplicate_records if dr.state == DigestRecordState.IN_DIGEST and (dr.language == Language.ENGLISH or 'opennet' in dr.url)]
-            if not duplicate_records_to_digest:
+        digest_records_ids_from_similar_records = []
+        for similar_records_item in self._similar_records:
+            similar_records_item_records = similar_records_item['digest_records']
+            similar_records_item_records_included_to_digest = [dr for dr in similar_records_item_records if dr.state == DigestRecordState.IN_DIGEST and (dr.language == Language.ENGLISH or 'opennet' in dr.url)]
+            if not similar_records_item_records_included_to_digest:
                 continue
-            for duplicate_record in duplicate_records:
-                digest_records_ids_from_duplicates.append(duplicate_record.drid)
-            first_in_duplicate = duplicate_records_to_digest[0]
-            if [dr for dr in duplicate_records_to_digest if dr.is_main]:
-                output_records['main'].append(duplicate_records)
-            elif first_in_duplicate.content_type == DigestRecordContentType.OTHER:
-                output_records[first_in_duplicate.content_type.value].append(duplicate_records)
-            elif not first_in_duplicate.is_main and first_in_duplicate.content_type in (DigestRecordContentType.NEWS,
+            for similar_records_item_records_one in similar_records_item_records:
+                digest_records_ids_from_similar_records.append(similar_records_item_records_one.drid)
+            first_in_similar_records_item_records = similar_records_item_records_included_to_digest[0]
+            if [dr for dr in similar_records_item_records_included_to_digest if dr.is_main]:
+                output_records['main'].append(similar_records_item_records)
+            elif first_in_similar_records_item_records.content_type == DigestRecordContentType.OTHER:
+                output_records[first_in_similar_records_item_records.content_type.value].append(similar_records_item_records)
+            elif not first_in_similar_records_item_records.is_main and first_in_similar_records_item_records.content_type in (DigestRecordContentType.NEWS,
                                                                                         DigestRecordContentType.ARTICLES,
                                                                                         DigestRecordContentType.VIDEOS,
                                                                                         DigestRecordContentType.RELEASES):
-                if first_in_duplicate.content_category is not None:
-                    output_records[first_in_duplicate.content_type.value][first_in_duplicate.content_category.value].append(duplicate_records)
+                if first_in_similar_records_item_records.content_category is not None:
+                    output_records[first_in_similar_records_item_records.content_type.value][first_in_similar_records_item_records.content_category.value].append(similar_records_item_records)
             else:
-                pprint(duplicate)
+                pprint(similar_records_item)
                 raise NotImplementedError
         for digest_record in self._records:
             if digest_record.state != DigestRecordState.IN_DIGEST:
                 continue
-            if digest_record.drid in digest_records_ids_from_duplicates:
+            if digest_record.drid in digest_records_ids_from_similar_records:
                 continue
             if digest_record.is_main:
                 output_records['main'].append(digest_record)
@@ -537,8 +537,8 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
 # TODO: Extract common code from here and RedditDbToHtmlConverter
 class HabrDbToHtmlConverter(DbToHtmlConverter):
 
-    def __init__(self, records, duplicates):
-        super().__init__(records, duplicates)
+    def __init__(self, records, similar_records):
+        super().__init__(records, similar_records)
 
     def _convert(self) -> str:
         output_records = {
@@ -553,33 +553,33 @@ class HabrDbToHtmlConverter(DbToHtmlConverter):
                                                      DIGEST_RECORD_CONTENT_CATEGORY_VALUES},
             DigestRecordContentType.OTHER.value: [],
         }
-        digest_records_ids_from_duplicates = []
-        for duplicate in self._duplicates:
-            duplicate_records = duplicate['digest_records']
-            duplicate_records_to_digest = [dr for dr in duplicate_records if dr.state == DigestRecordState.IN_DIGEST]
-            if not duplicate_records_to_digest:
+        digest_records_ids_from_similar_records_item_records = []
+        for similar_records_item in self._similar_records:
+            similar_records_item_records = similar_records_item['digest_records']
+            similar_records_item_records_included_to_digest = [dr for dr in similar_records_item_records if dr.state == DigestRecordState.IN_DIGEST]
+            if not similar_records_item_records_included_to_digest:
                 continue
-            for duplicate_record in duplicate_records:
-                digest_records_ids_from_duplicates.append(duplicate_record.drid)
-            first_in_duplicate = duplicate_records_to_digest[0]
-            if [dr for dr in duplicate_records_to_digest if dr.is_main]:
-                output_records['main'].append(duplicate_records)
-            elif first_in_duplicate.content_type == DigestRecordContentType.OTHER:
-                output_records[first_in_duplicate.content_type.value].append(duplicate_records)
-            elif not first_in_duplicate.is_main and first_in_duplicate.content_type in (DigestRecordContentType.NEWS,
+            for similar_records_item_records_one in similar_records_item_records:
+                digest_records_ids_from_similar_records_item_records.append(similar_records_item_records_one.drid)
+            first_in_similar_records_item_records = similar_records_item_records_included_to_digest[0]
+            if [dr for dr in similar_records_item_records_included_to_digest if dr.is_main]:
+                output_records['main'].append(similar_records_item_records)
+            elif first_in_similar_records_item_records.content_type == DigestRecordContentType.OTHER:
+                output_records[first_in_similar_records_item_records.content_type.value].append(similar_records_item_records)
+            elif not first_in_similar_records_item_records.is_main and first_in_similar_records_item_records.content_type in (DigestRecordContentType.NEWS,
                                                                                         DigestRecordContentType.ARTICLES,
                                                                                         DigestRecordContentType.VIDEOS,
                                                                                         DigestRecordContentType.RELEASES):
-                if first_in_duplicate.content_category is not None:
-                    output_records[first_in_duplicate.content_type.value][first_in_duplicate.content_category.value].append(
-                        duplicate_records)
+                if first_in_similar_records_item_records.content_category is not None:
+                    output_records[first_in_similar_records_item_records.content_type.value][first_in_similar_records_item_records.content_category.value].append(
+                        similar_records_item_records)
             else:
-                pprint(duplicate)
+                pprint(similar_records_item)
                 raise NotImplementedError
         for digest_record in self._records:
             if digest_record.state != DigestRecordState.IN_DIGEST:
                 continue
-            if digest_record.drid in digest_records_ids_from_duplicates:
+            if digest_record.drid in digest_records_ids_from_similar_records_item_records:
                 continue
             if digest_record.is_main:
                 output_records['main'].append(digest_record)
@@ -661,7 +661,7 @@ class DigestRecordsCollection(NetworkingMixin,
                  bot_only: bool = True):
         self._config_path = config_path
         self.records = records if records is not None else []
-        self.duplicates = []
+        self.similar_records = []
         self._bot_only = bot_only
         self._token = None
         self._current_digest_issue = None
@@ -693,7 +693,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                                  digest_issue: int):
         self._load_config(self._config_path)
         self._login()
-        self._load_duplicates_for_specific_digest(digest_issue)
+        self._load_similar_records_for_specific_digest(digest_issue)
         self._basic_load_digest_records_from_server(f'{self.api_url}/specific-digest-records/?digest_issue={digest_issue}')
 
     @property
@@ -719,7 +719,7 @@ class DigestRecordsCollection(NetworkingMixin,
         url = f'{self.api_url}/digest-records-categorized-by-tbot/'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
-            raise Exception(f'Failed to retrieve digest records duplicates, status code {response.status_code}, response: {response.content}')
+            raise Exception(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
         response_str = response.content.decode()
         response_data = json.loads(response_str)
         for digest_record_id, digest_record_data_and_estimations in response_data.items():
@@ -746,28 +746,28 @@ class DigestRecordsCollection(NetworkingMixin,
             self.records.append(record_object)
 
 
-    def _load_duplicates_for_specific_digest(self,
-                                             digest_issue: int):
-        logger.info(f'Getting digest records duplicates for digest number #{digest_issue}')
-        url = f'{self.api_url}/digest-records-duplicates-detailed/?digest_issue={digest_issue}'
+    def _load_similar_records_for_specific_digest(self,
+                                                  digest_issue: int):
+        logger.info(f'Getting similar digest records for digest number #{digest_issue}')
+        url = f'{self.api_url}/similar-digest-records-detailed/?digest_issue={digest_issue}'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
-            raise Exception(f'Failed to retrieve digest records duplicates, status code {response.status_code}, response: {response.content}')
+            raise Exception(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
         response_str = response.content.decode()
         response = json.loads(response_str)
         if not response:
-            logger.info('No digest records duplicates found')
+            logger.info('No similar digest records found')
             return None
         response_converted = []
-        for duplicate in response:
-            duplicate_converted = {}
+        for similar_records_item in response:
+            similar_records_item_converted = {}
             for key in ('id', 'digest_issue'):
-                duplicate_converted[key] = duplicate[key]
-            if not duplicate['digest_records']:
-                logger.warning(f'Empty digest records list in duplicate #{duplicate["id"]}')
+                similar_records_item_converted[key] = similar_records_item[key]
+            if not similar_records_item['digest_records']:
+                logger.warning(f'Empty digest records list in similar records #{similar_records_item["id"]}')
                 continue
-            duplicate_converted['digest_records'] = []
-            for record in duplicate['digest_records']:
+            similar_records_item_converted['digest_records'] = []
+            for record in similar_records_item['digest_records']:
                 if record['dt'] is not None:
                     dt_str = datetime.datetime.strptime(record['dt'],
                                                         '%Y-%m-%dT%H:%M:%SZ')
@@ -788,9 +788,9 @@ class DigestRecordsCollection(NetworkingMixin,
                 if 'content_category' in record and record['content_category'] == 'DATABASES':
                     record['content_category'] = 'db'
                 record_obj.content_category = DigestRecordContentCategory(record['content_category'].lower()) if 'content_category' in record and record['content_category'] is not None else None
-                duplicate_converted['digest_records'].append(record_obj)
-            response_converted.append(duplicate_converted)
-        self.duplicates += response_converted
+                similar_records_item_converted['digest_records'].append(record_obj)
+            response_converted.append(similar_records_item_converted)
+        self.similar_records += response_converted
 
 
     def _basic_load_digest_records_from_server(self, url: str):
@@ -849,9 +849,9 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def records_to_html(self, format_name, html_path):
         if format_name == HtmlFormat.HABR.name:
-            converter = HabrDbToHtmlConverter(self.records, self.duplicates)
+            converter = HabrDbToHtmlConverter(self.records, self.similar_records)
         elif format_name == HtmlFormat.REDDIT.name:
-            converter = RedditDbToHtmlConverter(self.records, self.duplicates)
+            converter = RedditDbToHtmlConverter(self.records, self.similar_records)
         else:
             raise NotImplementedError
         converter.convert(html_path)
@@ -1140,9 +1140,9 @@ class DigestRecordsCollection(NetworkingMixin,
                                                                                            record.content_type,
                                                                                            record.content_category)
                     if current_records_with_similar_categories:
-                        if len(current_records_with_similar_categories['duplicates']) + len(current_records_with_similar_categories['records']) == 1:
-                            if current_records_with_similar_categories['duplicates']:
-                                obj = current_records_with_similar_categories['duplicates'][0]
+                        if len(current_records_with_similar_categories['similar_records']) + len(current_records_with_similar_categories['records']) == 1:
+                            if current_records_with_similar_categories['similar_records']:
+                                obj = current_records_with_similar_categories['similar_records'][0]
                                 text = f'[{"; ".join([dr["title"] + " " + dr["url"] for dr in obj["digest_records"]])}]'
                             else:
                                 obj = current_records_with_similar_categories['records'][0]
@@ -1155,10 +1155,10 @@ class DigestRecordsCollection(NetworkingMixin,
                             else:
                                 option_index = None
                         else:
-                            print(f'Are there any duplicates for digest record "{record.title}" ({record.url})? Here is list of possible ones:')
+                            print(f'Are there any similar records for digest record "{record.title}" ({record.url})? Here is list of possible ones:')
                             i = 1
                             options_indexes = []
-                            for option in current_records_with_similar_categories['duplicates']:
+                            for option in current_records_with_similar_categories['similar_records']:
                                 print(f'{i}. {"; ".join([dr["title"] + " " + dr["url"] for dr in option["digest_records"]])}')
                                 options_indexes.append(option['id'])
                                 i += 1
@@ -1169,18 +1169,18 @@ class DigestRecordsCollection(NetworkingMixin,
                             option_index = self._ask_option_index_or_no(i - 1)
                         print(Style.RESET_ALL, end='')
                         if option_index is not None:
-                            if current_records_with_similar_categories['duplicates'] and option_index <= len(current_records_with_similar_categories['duplicates']):
+                            if current_records_with_similar_categories['similar_records'] and option_index <= len(current_records_with_similar_categories['similar_records']):
                                 existing_drids = []
-                                for option in current_records_with_similar_categories['duplicates']:
+                                for option in current_records_with_similar_categories['similar_records']:
                                     if option['id'] == options_indexes[option_index - 1]:
                                         existing_drids = [dr['id'] for dr in option['digest_records']]
-                                self._add_digest_record_do_duplicate(options_indexes[option_index - 1], existing_drids, record.drid)
-                                logger.info('Added to duplicate')  # TODO: More details
+                                self._add_digest_record_do_similar(options_indexes[option_index - 1], existing_drids, record.drid)
+                                logger.info('Added to existing similar records item')  # TODO: More details
                             else:
-                                self._create_digest_record_duplicate(record.digest_issue, [options_indexes[option_index - 1], record.drid])
-                                logger.info('New duplicate created')  # TODO: More details
+                                self._create_similar_digest_records_item(record.digest_issue, [options_indexes[option_index - 1], record.drid])
+                                logger.info('New similar records item created')  # TODO: More details
                         else:
-                            logger.info('No duplicates specified')
+                            logger.info('No similar records specified')
                     else:
                         logger.info('Similar digest records not found')
 
@@ -1281,8 +1281,8 @@ class DigestRecordsCollection(NetworkingMixin,
                                 digest_issue,
                                 content_type,
                                 content_category):
-        logger.debug(f'Getting similar records for digest number #{digest_issue}, content_type "{content_type.value}" and content_category "{content_category.value}"')
-        url = f'{self.api_url}/similar-digest-records/?digest_issue={digest_issue}&content_type={content_type.name}&content_category={content_category.name}'
+        logger.debug(f'Getting records looking similar for digest number #{digest_issue}, content_type "{content_type.value}" and content_category "{content_category.value}"')
+        url = f'{self.api_url}/digest-records-looking-similar/?digest_issue={digest_issue}&content_type={content_type.name}&content_category={content_category.name}'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
@@ -1293,51 +1293,51 @@ class DigestRecordsCollection(NetworkingMixin,
         if not response:
             logger.info('No similar records found')
             return None
-        options_duplicates = []
+        options_similar_records = []
         options_records = []
         for similar_record_i, similar_record in enumerate(response):
-            duplicates_object = self._duplicates_by_digest_record(similar_record['id'])
-            if duplicates_object:
-                options_duplicates.append(duplicates_object)
+            similar_records_item = self._similar_digest_records_by_digest_record(similar_record['id'])
+            if similar_records_item:
+                options_similar_records.append(similar_records_item)
             else:
                 options_records.append({'id': similar_record['id'], 'title': similar_record['title'], 'url': similar_record['url']})
-        options_duplicates_filtered = []
-        for option_duplicate in options_duplicates:
-            duplicate_digest_records = []
-            for duplicate_digest_record in option_duplicate['digest_records']:
-                duplicate_digest_records.append({'id': duplicate_digest_record['id'], 'title': duplicate_digest_record['title'], 'url': duplicate_digest_record['url']})
+        options_similar_records_filtered = []
+        for option_similar_records_one in options_similar_records:
+            similar_digest_records = []
+            for similar_digest_records_record in option_similar_records_one['digest_records']:
+                similar_digest_records.append({'id': similar_digest_records_record['id'], 'title': similar_digest_records_record['title'], 'url': similar_digest_records_record['url']})
             exists = False
-            for option_duplicates_filtered in options_duplicates_filtered:
-                if option_duplicates_filtered['id'] == option_duplicate['id']:
+            for option_similar_records_filtered in options_similar_records_filtered:
+                if option_similar_records_filtered['id'] == option_similar_records_one['id']:
                     exists = True
                     break
             if not exists:
-                options_duplicates_filtered.append({'id': option_duplicate['id'], 'digest_records': duplicate_digest_records})
+                options_similar_records_filtered.append({'id': option_similar_records_one['id'], 'digest_records': similar_digest_records})
         return {
-            'duplicates': options_duplicates_filtered,
+            'similar_records': options_similar_records_filtered,
             'records': options_records,
         }
 
-    def _add_digest_record_do_duplicate(self, duplicate_id, existing_drids, digest_record_id):
-        logger.debug(f'Adding digest record #{digest_record_id} to duplicate #{duplicate_id}')
-        url = f'{self.api_url}/digest-records-duplicates/{duplicate_id}/'
+    def _add_digest_record_do_similar(self, similar_digest_records_item_id, existing_drids, digest_record_id):
+        logger.debug(f'Adding digest record #{digest_record_id} to similar digest records item #{similar_digest_records_item_id}')
+        url = f'{self.api_url}/similar-digest-records/{similar_digest_records_item_id}/'
         data = {
-            'id': duplicate_id,
+            'id': similar_digest_records_item_id,
             'digest_records': existing_drids + [digest_record_id],
         }
         response = self.patch_with_retries(url=url,
                                            data=json.dumps(data),
                                            headers=self._auth_headers)
         if response.status_code != 200:
-            logger.error(f'Failed to update digest record duplicate, status code {response.status_code}, response: {response.content}')
+            logger.error(f'Failed to update similar digest records item, status code {response.status_code}, response: {response.content}')
             # TODO: Raise exception and handle above
 
-    def _create_digest_record_duplicate(self,
-                                        digest_issue,
-                                        digest_records_ids,
-                                        ):
-        logger.debug(f'Creating digest record duplicate from #{digest_records_ids}')
-        url = f'{self.api_url}/digest-records-duplicates/'
+    def _create_similar_digest_records_item(self,
+                                            digest_issue,
+                                            digest_records_ids,
+                                            ):
+        logger.debug(f'Creating similar digest records item from #{digest_records_ids}')
+        url = f'{self.api_url}/similar-digest-records/'
         data = {
             'digest_issue': digest_issue,
             'digest_records': digest_records_ids,
@@ -1347,7 +1347,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                           data=json.dumps(data),
                                           headers=self._auth_headers)
         if response.status_code != 201:
-            logger.error(f'Failed to create digest record duplicate, status code {response.status_code}, response: {response.content}')
+            logger.error(f'Failed to create similar digest records item, status code {response.status_code}, response: {response.content}')
             # TODO: Raise exception and handle above
 
     def _digest_record_by_id(self, digest_record_id):
@@ -1367,9 +1367,9 @@ class DigestRecordsCollection(NetworkingMixin,
             return None
         return response
 
-    def _duplicates_by_digest_record(self, digest_record_id):
-        logger.debug(f'Checking if there are duplicates for digest record #{digest_record_id}')
-        url = f'{self.api_url}/duplicates-by-digest-record/?digest_record={digest_record_id}'
+    def _similar_digest_records_by_digest_record(self, digest_record_id):
+        logger.debug(f'Checking if there are similar records for digest record #{digest_record_id}')
+        url = f'{self.api_url}/similar-digest-records-by-digest-record/?digest_record={digest_record_id}'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
@@ -1379,7 +1379,7 @@ class DigestRecordsCollection(NetworkingMixin,
         response_str = response.content.decode()
         response = json.loads(response_str)
         if not response:
-            logger.debug(f'No duplicates found for digest record #{digest_record_id}')
+            logger.debug(f'No similar records found for digest record #{digest_record_id}')
             return None
         return response[0] # TODO: Handle multiple case
 
