@@ -130,7 +130,7 @@ class NetworkingMixin:
         return response
 
     @staticmethod
-    def get_all_pages(base_url, headers):
+    def get_results_from_all_pages(base_url, headers):
         results = []
         url_parts = list(urlparse(base_url))
         query = dict(parse_qsl(url_parts[4]))
@@ -827,7 +827,7 @@ class DigestRecordsCollection(NetworkingMixin,
     def _basic_load_digest_records_from_server(self, url: str):
         records_objects: List[DigestRecord] = []
         logger.info('Getting digest records')
-        results = self.get_all_pages(url, headers=self._auth_headers)
+        results = self.get_results_from_all_pages(url, self._auth_headers)
         for record_plain in results:
             if record_plain['dt'] is not None:
                 dt_str = datetime.datetime.strptime(record_plain['dt'],
@@ -907,7 +907,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _keywords(self):
         url = f'{self.api_url}/keywords'
-        results = self.get_all_pages(url, self._auth_headers)
+        results = self.get_results_from_all_pages(url, self._auth_headers)
         return results
 
     def _show_similar_from_previous_digest(self, keywords: List[Dict]):
@@ -1302,7 +1302,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                 content_category):
         logger.debug(f'Getting records looking similar for digest number #{digest_issue}, content_type "{content_type.value}" and content_category "{content_category.value}"')
         url = f'{self.api_url}/digest-records-looking-similar/?digest_issue={digest_issue}&content_type={content_type.name}&content_category={content_category.name}'
-        results = self.get_all_pages(url, self._auth_headers)
+        results = self.get_results_from_all_pages(url, self._auth_headers)
         if not results:
             logger.info('No similar records found')
             return None
@@ -1383,7 +1383,7 @@ class DigestRecordsCollection(NetworkingMixin,
     def _similar_digest_records_by_digest_record(self, digest_record_id):
         logger.debug(f'Checking if there are similar records for digest record #{digest_record_id}')
         url = f'{self.api_url}/similar-digest-records-by-digest-record/?digest_record={digest_record_id}'
-        results = self.get_all_pages(url, self._auth_headers)
+        results = self.get_results_from_all_pages(url, self._auth_headers)
         if not results:
             logger.debug(f'No similar records found for digest record #{digest_record_id}')
             return None
