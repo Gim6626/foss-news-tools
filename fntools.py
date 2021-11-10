@@ -22,6 +22,12 @@ from pprint import (
 )
 import html
 from colorama import Fore, Style
+from urllib.parse import (
+    urlparse,
+    parse_qsl,
+    urlencode,
+    urlunparse,
+)
 
 from data.releaseskeywords import *
 from data.articleskeywords import *
@@ -109,6 +115,7 @@ class NetworkingMixin:
     SLEEP_BETWEEN_ATTEMPTS_SECONDS = 5
     NETWORK_TIMEOUT_SECONDS = 10
     NETWORK_RETRIES_COUNT = 50
+    MAX_PAGE_SIZE = 500
 
     class RequestType(Enum):
         GET = 'GET'
@@ -117,7 +124,31 @@ class NetworkingMixin:
 
     @staticmethod
     def get_with_retries(url, headers=None):
-        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.GET, data=None)
+        response = NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.GET, data=None)
+        if response.status_code != 200:
+            raise Exception(f'Non-success HTTP return code {response.status_code}')
+        return response
+
+    @staticmethod
+    def get_all_pages(base_url, headers):
+        results = []
+        url_parts = list(urlparse(base_url))
+        query = dict(parse_qsl(url_parts[4]))
+        if 'page_size' not in query:
+            query.update({'page_size': NetworkingMixin.MAX_PAGE_SIZE})
+            url_parts[4] = urlencode(query)
+            base_url = urlunparse(url_parts)
+        while True:  # TODO: Think how to get rid of infinite loop
+            response = NetworkingMixin.get_with_retries(base_url, headers)
+            response_str = response.content.decode()
+            response_data = json.loads(response_str)
+            results += response_data['results']
+            if response_data['links']['next']:
+                base_url = response_data['links']['next']
+            else:
+                break
+        logger.debug(f'{len(results)} results fetched')
+        return results
 
     @staticmethod
     def patch_with_retries(url, headers=None, data=None):
@@ -345,11 +376,11 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
 
     @property
     def _digest_issues(self):
-        response = self.get_with_retries(f'{self.api_url}/digest-issues/', headers=self._auth_headers)
+        response = self.get_with_retries(f'{self.api_url}/digest-issues/?page_size=100', headers=self._auth_headers)
         content = response.text
         if response.status_code != 200:
             raise Exception(f'Failed to get digest issues info, status code {response.status_code}, response: {content}')
-        content_data = json.loads(content)
+        content_data = json.loads(content)['results']
         return content_data
 
     def _internal_gather_post_statistics(self, number, url):
@@ -796,13 +827,8 @@ class DigestRecordsCollection(NetworkingMixin,
     def _basic_load_digest_records_from_server(self, url: str):
         records_objects: List[DigestRecord] = []
         logger.info('Getting digest records')
-        response = self.get_with_retries(url, headers=self._auth_headers)
-        if response.status_code != 200:
-            raise Exception(
-                f'Invalid response code from FNGS fetch - {response.status_code}: {response.content.decode("utf-8")}')
-        logger.info('Got data')
-        result_data = json.loads(response.content)
-        for record_plain in result_data:
+        results = self.get_all_pages(url, headers=self._auth_headers)
+        for record_plain in results:
             if record_plain['dt'] is not None:
                 dt_str = datetime.datetime.strptime(record_plain['dt'],
                                                     '%Y-%m-%dT%H:%M:%SZ')
@@ -881,15 +907,8 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _keywords(self):
         url = f'{self.api_url}/keywords'
-        response = self.get_with_retries(url, self._auth_headers)
-        if response.status_code != 200:
-            logger.error(
-                f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
-            # TODO: Raise exception and handle above
-            return None
-        response_str = response.content.decode()
-        response = json.loads(response_str)
-        return response
+        results = self.get_all_pages(url, self._auth_headers)
+        return results
 
     def _show_similar_from_previous_digest(self, keywords: List[Dict]):
         if not keywords:
@@ -1283,19 +1302,13 @@ class DigestRecordsCollection(NetworkingMixin,
                                 content_category):
         logger.debug(f'Getting records looking similar for digest number #{digest_issue}, content_type "{content_type.value}" and content_category "{content_category.value}"')
         url = f'{self.api_url}/digest-records-looking-similar/?digest_issue={digest_issue}&content_type={content_type.name}&content_category={content_category.name}'
-        response = self.get_with_retries(url, headers=self._auth_headers)
-        if response.status_code != 200:
-            logger.error(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
-            # TODO: Raise exception and handle above
-            return None
-        response_str = response.content.decode()
-        response = json.loads(response_str)
-        if not response:
+        results = self.get_all_pages(url, self._auth_headers)
+        if not results:
             logger.info('No similar records found')
             return None
         options_similar_records = []
         options_records = []
-        for similar_record_i, similar_record in enumerate(response):
+        for similar_record_i, similar_record in enumerate(results):
             similar_records_item = self._similar_digest_records_by_digest_record(similar_record['id'])
             if similar_records_item:
                 options_similar_records.append(similar_records_item)
@@ -1370,18 +1383,11 @@ class DigestRecordsCollection(NetworkingMixin,
     def _similar_digest_records_by_digest_record(self, digest_record_id):
         logger.debug(f'Checking if there are similar records for digest record #{digest_record_id}')
         url = f'{self.api_url}/similar-digest-records-by-digest-record/?digest_record={digest_record_id}'
-        response = self.get_with_retries(url, headers=self._auth_headers)
-        if response.status_code != 200:
-            logger.error(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
-            # TODO: Raise exception and handle above
-            return None
-        # logger.debug(f'Received response: {response.content}')  # TODO: Make "super debug" level and enable for it only
-        response_str = response.content.decode()
-        response = json.loads(response_str)
-        if not response:
+        results = self.get_all_pages(url, self._auth_headers)
+        if not results:
             logger.debug(f'No similar records found for digest record #{digest_record_id}')
             return None
-        return response[0] # TODO: Handle multiple case
+        return results[0] # TODO: Handle multiple case
 
     def _ask_enum(self,
                   enum_name,
