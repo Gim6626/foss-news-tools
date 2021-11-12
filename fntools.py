@@ -1046,7 +1046,7 @@ class DigestRecordsCollection(NetworkingMixin,
                 for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
                     record_to_ignore.digest_issue = self._current_digest_issue
                     record_to_ignore.state = DigestRecordState.IGNORED
-                    self._upload_record(record_to_ignore)
+                    self._upload_record(record_to_ignore, ['state'])
 
             # TODO: Research if this is really needed because records are taken from server
             # records_left_from_tbot += [digest_record
@@ -1067,7 +1067,7 @@ class DigestRecordsCollection(NetworkingMixin,
                 for record_to_approve_i, record_to_approve in enumerate(records_to_approve):
                     record_to_approve.digest_issue = self._current_digest_issue
                     record_to_approve.state = DigestRecordState.IN_DIGEST
-                    self._upload_record(record_to_approve)
+                    self._upload_record(record_to_approve, ['state'])
 
             # TODO: Research if this is really needed because records are taken from server
             # records_left_from_tbot += [digest_record
@@ -1090,7 +1090,7 @@ class DigestRecordsCollection(NetworkingMixin,
                 for record_with_approved_estimations in records_with_approved_estimations:
                     # TODO: Add support for multiple estimations
                     record_with_approved_estimations.is_main = record_with_approved_estimations.estimations[0]['is_main']
-                    self._upload_record(record_with_approved_estimations)
+                    self._upload_record(record_with_approved_estimations, ['is_main'])
 
         if records_with_content_type_estimation:
             print('Content type estimations from Telegram bot to process:')
@@ -1106,8 +1106,8 @@ class DigestRecordsCollection(NetworkingMixin,
                 logger.info('Uploading data')
                 for record_with_approved_estimations in records_with_approved_estimations:
                     # TODO: Add support for multiple estimations
-                    record_with_approved_estimations.content_type = record_with_approved_estimations.estimations[0]['content_type']
-                    self._upload_record(record_with_approved_estimations)
+                    record_with_approved_estimations.content_type = self._admins_estimation(record_with_approved_estimations.estimations)['content_type']
+                    self._upload_record(record_with_approved_estimations, ['content_type'])
 
         if records_with_content_category_estimation:
             print('Content category estimations from Telegram bot to process:')
@@ -1123,8 +1123,8 @@ class DigestRecordsCollection(NetworkingMixin,
                 logger.info('Uploading data')
                 for record_with_approved_estimations in records_with_approved_estimations:
                     # TODO: Add support for multiple estimations
-                    record_with_approved_estimations.content_category = record_with_approved_estimations.estimations[0]['content_category']
-                    self._upload_record(record_with_approved_estimations)
+                    record_with_approved_estimations.content_category = self._admins_estimation(record_with_approved_estimations.estimations)['content_category']
+                    self._upload_record(record_with_approved_estimations, ['content_category'])
 
         # TODO: Research if this is really needed because records are taken from server
         # self.records = records_left_from_tbot
@@ -1257,17 +1257,25 @@ class DigestRecordsCollection(NetworkingMixin,
 
             self._upload_record(record)
 
-    def _upload_record(self, record):
+    def _upload_record(self, record, additional_fields_keys=None):
         logger.info(f'Uploading record #{record.drid} to FNGS')
         url = f'{self.api_url}/digest-records/{record.drid}/'
-        data = json.dumps({
+        base_fields = {
             'id': record.drid,
-            'state': record.state.name if record.state is not None else None,
             'digest_issue': record.digest_issue,
+        }
+        all_additional_fields = {
+            'state': record.state.name if record.state is not None else None,
             'is_main': record.is_main,
             'content_type': record.content_type.name if record.content_type is not None else None,
             'content_category': record.content_category.name if record.content_category is not None else None,
-        })
+        }
+        if additional_fields_keys is None:
+            additional_fields = all_additional_fields
+        else:
+            additional_fields = {k: v for k, v in all_additional_fields.items() if k in additional_fields_keys}
+        selected_fields = dict(**base_fields, **additional_fields)
+        data = json.dumps(selected_fields)
         response = self.patch_with_retries(url=url,
                                            headers=self._auth_headers,
                                            data=data)
