@@ -1000,6 +1000,10 @@ class DigestRecordsCollection(NetworkingMixin,
         response_data = json.loads(response_str)
         return response_data['count']
 
+    def _admins_estimation(self, estimations):
+        # TODO: Support multiple admins estimations
+        return [e for e in estimations if e['user'] == 'gim6626'][0]
+
     def _process_estimations_from_tbot(self):
         # TODO: Refactor, split into steps and extract them into separate methods and extract common selection code
         ignore_candidates_records = []
@@ -1075,7 +1079,7 @@ class DigestRecordsCollection(NetworkingMixin,
             print('Main or not main estimations from Telegram bot to process:')
             for mark_as_main_record_i, mark_as_main_record in enumerate(records_with_is_main_estimation):
                 # TODO: Add support for multiple estimations
-                print(f'{mark_as_main_record_i + 1}. {"MAIN" if mark_as_main_record.estimations[0]["is_main"] else "NOT MAIN"} {mark_as_main_record.title} {mark_as_main_record.url}')
+                print(f'{mark_as_main_record_i + 1}. {"MAIN" if self._admins_estimation(mark_as_main_record.estimations)["is_main"] else "NOT MAIN"} {mark_as_main_record.title} {mark_as_main_record.url}')
             not_accepted_estimations_records_indexes = self._ask_all_or_skipped_indexes('Approve all specified above records "is_main" estimations with typing "all" or specify comma-separated list of records indexes to ignore estimation and process separately: ')
             records_with_approved_estimations = [digest_record
                                                  for digest_record_i, digest_record in
@@ -1092,7 +1096,7 @@ class DigestRecordsCollection(NetworkingMixin,
             print('Content type estimations from Telegram bot to process:')
             for estimated_record_i, estimated_record in enumerate(records_with_content_type_estimation):
                 # TODO: Add support for multiple estimations
-                print(f'{estimated_record_i + 1}. {estimated_record.estimations[0]["content_type"].name} {estimated_record.title} {estimated_record.url}')
+                print(f'{estimated_record_i + 1}. {self._admins_estimation(estimated_record.estimations)["content_type"].name} {estimated_record.title} {estimated_record.url}')
             not_accepted_estimations_records_indexes = self._ask_all_or_skipped_indexes('Approve all specified above content type estimations with typing "all" or specify comma-separated list of records indexes to ignore estimation and process separately: ')
             records_with_approved_estimations = [digest_record
                                                  for digest_record_i, digest_record in
@@ -1109,7 +1113,7 @@ class DigestRecordsCollection(NetworkingMixin,
             print('Content category estimations from Telegram bot to process:')
             for estimated_record_i, estimated_record in enumerate(records_with_content_category_estimation):
                 # TODO: Add support for multiple estimations
-                print(f'{estimated_record_i + 1}. {estimated_record.estimations[0]["content_category"].name} {estimated_record.title} {estimated_record.url}')
+                print(f'{estimated_record_i + 1}. {self._admins_estimation(estimated_record.estimations)["content_category"].name} {estimated_record.title} {estimated_record.url}')
             not_accepted_estimations_records_indexes = self._ask_all_or_skipped_indexes('Approve all specified above content category estimations with typing "all" or specify comma-separated list of records indexes to ignore estimation and process separately: ')
             records_with_approved_estimations = [digest_record
                                                  for digest_record_i, digest_record in
