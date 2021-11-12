@@ -772,7 +772,10 @@ class DigestRecordsCollection(NetworkingMixin,
                                          is_main=digest_record_data['is_main'],
                                          keywords=digest_record_data['title_keywords'],
                                          estimations=[{'user': e['user'],
-                                                       'state': DigestRecordState(e['state'].lower())}
+                                                       'state': DigestRecordState(e['state'].lower()),
+                                                       'is_main': e['is_main'],
+                                                       'content_type': DigestRecordContentType(e['content_type'].lower()) if e['content_type'] else None,
+                                                       'content_category': DigestRecordContentCategory(e['content_category'].lower()) if e['content_category'] else None}
                                                       for e in estimations])
             self.records.append(record_object)
 
@@ -984,7 +987,7 @@ class DigestRecordsCollection(NetworkingMixin,
             self._load_tbot_categorization_data()
             if self.records:
                 # TODO: Think how to process left record in non-conflicting with Tbot usage way
-                self._categorize_records_from_tbot()
+                self._process_estimations_from_tbot()
                 # self._print_non_categorized_digest_records_count()
             if not self.records:
                 self._load_one_new_digest_record_from_server()
@@ -1004,9 +1007,13 @@ class DigestRecordsCollection(NetworkingMixin,
         response_data = json.loads(response_str)
         return response_data['count']
 
-    def _categorize_records_from_tbot(self):
+    def _process_estimations_from_tbot(self):
+        # TODO: Refactor, split into steps and extract them into separate methods and extract common selection code
         ignore_candidates_records = []
         approve_candidates_records = []
+        records_with_is_main_estimation = []
+        records_with_content_type_estimation = []
+        records_with_content_category_estimation = []
         for record in self.records:
             if not record.estimations:
                 continue
@@ -1020,77 +1027,124 @@ class DigestRecordsCollection(NetworkingMixin,
             total_state_votes_count = len(record.estimations)
             if approve_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or approve_vote_by_admin:
                 approve_candidates_records.append(record)
-        if ignore_candidates_records or approve_candidates_records:
-            records_left_from_tbot = []
-            if ignore_candidates_records:
-                print('Candidates to ignore:')
-                for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records):
-                    print(f'{ignore_candidate_record_i + 1}. {ignore_candidate_record.title} {ignore_candidate_record.url}')
-                do_not_ignore_records_indexes = []
-                while True:
-                    answer = input('Approve all records ignoring with typing "all" or comma-separated input records indexes which you want to left non-ignored: ')
-                    if answer == 'all':
-                        do_not_ignore_records_indexes = []
-                    elif re.fullmatch(r'[0-9]+(,[0-9]+)*?', answer):
-                        do_not_ignore_records_indexes = [int(i) - 1 for i in answer.split(',')]
-                    else:
-                        print('Invalid answer, please input "all" or comma-separated indexes list')
-                        continue
-                    break
-                records_to_ignore = [ignore_candidate_record
-                                     for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records)
-                                     if ignore_candidate_record_i not in do_not_ignore_records_indexes]
-                if records_to_ignore:
-                    logger.info('Setting following records as "ignored":')
-                    for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
-                        logger.info(f'{record_to_ignore_i + 1}. {record_to_ignore.title} {record_to_ignore.url} {self.admin_url}/gatherer/digestrecord/{record_to_ignore.drid}/change/')
-                        record_to_ignore.digest_issue = self._current_digest_issue
-                        record_to_ignore.state = DigestRecordState.IGNORED
-                    logger.info('Uploading data')
-                    for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
-                        self._upload_record(record_to_ignore)
+            for estimation in record.estimations:
+                if estimation['is_main'] is not None:
+                    records_with_is_main_estimation.append(record)
+                if estimation['content_type'] is not None:
+                    records_with_content_type_estimation.append(record)
+                if estimation['content_category'] is not None:
+                    records_with_content_category_estimation.append(record)
 
-                records_left_from_tbot += [digest_record
-                                           for digest_record_i, digest_record in
-                                           enumerate(ignore_candidates_records)
-                                           if digest_record_i in do_not_ignore_records_indexes]
+        records_left_from_tbot = []
+        if ignore_candidates_records:
+            print('Candidates to ignore:')
+            for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records):
+                print(f'{ignore_candidate_record_i + 1}. {ignore_candidate_record.title} {ignore_candidate_record.url}')
+            do_not_ignore_records_indexes = self._ask_all_or_skipped_indexes('Approve all records ignoring with typing "all" or comma-separated input records indexes which you want to left non-ignored: ')
+            records_to_ignore = [ignore_candidate_record
+                                 for ignore_candidate_record_i, ignore_candidate_record in enumerate(ignore_candidates_records)
+                                 if ignore_candidate_record_i not in do_not_ignore_records_indexes]
+            if records_to_ignore:
+                logger.info('Uploading data')
+                for record_to_ignore_i, record_to_ignore in enumerate(records_to_ignore):
+                    record_to_ignore.digest_issue = self._current_digest_issue
+                    record_to_ignore.state = DigestRecordState.IGNORED
+                    self._upload_record(record_to_ignore)
 
-            if approve_candidates_records:
-                print('Candidates to approve:')
-                for approve_candidate_record_i, approve_candidate_record in enumerate(approve_candidates_records):
-                    print(f'{approve_candidate_record_i + 1}. {approve_candidate_record.title} {approve_candidate_record.url}')
-                do_not_approve_records_indexes = []
-                while True:
-                    answer = input('Approve all records inclusion in digest with typing "all" or comma-separated input records indexes which you want to left to be processed separately: ')
-                    if answer == 'all':
-                        do_not_approve_records_indexes = []
-                    elif re.fullmatch(r'[0-9]+(,[0-9]+)*?', answer):
-                        do_not_approve_records_indexes = [int(i) - 1 for i in answer.split(',')]
-                    else:
-                        print('Invalid answer, please input "all" or comma-separated indexes list')
-                        continue
-                    break
-                records_to_approve = [approve_candidate_record
-                                      for approve_candidate_record_i, approve_candidate_record in enumerate(approve_candidates_records)
-                                      if approve_candidate_record_i not in do_not_approve_records_indexes]
-                if records_to_approve:
-                    logger.info('Setting following records as "in digest":')
-                    for record_to_approve_i, record_to_approve in enumerate(records_to_approve):
-                        logger.info(f'{record_to_approve_i + 1}. {record_to_approve.title} {record_to_approve.url} {self.admin_url}/gatherer/digestrecord/{record_to_approve.drid}/change/')
-                        record_to_approve.digest_issue = self._current_digest_issue
-                        record_to_approve.state = DigestRecordState.IN_DIGEST
-                    logger.info('Uploading data')
-                    for record_to_approve_i, record_to_approve in enumerate(records_to_approve):
-                        self._upload_record(record_to_approve)
+            # TODO: Research if this is really needed because records are taken from server
+            # records_left_from_tbot += [digest_record
+            #                            for digest_record_i, digest_record in
+            #                            enumerate(ignore_candidates_records)
+            #                            if digest_record_i in do_not_ignore_records_indexes]
 
-                records_left_from_tbot += [digest_record
-                                           for digest_record_i, digest_record in
-                                           enumerate(approve_candidates_records)
-                                           if digest_record_i in do_not_approve_records_indexes]
+        if approve_candidates_records:
+            print('Candidates to approve:')
+            for approve_candidate_record_i, approve_candidate_record in enumerate(approve_candidates_records):
+                print(f'{approve_candidate_record_i + 1}. {approve_candidate_record.title} {approve_candidate_record.url}')
+            do_not_approve_records_indexes = self._ask_all_or_skipped_indexes('Approve all records inclusion in digest with typing "all" or comma-separated input records indexes which you want to left to be processed separately: ')
+            records_to_approve = [approve_candidate_record
+                                  for approve_candidate_record_i, approve_candidate_record in enumerate(approve_candidates_records)
+                                  if approve_candidate_record_i not in do_not_approve_records_indexes]
+            if records_to_approve:
+                logger.info('Uploading data')
+                for record_to_approve_i, record_to_approve in enumerate(records_to_approve):
+                    record_to_approve.digest_issue = self._current_digest_issue
+                    record_to_approve.state = DigestRecordState.IN_DIGEST
+                    self._upload_record(record_to_approve)
 
-            self.records = records_left_from_tbot
-        else:
-            self.records = []
+            # TODO: Research if this is really needed because records are taken from server
+            # records_left_from_tbot += [digest_record
+            #                            for digest_record_i, digest_record in
+            #                            enumerate(approve_candidates_records)
+            #                            if digest_record_i in do_not_approve_records_indexes]
+
+        if records_with_is_main_estimation:
+            print('Main or not main estimations from Telegram bot to process:')
+            for mark_as_main_record_i, mark_as_main_record in enumerate(records_with_is_main_estimation):
+                # TODO: Add support for multiple estimations
+                print(f'{mark_as_main_record_i + 1}. {"MAIN" if mark_as_main_record.estimations[0]["is_main"] else "NOT MAIN"} {mark_as_main_record.title} {mark_as_main_record.url}')
+            not_accepted_estimations_records_indexes = self._ask_all_or_skipped_indexes('Approve all specified above records "is_main" estimations with typing "all" or specify comma-separated list of records indexes to ignore estimation and process separately: ')
+            records_with_approved_estimations = [digest_record
+                                                 for digest_record_i, digest_record in
+                                                 enumerate(records_with_is_main_estimation)
+                                                 if digest_record_i not in not_accepted_estimations_records_indexes]
+            if records_with_approved_estimations:
+                logger.info('Uploading data')
+                for record_with_approved_estimations in records_with_approved_estimations:
+                    # TODO: Add support for multiple estimations
+                    record_with_approved_estimations.is_main = record_with_approved_estimations.estimations[0]['is_main']
+                    self._upload_record(record_with_approved_estimations)
+
+        if records_with_content_type_estimation:
+            print('Content type estimations from Telegram bot to process:')
+            for estimated_record_i, estimated_record in enumerate(records_with_content_type_estimation):
+                # TODO: Add support for multiple estimations
+                print(f'{estimated_record_i + 1}. {estimated_record.estimations[0]["content_type"].name} {estimated_record.title} {estimated_record.url}')
+            not_accepted_estimations_records_indexes = self._ask_all_or_skipped_indexes('Approve all specified above content type estimations with typing "all" or specify comma-separated list of records indexes to ignore estimation and process separately: ')
+            records_with_approved_estimations = [digest_record
+                                                 for digest_record_i, digest_record in
+                                                 enumerate(records_with_content_type_estimation)
+                                                 if digest_record_i not in not_accepted_estimations_records_indexes]
+            if records_with_approved_estimations:
+                logger.info('Uploading data')
+                for record_with_approved_estimations in records_with_approved_estimations:
+                    # TODO: Add support for multiple estimations
+                    record_with_approved_estimations.content_type = record_with_approved_estimations.estimations[0]['content_type']
+                    self._upload_record(record_with_approved_estimations)
+
+        if records_with_content_category_estimation:
+            print('Content category estimations from Telegram bot to process:')
+            for estimated_record_i, estimated_record in enumerate(records_with_content_category_estimation):
+                # TODO: Add support for multiple estimations
+                print(f'{estimated_record_i + 1}. {estimated_record.estimations[0]["content_category"].name} {estimated_record.title} {estimated_record.url}')
+            not_accepted_estimations_records_indexes = self._ask_all_or_skipped_indexes('Approve all specified above content category estimations with typing "all" or specify comma-separated list of records indexes to ignore estimation and process separately: ')
+            records_with_approved_estimations = [digest_record
+                                                 for digest_record_i, digest_record in
+                                                 enumerate(records_with_content_category_estimation)
+                                                 if digest_record_i not in not_accepted_estimations_records_indexes]
+            if records_with_approved_estimations:
+                logger.info('Uploading data')
+                for record_with_approved_estimations in records_with_approved_estimations:
+                    # TODO: Add support for multiple estimations
+                    record_with_approved_estimations.content_category = record_with_approved_estimations.estimations[0]['content_category']
+                    self._upload_record(record_with_approved_estimations)
+
+        # TODO: Research if this is really needed because records are taken from server
+        # self.records = records_left_from_tbot
+
+    def _ask_all_or_skipped_indexes(self, question):
+        while True:
+            answer = input(question)
+            if answer == 'all':
+                skipped_indexes = []
+                break
+            elif re.fullmatch(r'[0-9]+(,[0-9]+)*?', answer):
+                skipped_indexes = [int(i) - 1 for i in answer.split(',')]
+                break
+            else:
+                print('Invalid answer, please input "all" or comma-separated indexes list')
+                continue
+        return skipped_indexes
 
     def _categorize_new_records(self):
         for record in self.records:
