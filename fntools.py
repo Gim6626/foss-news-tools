@@ -1148,6 +1148,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _categorize_new_records(self):
         for record in self.records:
+            self._print_non_categorized_digest_records_count()
             # TODO: Rewrite using FSM
             logger.info(f'Processing record "{record.title}" from date {record.dt}')
             print(f'New record:\n{record}')
