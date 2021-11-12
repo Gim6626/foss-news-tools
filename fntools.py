@@ -623,7 +623,7 @@ class HabrDbToHtmlConverter(DbToHtmlConverter):
                 if digest_record.content_category is not None:
                     output_records[digest_record.content_type.value][digest_record.content_category.value].append(digest_record)
             else:
-                print(digest_record.title, digest_record.content_type, digest_record.is_main)
+                logger.error(f'Unsupported digest record data: {digest_record}')
                 raise NotImplementedError
         output = '<h2>Главное</h2>\n\n'
         for main_record in output_records['main']:
