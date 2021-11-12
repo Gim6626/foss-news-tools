@@ -784,16 +784,9 @@ class DigestRecordsCollection(NetworkingMixin,
                                                   digest_issue: int):
         logger.info(f'Getting similar digest records for digest number #{digest_issue}')
         url = f'{self.api_url}/similar-digest-records-detailed/?digest_issue={digest_issue}'
-        response = self.get_with_retries(url, headers=self._auth_headers)
-        if response.status_code != 200:
-            raise Exception(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
-        response_str = response.content.decode()
-        response = json.loads(response_str)
-        if not response:
-            logger.info('No similar digest records found')
-            return None
+        results = self.get_results_from_all_pages(url, self._auth_headers)
         response_converted = []
-        for similar_records_item in response:
+        for similar_records_item in results:
             similar_records_item_converted = {}
             for key in ('id', 'digest_issue'):
                 similar_records_item_converted[key] = similar_records_item[key]
