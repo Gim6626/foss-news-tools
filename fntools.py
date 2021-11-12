@@ -1161,40 +1161,41 @@ class DigestRecordsCollection(NetworkingMixin,
                     logger.info(f'{"Marking" if is_main else "Not marking"} "{record.title}" as one of main records')
                     record.is_main = is_main
 
-                guessed_content_type = self._guess_content_type(record.title, record.url)
-                if guessed_content_type is not None:
-                    msg = f'Guessed content_type is "{DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[guessed_content_type.value]}". Accept? y/n: '
-                    accepted = self._ask_bool(msg)
-                    if accepted:
-                        logger.info(f'Setting content_type of record "{record.title}" to "{DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[guessed_content_type.value]}"')
-                        record.content_type = guessed_content_type
+                if record.content_type is None:
+                    guessed_content_type = self._guess_content_type(record.title, record.url)
+                    if guessed_content_type is not None:
+                        msg = f'Guessed content_type is "{DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[guessed_content_type.value]}". Accept? y/n: '
+                        accepted = self._ask_bool(msg)
+                        if accepted:
+                            logger.info(f'Setting content_type of record "{record.title}" to "{DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[guessed_content_type.value]}"')
+                            record.content_type = guessed_content_type
 
-                if guessed_content_type != DigestRecordContentType.OTHER:
-                    guessed_content_categories, matched_subcategories_keywords = self._guess_content_category(record.title, record.url)
-                    if guessed_content_categories:
-                        if matched_subcategories_keywords:
-                            matched_subcategories_keywords_translated = {}
-                            for matched_content_category, keywords in matched_subcategories_keywords.items():
-                                matched_subcategories_keywords_translated[DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[matched_content_category if matched_content_category != 'databases' else 'db']] = keywords
-                            print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
-                        if len(guessed_content_categories) == 1:
-                            guessed_content_category = guessed_content_categories[0]
-                            msg = f'Guessed content_category is "{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}". Accept? y/n: '
-                            accepted = self._ask_bool(msg)
-                            if accepted:
-                                logger.info(f'Setting content_category of record "{record.title}" to "{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}"')
-                                record.content_category = guessed_content_category
-                        else:
-                            msg = f'Guessed subcategories are:'
-                            for guessed_content_category_i, guessed_content_category in enumerate(guessed_content_categories):
-                                msg += f'\n{guessed_content_category_i + 1}. {DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}'
-                            msg += f'\nType guessed content_category index or "n" if no match: '
-                            guessed_content_category_index = self._ask_guessed_content_category_index(msg,
-                                                                                            len(guessed_content_categories))
-                            if guessed_content_category_index is not None:
-                                guessed_content_category = guessed_content_categories[guessed_content_category_index - 1]
-                                logger.info(f'Setting content_category of record "{record.title}" to "{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}"')
-                                record.content_category = guessed_content_category
+                    if guessed_content_type != DigestRecordContentType.OTHER and record.content_category is None:
+                        guessed_content_categories, matched_subcategories_keywords = self._guess_content_category(record.title, record.url)
+                        if guessed_content_categories:
+                            if matched_subcategories_keywords:
+                                matched_subcategories_keywords_translated = {}
+                                for matched_content_category, keywords in matched_subcategories_keywords.items():
+                                    matched_subcategories_keywords_translated[DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[matched_content_category if matched_content_category != 'databases' else 'db']] = keywords
+                                print(f'Matched subcategories keywords:\n{pformat(matched_subcategories_keywords_translated)}')
+                            if len(guessed_content_categories) == 1:
+                                guessed_content_category = guessed_content_categories[0]
+                                msg = f'Guessed content_category is "{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}". Accept? y/n: '
+                                accepted = self._ask_bool(msg)
+                                if accepted:
+                                    logger.info(f'Setting content_category of record "{record.title}" to "{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}"')
+                                    record.content_category = guessed_content_category
+                            else:
+                                msg = f'Guessed subcategories are:'
+                                for guessed_content_category_i, guessed_content_category in enumerate(guessed_content_categories):
+                                    msg += f'\n{guessed_content_category_i + 1}. {DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}'
+                                msg += f'\nType guessed content_category index or "n" if no match: '
+                                guessed_content_category_index = self._ask_guessed_content_category_index(msg,
+                                                                                                len(guessed_content_categories))
+                                if guessed_content_category_index is not None:
+                                    guessed_content_category = guessed_content_categories[guessed_content_category_index - 1]
+                                    logger.info(f'Setting content_category of record "{record.title}" to "{DIGEST_RECORD_CONTENT_CATEGORY_RU_MAPPING[guessed_content_category.value]}"')
+                                    record.content_category = guessed_content_category
 
                 if record.content_type == DigestRecordContentType.UNKNOWN or record.content_type is None:
                     record.content_type = self._ask_content_type(record,
