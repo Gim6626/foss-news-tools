@@ -909,7 +909,7 @@ class DigestRecordsCollection(NetworkingMixin,
         return None
 
     def _keywords(self):
-        url = f'{self.api_url}/keywords'
+        url = f'{self.api_url}/keywords?page_size=5000'
         results = self.get_results_from_all_pages(url, self._auth_headers)
         return results
 
