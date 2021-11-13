@@ -513,14 +513,14 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
             if not isinstance(main_record, list):
                 output += f'<h3>{DigestRecordsCollection.clear_title(main_record.title)}</h3>\n\n'
                 output += f'<i><b>Category</b>: {DIGEST_RECORD_CONTENT_TYPE_EN_MAPPING[main_record.content_type.value]}/{DIGEST_RECORD_CONTENT_CATEGORY_EN_MAPPING[main_record.content_category.value]}</i><br>\n\n'
-                output += f'Details {DigestRecordsCollection.build_url_html(self._process_url(main_record), main_record.language, True)}\n\n'
+                output += f'Details {DigestRecordsCollection.build_url_html(self._process_url(main_record), main_record.language, do_not_mark_language=True)}\n\n'
             else:
                 output += f'<h3>{[DigestRecordsCollection.clear_title(r.title) for r in main_record]}</h3>\n\n'
                 output += f'<i><b>Category</b>: {DIGEST_RECORD_CONTENT_TYPE_EN_MAPPING[main_record[0].content_type.value]}/{DIGEST_RECORD_CONTENT_CATEGORY_EN_MAPPING[main_record[0].content_category.value]}</i><br>\n\n'
                 output += 'Details:<br>\n\n'
                 output += '<ol>\n'
                 for r in main_record:
-                    output += f'<li>{r.title} {DigestRecordsCollection.build_url_html(self._process_url(r), r.language, True)}</li>\n\n'
+                    output += f'<li>{r.title} {DigestRecordsCollection.build_url_html(self._process_url(r), r.language, do_not_mark_language=True)}</li>\n\n'
                 output += '</ol>\n'
 
         output += '<h2>Briefly</h2>\n\n'
@@ -540,27 +540,27 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
                 if len(key_records) == 1:
                     key_record = key_records[0]
                     if not isinstance(key_record, list):
-                        output += f'<p>{DigestRecordsCollection.clear_title(key_record.title)} {DigestRecordsCollection.build_url_html(self._process_url(key_record), key_record.language, True)}</p>\n'
+                        output += f'<p>{DigestRecordsCollection.build_url_html(self._process_url(key_record), key_record.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(key_record.title))}</p>\n'
                     else:
-                        output += f'<p>{[DigestRecordsCollection.clear_title(r.title) for r in key_record]} {", ".join([DigestRecordsCollection.build_url_html(self._process_url(r), r.language, True) for r in key_record])}</p>\n'
+                        output += f'<p>{", ".join([DigestRecordsCollection.build_url_html(self._process_url(r), r.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(r.title)) for r in key_record])}</p>\n'
                 else:
                     output += '<ol>\n'
                     for key_record in key_records:
                         if not isinstance(key_record, list):
-                            output += f'<li>{DigestRecordsCollection.clear_title(key_record.title)} {DigestRecordsCollection.build_url_html(self._process_url(key_record), key_record.language)}</li>\n'
+                            output += f'<li>{DigestRecordsCollection.build_url_html(self._process_url(key_record), key_record.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(key_record.title))}</li>\n'
                         else:
-                            output += f'<li>{[DigestRecordsCollection.clear_title(r.title) for r in key_record]} {", ".join([DigestRecordsCollection.build_url_html(self._process_url(r), r.language, True) for r in key_record])}</li>\n'
+                            output += f'<li>{", ".join([DigestRecordsCollection.build_url_html(self._process_url(r), r.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(r.title)) for r in key_record])}</li>\n'
                     output += '</ol>\n'
 
         if len(output_records[DigestRecordContentType.OTHER.value]):
             output += '<h2>More links</h2>\n\n'
             if len(output_records[DigestRecordContentType.OTHER.value]) == 1:
                 other_record = output_records[DigestRecordContentType.OTHER.value][0]
-                output += f'{DigestRecordsCollection.clear_title(other_record.title)} {DigestRecordsCollection.build_url_html(self._process_url(other_record), other_record.language, True)}<br>\n'
+                output += f'{DigestRecordsCollection.build_url_html(self._process_url(other_record), other_record.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(other_record.title))}<br>\n'
             else:
                 output += '<ol>\n'
                 for other_record in output_records[DigestRecordContentType.OTHER.value]:
-                    output += f'<li>{DigestRecordsCollection.clear_title(other_record.title)} {DigestRecordsCollection.build_url_html(self._process_url(other_record), other_record.language, True)}</li>\n'
+                    output += f'<li>{DigestRecordsCollection.build_url_html(self._process_url(other_record), other_record.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(other_record.title))}</li>\n'
                 output += '</ol>\n'
         return output
 
@@ -858,7 +858,7 @@ class DigestRecordsCollection(NetworkingMixin,
         return fixed_title
 
     @staticmethod
-    def build_url_html(url: str, lang: Language, do_not_mark_language: bool = False):
+    def build_url_html(url: str, lang: Language, do_not_mark_language: bool = False, link_text: str = None):
         if not isinstance(lang, Language):
             raise Exception('"lang" variable should be instance of "Language" class')
         patterns_to_clear = (
@@ -867,7 +867,7 @@ class DigestRecordsCollection(NetworkingMixin,
         )
         for pattern_to_clear in patterns_to_clear:
             url = re.sub(pattern_to_clear, '', url)
-        return f'{"!!! " if "!!! " in url else ""}<a href="{url.replace("!!! ", "")}">{url.replace("!!! ", "")}</a>{" (en)" if lang == Language.ENGLISH and not do_not_mark_language else ""}'  # TODO: Remove "!!! " replacement after Reddit converter refactoring
+        return f'{"!!! " if "!!! " in url else ""}<a href="{url.replace("!!! ", "")}">{link_text if link_text is not None else url.replace("!!! ", "")}</a>{" (en)" if lang == Language.ENGLISH and not do_not_mark_language else ""}'  # TODO: Remove "!!! " replacement after Reddit converter refactoring
 
     def records_to_html(self, format_name, html_path):
         if format_name == HtmlFormat.HABR.name:
