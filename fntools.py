@@ -1161,7 +1161,7 @@ class DigestRecordsCollection(NetworkingMixin,
                     logger.info(f'{"Marking" if is_main else "Not marking"} "{record.title}" as one of main records')
                     record.is_main = is_main
 
-                if record.content_type is None:
+                if record.content_type is None or record.content_type == DigestRecordContentType.UNKNOWN:
                     guessed_content_type = self._guess_content_type(record.title, record.url)
                     if guessed_content_type is not None:
                         msg = f'Guessed content_type is "{DIGEST_RECORD_CONTENT_TYPE_RU_MAPPING[guessed_content_type.value]}". Accept? y/n: '
