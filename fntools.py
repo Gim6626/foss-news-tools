@@ -761,7 +761,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                                        'state': DigestRecordState(e['state'].lower()),
                                                        'is_main': e['is_main'],
                                                        'content_type': DigestRecordContentType(e['content_type'].lower()) if e['content_type'] else None,
-                                                       'content_category': DigestRecordContentCategory(e['content_category'].lower()) if e['content_category'] else None}
+                                                       'content_category': DigestRecordContentCategory(e['content_category'].lower() if e['content_category'] != 'DATABASES' else 'db') if e['content_category'] else None}
                                                       for e in estimations])
             self.records.append(record_object)
 
