@@ -537,31 +537,16 @@ class RedditDbToHtmlConverter(DbToHtmlConverter):
                 if not key_records:
                     continue
                 output += f'<h4>{DIGEST_RECORD_CONTENT_CATEGORY_EN_MAPPING[key_record_content_category]}</h4>\n\n'
-                if len(key_records) == 1:
-                    key_record = key_records[0]
+                for key_record in key_records:
                     if not isinstance(key_record, list):
                         output += f'<p>{DigestRecordsCollection.build_url_html(self._process_url(key_record), key_record.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(key_record.title))}</p>\n'
                     else:
                         output += f'<p>{", ".join([DigestRecordsCollection.build_url_html(self._process_url(r), r.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(r.title)) for r in key_record])}</p>\n'
-                else:
-                    output += '<ol>\n'
-                    for key_record in key_records:
-                        if not isinstance(key_record, list):
-                            output += f'<li>{DigestRecordsCollection.build_url_html(self._process_url(key_record), key_record.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(key_record.title))}</li>\n'
-                        else:
-                            output += f'<li>{", ".join([DigestRecordsCollection.build_url_html(self._process_url(r), r.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(r.title)) for r in key_record])}</li>\n'
-                    output += '</ol>\n'
 
         if len(output_records[DigestRecordContentType.OTHER.value]):
             output += '<h2>More links</h2>\n\n'
-            if len(output_records[DigestRecordContentType.OTHER.value]) == 1:
-                other_record = output_records[DigestRecordContentType.OTHER.value][0]
-                output += f'{DigestRecordsCollection.build_url_html(self._process_url(other_record), other_record.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(other_record.title))}<br>\n'
-            else:
-                output += '<ol>\n'
-                for other_record in output_records[DigestRecordContentType.OTHER.value]:
-                    output += f'<li>{DigestRecordsCollection.build_url_html(self._process_url(other_record), other_record.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(other_record.title))}</li>\n'
-                output += '</ol>\n'
+            for other_record in output_records[DigestRecordContentType.OTHER.value]:
+                output += f'<p>{DigestRecordsCollection.build_url_html(self._process_url(other_record), other_record.language, do_not_mark_language=True, link_text=DigestRecordsCollection.clear_title(other_record.title))}</p>\n'
         return output
 
 
