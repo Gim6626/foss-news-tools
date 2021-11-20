@@ -43,6 +43,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 SCRIPT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 DIGEST_RECORD_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
+FNGS_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
 
 days_count = None
 
@@ -743,7 +744,7 @@ class DigestRecordsCollection(NetworkingMixin,
             estimations = digest_record_data_and_estimations['estimations']
             if digest_record_data['dt'] is not None:
                 dt_str = datetime.datetime.strptime(digest_record_data['dt'],
-                                                    '%Y-%m-%dT%H:%M:%SZ')
+                                                    FNGS_DATETIME_FORMAT)
             else:
                 dt_str = None
             record_object = DigestRecord(dt_str,
@@ -782,7 +783,7 @@ class DigestRecordsCollection(NetworkingMixin,
             for record in similar_records_item['digest_records']:
                 if record['dt'] is not None:
                     dt_str = datetime.datetime.strptime(record['dt'],
-                                                        '%Y-%m-%dT%H:%M:%SZ')
+                                                        FNGS_DATETIME_FORMAT)
                 else:
                     dt_str = None
                 record_obj = DigestRecord(dt_str,
@@ -812,7 +813,7 @@ class DigestRecordsCollection(NetworkingMixin,
         for record_plain in results:
             if record_plain['dt'] is not None:
                 dt_str = datetime.datetime.strptime(record_plain['dt'],
-                                                    '%Y-%m-%dT%H:%M:%SZ')
+                                                    FNGS_DATETIME_FORMAT)
             else:
                 dt_str = None
             record_object = DigestRecord(dt_str,
