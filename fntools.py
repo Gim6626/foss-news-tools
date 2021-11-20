@@ -1197,13 +1197,27 @@ class DigestRecordsCollection(NetworkingMixin,
                     current_records_with_similar_categories = self._similar_digest_records(record.digest_issue,
                                                                                            record.content_type,
                                                                                            record.content_category)
+                    similar_records_lists_without_record_itself = []
+                    similar_records_without_record_itself = []
                     if current_records_with_similar_categories:
-                        if len(current_records_with_similar_categories['similar_records']) + len(current_records_with_similar_categories['records']) == 1:
-                            if current_records_with_similar_categories['similar_records']:
-                                obj = current_records_with_similar_categories['similar_records'][0]
+                        for similar_records in current_records_with_similar_categories['similar_records']:
+                            similar_records_one_without_record_itself = []
+                            for dr in similar_records['digest_records']:
+                                if dr['url'] != record.url:
+                                    similar_records_one_without_record_itself.append(dr)
+                            if similar_records_one_without_record_itself:
+                                similar_records_lists_without_record_itself.append(similar_records_one_without_record_itself)
+                    if current_records_with_similar_categories:
+                        for similar_record in current_records_with_similar_categories['records']:
+                            if similar_record['url'] != record.url:
+                                similar_records_without_record_itself.append(similar_record)
+                    if similar_records_lists_without_record_itself or similar_records_without_record_itself:
+                        if len(similar_records_lists_without_record_itself) + len(similar_records_without_record_itself) == 1:
+                            if similar_records_lists_without_record_itself:
+                                obj = similar_records_lists_without_record_itself[0]
                                 text = f'[{"; ".join([dr["title"] + " " + dr["url"] for dr in obj["digest_records"]])}]'
                             else:
-                                obj = current_records_with_similar_categories['records'][0]
+                                obj = similar_records_without_record_itself[0]
                                 text = f'"{obj["title"]}" {obj["url"]}'
                             options_indexes = [obj['id']]
                             question = f'Is the record(s) {text} similar to current (y/n)? '
@@ -1216,11 +1230,11 @@ class DigestRecordsCollection(NetworkingMixin,
                             print(f'Are there any similar records for digest record "{record.title}" ({record.url})? Here is list of possible ones:')
                             i = 1
                             options_indexes = []
-                            for option in current_records_with_similar_categories['similar_records']:
+                            for option in similar_records_lists_without_record_itself:
                                 print(f'{i}. {"; ".join([dr["title"] + " " + dr["url"] for dr in option["digest_records"]])}')
                                 options_indexes.append(option['id'])
                                 i += 1
-                            for option in current_records_with_similar_categories['records']:
+                            for option in similar_records_without_record_itself:
                                 print(f'{i}. {option["title"]} {option["url"]}')
                                 options_indexes.append(option['id'])
                                 i += 1
