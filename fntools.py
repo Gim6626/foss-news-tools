@@ -840,7 +840,6 @@ class DigestRecordsCollection(NetworkingMixin,
     @staticmethod
     def clear_title(title: str):
         fixed_title = html.unescape(title)
-        fixed_title = re.sub(r'^\[.+?\]\s+', '', fixed_title)
         return fixed_title
 
     @staticmethod
