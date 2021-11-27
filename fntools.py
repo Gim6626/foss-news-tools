@@ -1010,7 +1010,7 @@ class DigestRecordsCollection(NetworkingMixin,
             if approve_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or approve_vote_by_admin:
                 approve_candidates_records.append(record)
             for estimation in record.estimations:
-                if estimation['is_main'] is not None and record.state and record.state != DigestRecordState.UNKNOWN:
+                if estimation['is_main'] is not None:
                     records_with_is_main_estimation.append(record)
                 if estimation['content_type'] is not None:
                     records_with_content_type_estimation.append(record)
