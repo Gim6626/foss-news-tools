@@ -752,6 +752,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                          digest_record_data['title'],
                                          digest_record_data['url'],
                                          digest_record_data['additional_url'],
+                                         state=DigestRecordState(digest_record_data['state'].lower()),
                                          content_type=DigestRecordContentType(digest_record_data['content_type'].lower()) if digest_record_data['content_type'] else None,
                                          content_category=DigestRecordContentCategory(digest_record_data['content_category'].lower() if digest_record_data['content_category'] != 'DATABASES' else 'db') if digest_record_data['content_category'] else None,
                                          digest_issue=digest_record_data['digest_issue'],
@@ -1002,7 +1003,7 @@ class DigestRecordsCollection(NetworkingMixin,
         for record in self.records:
             if not record.estimations:
                 continue
-            if record.state == 'UNKNOWN':
+            if record.state == DigestRecordState.UNKNOWN:
                 ignore_state_votes_count = len([estimation for estimation in record.estimations if estimation['state'] == DigestRecordState.IGNORED])
                 ignore_vote_by_admin = len([estimation for estimation in record.estimations if estimation['user'] == 'gim6626' and estimation['state'] == DigestRecordState.IGNORED]) > 0  # TODO: Replace hardcode with some DB query on backend
                 total_state_votes_count = len(record.estimations)
