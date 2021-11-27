@@ -1000,24 +1000,30 @@ class DigestRecordsCollection(NetworkingMixin,
         for record in self.records:
             if not record.estimations:
                 continue
-            ignore_state_votes_count = len([estimation for estimation in record.estimations if estimation['state'] == DigestRecordState.IGNORED])
-            ignore_vote_by_admin = len([estimation for estimation in record.estimations if estimation['user'] == 'gim6626' and estimation['state'] == DigestRecordState.IGNORED]) > 0  # TODO: Replace hardcode with some DB query on backend
-            total_state_votes_count = len(record.estimations)
-            if ignore_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or ignore_vote_by_admin:
-                ignore_candidates_records.append(record)
-            approve_state_votes_count = len([estimation for estimation in record.estimations if estimation['state'] == DigestRecordState.IN_DIGEST])
-            approve_vote_by_admin = len([estimation for estimation in record.estimations if estimation['user'] == 'gim6626' and estimation['state'] == DigestRecordState.IN_DIGEST]) > 0  # TODO: Replace hardcode with some DB query on backend
-            total_state_votes_count = len(record.estimations)
-            if approve_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or approve_vote_by_admin:
-                approve_candidates_records.append(record)
+            if record.state == 'UNKNOWN':
+                ignore_state_votes_count = len([estimation for estimation in record.estimations if estimation['state'] == DigestRecordState.IGNORED])
+                ignore_vote_by_admin = len([estimation for estimation in record.estimations if estimation['user'] == 'gim6626' and estimation['state'] == DigestRecordState.IGNORED]) > 0  # TODO: Replace hardcode with some DB query on backend
+                total_state_votes_count = len(record.estimations)
+                if ignore_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or ignore_vote_by_admin:
+                    ignore_candidates_records.append(record)
+                approve_state_votes_count = len([estimation for estimation in record.estimations if estimation['state'] == DigestRecordState.IN_DIGEST])
+                approve_vote_by_admin = len([estimation for estimation in record.estimations if estimation['user'] == 'gim6626' and estimation['state'] == DigestRecordState.IN_DIGEST]) > 0  # TODO: Replace hardcode with some DB query on backend
+                total_state_votes_count = len(record.estimations)
+                if approve_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or approve_vote_by_admin:
+                    approve_candidates_records.append(record)
             if self._admins_estimation(record.estimations):
-                for estimation in record.estimations:
-                    if estimation['is_main'] is not None:
-                        records_with_is_main_estimation.append(record)
-                    if estimation['content_type'] is not None:
-                        records_with_content_type_estimation.append(record)
-                    if estimation['content_category'] is not None:
-                        records_with_content_category_estimation.append(record)
+                if record.is_main is None:
+                    for estimation in record.estimations:
+                        if estimation['is_main'] is not None:
+                            records_with_is_main_estimation.append(record)
+                if record.content_type is None:
+                    for estimation in record.estimations:
+                        if estimation['content_type'] is not None:
+                            records_with_content_type_estimation.append(record)
+                if record.content_category is None:
+                    for estimation in record.estimations:
+                        if estimation['content_category'] is not None:
+                            records_with_content_category_estimation.append(record)
 
         records_left_from_tbot = []
         if ignore_candidates_records:
