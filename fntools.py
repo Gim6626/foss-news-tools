@@ -987,7 +987,8 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _admins_estimation(self, estimations):
         # TODO: Support multiple admins estimations
-        return [e for e in estimations if e['user'] == 'gim6626'][0]
+        admins_estimations = [e for e in estimations if e['user'] == 'gim6626']
+        return admins_estimations[0] if admins_estimations else None
 
     def _process_estimations_from_tbot(self):
         # TODO: Refactor, split into steps and extract them into separate methods and extract common selection code
@@ -1009,13 +1010,14 @@ class DigestRecordsCollection(NetworkingMixin,
             total_state_votes_count = len(record.estimations)
             if approve_state_votes_count / total_state_votes_count > 0.5 and total_state_votes_count > 1 or approve_vote_by_admin:
                 approve_candidates_records.append(record)
-            for estimation in record.estimations:
-                if estimation['is_main'] is not None:
-                    records_with_is_main_estimation.append(record)
-                if estimation['content_type'] is not None:
-                    records_with_content_type_estimation.append(record)
-                if estimation['content_category'] is not None:
-                    records_with_content_category_estimation.append(record)
+            if self._admins_estimation(record.estimations):
+                for estimation in record.estimations:
+                    if estimation['is_main'] is not None:
+                        records_with_is_main_estimation.append(record)
+                    if estimation['content_type'] is not None:
+                        records_with_content_type_estimation.append(record)
+                    if estimation['content_category'] is not None:
+                        records_with_content_category_estimation.append(record)
 
         records_left_from_tbot = []
         if ignore_candidates_records:
