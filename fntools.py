@@ -1224,12 +1224,13 @@ class DigestRecordsCollection(NetworkingMixin,
                     if similar_records_lists_without_record_itself or similar_records_without_record_itself:
                         if len(similar_records_lists_without_record_itself) + len(similar_records_without_record_itself) == 1:
                             if similar_records_lists_without_record_itself:
-                                obj = similar_records_lists_without_record_itself.values()[0]
-                                text = f'[{"; ".join([dr["title"] + " " + dr["url"] for dr in obj["digest_records"]])}]'
+                                obj = list(similar_records_lists_without_record_itself.values())[0]
+                                text = f'[{"; ".join([dr["title"] + " " + dr["url"] for dr in obj])}]'
+                                options_indexes = [list(similar_records_lists_without_record_itself.keys())[0]]
                             else:
                                 obj = similar_records_without_record_itself[0]
                                 text = f'"{obj["title"]}" {obj["url"]}'
-                            options_indexes = [obj['id']]
+                                options_indexes = [obj['id']]
                             question = f'Is the record(s) {text} similar to current (y/n)? '
                             confirmation = self._ask_bool(question)
                             if confirmation:
