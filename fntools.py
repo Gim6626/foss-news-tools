@@ -1283,7 +1283,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _upload_record(self, record, additional_fields_keys=None):
         logger.info(f'Uploading record #{record.drid} to FNGS')
-        url = f'{self.gatherer_api_url}/digest-record/{record.drid}/'
+        url = f'{self.gatherer_api_url}/digest-record/simple/{record.drid}/'
         base_fields = {
             'id': record.drid,
             'digest_issue': record.digest_issue,
@@ -1417,7 +1417,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _add_digest_record_do_similar(self, similar_digest_records_item_id, existing_drids, digest_record_id):
         logger.debug(f'Adding digest record #{digest_record_id} to similar digest records item #{similar_digest_records_item_id}')
-        url = f'{self.gatherer_api_url}/similar-digest-record/{similar_digest_records_item_id}/'
+        url = f'{self.gatherer_api_url}/similar-digest-record/simple/{similar_digest_records_item_id}/'
         data = {
             'id': similar_digest_records_item_id,
             'digest_records': existing_drids + [digest_record_id],
@@ -1434,7 +1434,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                             digest_records_ids,
                                             ):
         logger.debug(f'Creating similar digest records item from #{digest_records_ids}')
-        url = f'{self.gatherer_api_url}/similar-digest-record/'
+        url = f'{self.gatherer_api_url}/similar-digest-record/simple'
         data = {
             'digest_issue': digest_issue,
             'digest_records': digest_records_ids,
@@ -1466,7 +1466,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _similar_digest_records_by_digest_record(self, digest_record_id):
         logger.debug(f'Checking if there are similar records for digest record #{digest_record_id}')
-        url = f'{self.gatherer_api_url}/similar-digest-records-by-digest-record/?digest_record={digest_record_id}'
+        url = f'{self.gatherer_api_url}/similar-digest-record/detailed/?digest_record={digest_record_id}'
         results = self.get_results_from_all_pages(url, self._auth_headers)
         if not results:
             logger.debug(f'No similar records found for digest record #{digest_record_id}')
