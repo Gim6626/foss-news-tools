@@ -329,7 +329,7 @@ class ServerConnectionMixin:
 
     def _login(self):
         logger.info('Logging in')
-        url = f'{self.gatherer_api_url}/token/'
+        url = f'{self.auth_api_url}/token/'
         data = {'username': self._user, 'password': self._password}
         response = self.post_with_retries(url=url,
                                           data=data)
@@ -342,6 +342,10 @@ class ServerConnectionMixin:
     @property
     def base_api_url(self):
         return f'{self._protocol}://{self._host}:{self._port}/api/v2'
+
+    @property
+    def auth_api_url(self):
+        return f'{self.base_api_url}/auth'
 
     @property
     def gatherer_api_url(self):
