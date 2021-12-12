@@ -908,16 +908,15 @@ class DigestRecordsCollection(NetworkingMixin,
         if not keywords:
             logger.debug('Could not search for similar records from previous digest cause keywords list is empty')
             return
-        url = f'{self.gatherer_api_url}/similar-records-in-previous-digest/?keywords={",".join([k["name"] for k in keywords])}&current-digest-number={self._current_digest_issue}'
+        url = f'{self.gatherer_api_url}/digest/{self._current_digest_issue}/previous/similar-records/?keywords={",".join([k["name"] for k in keywords])}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
-            # TODO: Raise exception and handle above
-            return None
+            raise Exception('Failed to retrieve guessed subcategories')
         response_str = response.content.decode()
         response = json.loads(response_str)
-        if response and 'similar_records_in_previous_digest' in response:
-            similar_records_in_previous_digest = response['similar_records_in_previous_digest']
+        if response:
+            similar_records_in_previous_digest = response
             if similar_records_in_previous_digest:
                 print(f'Similar records in previous digest:')
                 for record in similar_records_in_previous_digest:
