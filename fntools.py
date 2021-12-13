@@ -904,7 +904,7 @@ class DigestRecordsCollection(NetworkingMixin,
         return None
 
     def _keywords(self):
-        url = f'{self.gatherer_api_url}/keywords?page_size=5000'
+        url = f'{self.gatherer_api_url}/keyword?page_size=5000'
         results = self.get_results_from_all_pages(url, self._auth_headers)
         return results
 
@@ -912,7 +912,7 @@ class DigestRecordsCollection(NetworkingMixin,
         if not keywords:
             logger.debug('Could not search for similar records from previous digest cause keywords list is empty')
             return
-        url = f'{self.gatherer_api_url}/digest/{self._current_digest_issue}/previous/similar-records/?keywords={",".join([k["name"] for k in keywords])}'
+        url = f'{self.gatherer_api_url}/digest-issue/{self._current_digest_issue}/previous/similar-records/?keywords={",".join([k["name"] for k in keywords])}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
