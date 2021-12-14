@@ -389,7 +389,7 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
 
     @property
     def _digest_issues(self):
-        response = self.get_with_retries(f'{self.gatherer_api_url}/digest-issue/?page_size=100', headers=self._auth_headers)
+        response = self.get_with_retries(f'{self.gatherer_api_url}/digest-issue/?page_size=500', headers=self._auth_headers)
         content = response.text
         if response.status_code != 200:
             raise Exception(f'Failed to get digest issues info, status code {response.status_code}, response: {content}')
