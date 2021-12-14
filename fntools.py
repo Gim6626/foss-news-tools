@@ -43,7 +43,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 SCRIPT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 DIGEST_RECORD_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
-FNGS_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
+FNGS_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
 
 days_count = None
 
