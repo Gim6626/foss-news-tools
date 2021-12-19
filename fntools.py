@@ -111,10 +111,11 @@ class Logger(logging.Logger):
 
 logger = Logger()
 
+NETWORK_TIMEOUT_SECONDS = 10
+
 
 class NetworkingMixin:
     SLEEP_BETWEEN_ATTEMPTS_SECONDS = 5
-    NETWORK_TIMEOUT_SECONDS = 10
     NETWORK_RETRIES_COUNT = 50
     MAX_PAGE_SIZE = 500
 
@@ -124,14 +125,14 @@ class NetworkingMixin:
         POST = 'POST'
 
     @staticmethod
-    def get_with_retries(url, headers=None):
-        response = NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.GET, data=None)
+    def get_with_retries(url, headers=None, timeout=NETWORK_TIMEOUT_SECONDS):
+        response = NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.GET, data=None, timeout=timeout)
         if response.status_code != 200:
             raise Exception(f'Non-success HTTP return code {response.status_code}')
         return response
 
     @staticmethod
-    def get_results_from_all_pages(base_url, headers):
+    def get_results_from_all_pages(base_url, headers, timeout=NETWORK_TIMEOUT_SECONDS):
         results = []
         url_parts = list(urlparse(base_url))
         query = dict(parse_qsl(url_parts[4]))
@@ -140,7 +141,7 @@ class NetworkingMixin:
             url_parts[4] = urlencode(query)
             base_url = urlunparse(url_parts)
         while True:  # TODO: Think how to get rid of infinite loop
-            response = NetworkingMixin.get_with_retries(base_url, headers)
+            response = NetworkingMixin.get_with_retries(base_url, headers, timeout)
             response_str = response.content.decode()
             response_data = json.loads(response_str)
             results += response_data['results']
@@ -152,15 +153,19 @@ class NetworkingMixin:
         return results
 
     @staticmethod
-    def patch_with_retries(url, headers=None, data=None):
-        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.PATCH, data=data)
+    def patch_with_retries(url, headers=None, data=None, timeout=NETWORK_TIMEOUT_SECONDS):
+        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.PATCH, data=data, timeout=timeout)
 
     @staticmethod
-    def post_with_retries(url, headers=None, data=None):
-        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.POST, data=data)
+    def post_with_retries(url, headers=None, data=None, timeout=NETWORK_TIMEOUT_SECONDS):
+        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.POST, data=data, timeout=timeout)
 
     @staticmethod
-    def request_with_retries(url, headers=None, method=RequestType.GET, data=None):
+    def request_with_retries(url,
+                             headers=None,
+                             method=RequestType.GET,
+                             data=None,
+                             timeout=NETWORK_TIMEOUT_SECONDS):
         if headers is None:
             headers = {}
         for attempt_i in range(NetworkingMixin.NETWORK_RETRIES_COUNT):
@@ -170,19 +175,19 @@ class NetworkingMixin:
                     logger.debug(f'GETting URL "{url}"')
                     response = requests.get(url,
                                             headers=headers,
-                                            timeout=NetworkingMixin.NETWORK_TIMEOUT_SECONDS)
+                                            timeout=timeout)
                 elif method == NetworkingMixin.RequestType.PATCH:
                     logger.debug(f'PATCHing URL "{url}"')
                     response = requests.patch(url,
                                               data=data,
                                               headers=headers,
-                                              timeout=NetworkingMixin.NETWORK_TIMEOUT_SECONDS)
+                                              timeout=timeout)
                 elif method == NetworkingMixin.RequestType.POST:
                     logger.debug(f'POSTing URL "{url}"')
                     response = requests.post(url,
                                              data=data,
                                              headers=headers,
-                                             timeout=NetworkingMixin.NETWORK_TIMEOUT_SECONDS)
+                                             timeout=timeout)
                 else:
                     raise NotImplementedError
                 end_datetime = datetime.datetime.now()
@@ -1386,16 +1391,17 @@ class DigestRecordsCollection(NetworkingMixin,
                                 content_category):
         logger.debug(f'Getting records looking similar for digest number #{digest_issue}, content_type "{content_type.value}" and content_category "{content_category.value}"')
         url = f'{self.gatherer_api_url}/digest-record/similar/?digest_issue={digest_issue}&content_type={content_type.name}&content_category={content_category.name}'
-        results = self.get_results_from_all_pages(url, self._auth_headers)
+        results = self.get_results_from_all_pages(url, self._auth_headers, timeout=5*NETWORK_TIMEOUT_SECONDS)
         if not results:
             logger.info('No similar records found')
             return None
         options_similar_records = []
         options_records = []
         for similar_record_i, similar_record in enumerate(results):
-            similar_records_item = self._similar_digest_records_by_digest_record(similar_record['id'])
+            similar_records_item = similar_record['similar_records']
             if similar_records_item:
-                options_similar_records.append(similar_records_item)
+                for similar_records_item_one in similar_records_item:
+                    options_similar_records.append(similar_records_item_one)
             else:
                 options_records.append({'id': similar_record['id'], 'title': similar_record['title'], 'url': similar_record['url']})
         options_similar_records_filtered = []
