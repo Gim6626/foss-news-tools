@@ -43,7 +43,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 SCRIPT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 DIGEST_RECORD_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
-FNGS_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
+FNGS_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
 
 days_count = None
 
@@ -111,10 +111,11 @@ class Logger(logging.Logger):
 
 logger = Logger()
 
+NETWORK_TIMEOUT_SECONDS = 10
+
 
 class NetworkingMixin:
     SLEEP_BETWEEN_ATTEMPTS_SECONDS = 5
-    NETWORK_TIMEOUT_SECONDS = 10
     NETWORK_RETRIES_COUNT = 50
     MAX_PAGE_SIZE = 500
 
@@ -124,14 +125,14 @@ class NetworkingMixin:
         POST = 'POST'
 
     @staticmethod
-    def get_with_retries(url, headers=None):
-        response = NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.GET, data=None)
+    def get_with_retries(url, headers=None, timeout=NETWORK_TIMEOUT_SECONDS):
+        response = NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.GET, data=None, timeout=timeout)
         if response.status_code != 200:
             raise Exception(f'Non-success HTTP return code {response.status_code}')
         return response
 
     @staticmethod
-    def get_results_from_all_pages(base_url, headers):
+    def get_results_from_all_pages(base_url, headers, timeout=NETWORK_TIMEOUT_SECONDS):
         results = []
         url_parts = list(urlparse(base_url))
         query = dict(parse_qsl(url_parts[4]))
@@ -140,7 +141,7 @@ class NetworkingMixin:
             url_parts[4] = urlencode(query)
             base_url = urlunparse(url_parts)
         while True:  # TODO: Think how to get rid of infinite loop
-            response = NetworkingMixin.get_with_retries(base_url, headers)
+            response = NetworkingMixin.get_with_retries(base_url, headers, timeout)
             response_str = response.content.decode()
             response_data = json.loads(response_str)
             results += response_data['results']
@@ -152,15 +153,19 @@ class NetworkingMixin:
         return results
 
     @staticmethod
-    def patch_with_retries(url, headers=None, data=None):
-        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.PATCH, data=data)
+    def patch_with_retries(url, headers=None, data=None, timeout=NETWORK_TIMEOUT_SECONDS):
+        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.PATCH, data=data, timeout=timeout)
 
     @staticmethod
-    def post_with_retries(url, headers=None, data=None):
-        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.POST, data=data)
+    def post_with_retries(url, headers=None, data=None, timeout=NETWORK_TIMEOUT_SECONDS):
+        return NetworkingMixin.request_with_retries(url, headers=headers, method=NetworkingMixin.RequestType.POST, data=data, timeout=timeout)
 
     @staticmethod
-    def request_with_retries(url, headers=None, method=RequestType.GET, data=None):
+    def request_with_retries(url,
+                             headers=None,
+                             method=RequestType.GET,
+                             data=None,
+                             timeout=NETWORK_TIMEOUT_SECONDS):
         if headers is None:
             headers = {}
         for attempt_i in range(NetworkingMixin.NETWORK_RETRIES_COUNT):
@@ -170,19 +175,19 @@ class NetworkingMixin:
                     logger.debug(f'GETting URL "{url}"')
                     response = requests.get(url,
                                             headers=headers,
-                                            timeout=NetworkingMixin.NETWORK_TIMEOUT_SECONDS)
+                                            timeout=timeout)
                 elif method == NetworkingMixin.RequestType.PATCH:
                     logger.debug(f'PATCHing URL "{url}"')
                     response = requests.patch(url,
                                               data=data,
                                               headers=headers,
-                                              timeout=NetworkingMixin.NETWORK_TIMEOUT_SECONDS)
+                                              timeout=timeout)
                 elif method == NetworkingMixin.RequestType.POST:
                     logger.debug(f'POSTing URL "{url}"')
                     response = requests.post(url,
                                              data=data,
                                              headers=headers,
-                                             timeout=NetworkingMixin.NETWORK_TIMEOUT_SECONDS)
+                                             timeout=timeout)
                 else:
                     raise NotImplementedError
                 end_datetime = datetime.datetime.now()
@@ -329,7 +334,7 @@ class ServerConnectionMixin:
 
     def _login(self):
         logger.info('Logging in')
-        url = f'{self.api_url}/token/'
+        url = f'{self.auth_api_url}/token/'
         data = {'username': self._user, 'password': self._password}
         response = self.post_with_retries(url=url,
                                           data=data)
@@ -340,8 +345,20 @@ class ServerConnectionMixin:
         logger.info('Logged in')
 
     @property
-    def api_url(self):
-        return f'{self._protocol}://{self._host}:{self._port}/api/v1'
+    def base_api_url(self):
+        return f'{self._protocol}://{self._host}:{self._port}/api/v2'
+
+    @property
+    def auth_api_url(self):
+        return f'{self.base_api_url}/auth'
+
+    @property
+    def gatherer_api_url(self):
+        return f'{self.base_api_url}/gatherer'
+
+    @property
+    def tbot_api_url(self):
+        return f'{self.base_api_url}/tbot'
 
     @property
     def admin_url(self):
@@ -377,7 +394,7 @@ class HabrPostsStatisticsGetter(BasicPostsStatisticsGetter,
 
     @property
     def _digest_issues(self):
-        response = self.get_with_retries(f'{self.api_url}/digest-issues/?page_size=100', headers=self._auth_headers)
+        response = self.get_with_retries(f'{self.gatherer_api_url}/digest-issue/?page_size=500', headers=self._auth_headers)
         content = response.text
         if response.status_code != 200:
             raise Exception(f'Failed to get digest issues info, status code {response.status_code}, response: {content}')
@@ -711,21 +728,23 @@ class DigestRecordsCollection(NetworkingMixin,
         self._load_config(self._config_path)
         self._login()
         self._load_similar_records_for_specific_digest(digest_issue)
-        self._basic_load_digest_records_from_server(f'{self.api_url}/specific-digest-records/?digest_issue={digest_issue}')
+        self._basic_load_digest_records_from_server(f'{self.gatherer_api_url}/digest-record/detailed/?digest_issue={digest_issue}')
 
     @property
     def _unsorted_digest_record_endpoint(self):
+        base_url = f'{self.gatherer_api_url}/digest-record/not-categorized/oldest/?project=FOSS News'
         if self._bot_only:
-            return f'{self.api_url}/one-new-foss-news-digest-record-from-tbot/'
+            return f'{base_url}&from-bot=true'
         else:
-            return f'{self.api_url}/one-new-foss-news-digest-record/'
+            return f'{base_url}&from-bot=false'
 
     @property
     def _unsorted_digest_records_count_endpoint(self):
+        base_url = f'{self.gatherer_api_url}/digest-record/not-categorized/count/?project=FOSS News'
         if self._bot_only:
-            return f'{self.api_url}/not-categorized-digest-records-from-tbot-count/'
+            return f'{base_url}&from-bot=true'
         else:
-            return f'{self.api_url}/not-categorized-digest-records-count/'
+            return f'{base_url}&from-bot=false'
 
     def _load_one_new_digest_record_from_server(self):
         self._basic_load_digest_records_from_server(self._unsorted_digest_record_endpoint)
@@ -733,7 +752,7 @@ class DigestRecordsCollection(NetworkingMixin,
     def _load_tbot_categorization_data(self):
         self.records = []
         logger.info('Loading TBot categorization data')
-        url = f'{self.api_url}/digest-records-categorized-by-tbot/'
+        url = f'{self.tbot_api_url}/digest-record/categorized/'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
             raise Exception(f'Failed to retrieve similar digest records, status code {response.status_code}, response: {response.content}')
@@ -772,7 +791,7 @@ class DigestRecordsCollection(NetworkingMixin,
     def _load_similar_records_for_specific_digest(self,
                                                   digest_issue: int):
         logger.info(f'Getting similar digest records for digest number #{digest_issue}')
-        url = f'{self.api_url}/similar-digest-records-detailed/?digest_issue={digest_issue}'
+        url = f'{self.gatherer_api_url}/similar-digest-record/detailed/?digest_issue={digest_issue}'
         results = self.get_results_from_all_pages(url, self._auth_headers)
         response_converted = []
         for similar_records_item in results:
@@ -890,7 +909,7 @@ class DigestRecordsCollection(NetworkingMixin,
         return None
 
     def _keywords(self):
-        url = f'{self.api_url}/keywords?page_size=5000'
+        url = f'{self.gatherer_api_url}/keyword?page_size=5000'
         results = self.get_results_from_all_pages(url, self._auth_headers)
         return results
 
@@ -898,16 +917,15 @@ class DigestRecordsCollection(NetworkingMixin,
         if not keywords:
             logger.debug('Could not search for similar records from previous digest cause keywords list is empty')
             return
-        url = f'{self.api_url}/similar-records-in-previous-digest/?keywords={",".join([k["name"] for k in keywords])}&current-digest-number={self._current_digest_issue}'
+        url = f'{self.gatherer_api_url}/digest-issue/{self._current_digest_issue}/previous/similar-records/?keywords={",".join([k["name"] for k in keywords])}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve guessed subcategories, status code {response.status_code}, response: {response.content}')
-            # TODO: Raise exception and handle above
-            return None
+            raise Exception('Failed to retrieve guessed subcategories')
         response_str = response.content.decode()
         response = json.loads(response_str)
-        if response and 'similar_records_in_previous_digest' in response:
-            similar_records_in_previous_digest = response['similar_records_in_previous_digest']
+        if response:
+            similar_records_in_previous_digest = response
             if similar_records_in_previous_digest:
                 print(f'Similar records in previous digest:')
                 for record in similar_records_in_previous_digest:
@@ -928,7 +946,7 @@ class DigestRecordsCollection(NetworkingMixin,
         if re.search(r'DEF CON \d+ Cloud Village', record_title):
             return [DigestRecordContentCategory.SECURITY], {}
 
-        url = f'{self.api_url}/guess-content-category/?title={record_title}'
+        url = f'{self.gatherer_api_url}/content-category/guess/?title={record_title}'
         response = self.get_with_retries(url, self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve guessed content categories, status code {response.status_code}, response: {response.content}')
@@ -1271,7 +1289,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _upload_record(self, record, additional_fields_keys=None):
         logger.info(f'Uploading record #{record.drid} to FNGS')
-        url = f'{self.api_url}/digest-records/{record.drid}/'
+        url = f'{self.gatherer_api_url}/digest-record/simple/{record.drid}/'
         base_fields = {
             'id': record.drid,
             'digest_issue': record.digest_issue,
@@ -1373,17 +1391,18 @@ class DigestRecordsCollection(NetworkingMixin,
                                 content_type,
                                 content_category):
         logger.debug(f'Getting records looking similar for digest number #{digest_issue}, content_type "{content_type.value}" and content_category "{content_category.value}"')
-        url = f'{self.api_url}/digest-records-looking-similar/?digest_issue={digest_issue}&content_type={content_type.name}&content_category={content_category.name}'
-        results = self.get_results_from_all_pages(url, self._auth_headers)
+        url = f'{self.gatherer_api_url}/digest-record/similar/?digest_issue={digest_issue}&content_type={content_type.name}&content_category={content_category.name}'
+        results = self.get_results_from_all_pages(url, self._auth_headers, timeout=5*NETWORK_TIMEOUT_SECONDS)
         if not results:
             logger.info('No similar records found')
             return None
         options_similar_records = []
         options_records = []
         for similar_record_i, similar_record in enumerate(results):
-            similar_records_item = self._similar_digest_records_by_digest_record(similar_record['id'])
+            similar_records_item = similar_record['similar_records']
             if similar_records_item:
-                options_similar_records.append(similar_records_item)
+                for similar_records_item_one in similar_records_item:
+                    options_similar_records.append(similar_records_item_one)
             else:
                 options_records.append({'id': similar_record['id'], 'title': similar_record['title'], 'url': similar_record['url']})
         options_similar_records_filtered = []
@@ -1405,7 +1424,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _add_digest_record_do_similar(self, similar_digest_records_item_id, existing_drids, digest_record_id):
         logger.debug(f'Adding digest record #{digest_record_id} to similar digest records item #{similar_digest_records_item_id}')
-        url = f'{self.api_url}/similar-digest-records/{similar_digest_records_item_id}/'
+        url = f'{self.gatherer_api_url}/similar-digest-record/simple/{similar_digest_records_item_id}/'
         data = {
             'id': similar_digest_records_item_id,
             'digest_records': existing_drids + [digest_record_id],
@@ -1422,7 +1441,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                             digest_records_ids,
                                             ):
         logger.debug(f'Creating similar digest records item from #{digest_records_ids}')
-        url = f'{self.api_url}/similar-digest-records/'
+        url = f'{self.gatherer_api_url}/similar-digest-record/simple'
         data = {
             'digest_issue': digest_issue,
             'digest_records': digest_records_ids,
@@ -1437,7 +1456,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _digest_record_by_id(self, digest_record_id):
         logger.debug(f'Loading digest record #{digest_record_id}')
-        url = f'{self.api_url}/digest-records/{digest_record_id}'
+        url = f'{self.gatherer_api_url}/digest-record/{digest_record_id}'
         response = self.get_with_retries(url, headers=self._auth_headers)
         if response.status_code != 200:
             logger.error(f'Failed to retrieve digest record, status code {response.status_code}, response: {response.content}')
@@ -1454,7 +1473,7 @@ class DigestRecordsCollection(NetworkingMixin,
 
     def _similar_digest_records_by_digest_record(self, digest_record_id):
         logger.debug(f'Checking if there are similar records for digest record #{digest_record_id}')
-        url = f'{self.api_url}/similar-digest-records-by-digest-record/?digest_record={digest_record_id}'
+        url = f'{self.gatherer_api_url}/similar-digest-record/detailed/?digest_record={digest_record_id}'
         results = self.get_results_from_all_pages(url, self._auth_headers)
         if not results:
             logger.debug(f'No similar records found for digest record #{digest_record_id}')
