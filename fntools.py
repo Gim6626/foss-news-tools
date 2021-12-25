@@ -1441,7 +1441,7 @@ class DigestRecordsCollection(NetworkingMixin,
                                             digest_records_ids,
                                             ):
         logger.debug(f'Creating similar digest records item from #{digest_records_ids}')
-        url = f'{self.gatherer_api_url}/similar-digest-record/simple'
+        url = f'{self.gatherer_api_url}/similar-digest-record/simple/'
         data = {
             'digest_issue': digest_issue,
             'digest_records': digest_records_ids,
