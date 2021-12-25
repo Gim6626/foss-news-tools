@@ -1035,7 +1035,7 @@ class DigestRecordsCollection(NetworkingMixin,
             if self._admins_estimation(record.estimations):
                 if record.is_main is None:
                     for estimation in record.estimations:
-                        if estimation['is_main'] is not None:
+                        if estimation['is_main'] is not None and record.url not in [r.url for r in records_with_is_main_estimation]:
                             records_with_is_main_estimation.append(record)
                 if record.content_type is None:
                     for estimation in record.estimations:
