@@ -871,6 +871,7 @@ class DigestRecordsCollection(NetworkingMixin,
         patterns_to_clear = (
             '\?rss=1$',
             r'#ftag=\w+$',
+            '[&?]utm_source=rss&utm_medium=rss&utm_campaign=.*$',
         )
         for pattern_to_clear in patterns_to_clear:
             url = re.sub(pattern_to_clear, '', url)
