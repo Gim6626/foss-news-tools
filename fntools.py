@@ -111,7 +111,7 @@ class Logger(logging.Logger):
 
 logger = Logger()
 
-NETWORK_TIMEOUT_SECONDS = 10
+NETWORK_TIMEOUT_SECONDS = 30
 
 
 class NetworkingMixin:
@@ -194,7 +194,7 @@ class NetworkingMixin:
                 logger.debug(f'Response time: {end_datetime - begin_datetime}')
                 return response
             except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
-                base_timeout_msg = f'Request to url {url} reached timeout of {NetworkingMixin.NETWORK_TIMEOUT_SECONDS} seconds'
+                base_timeout_msg = f'Request to url {url} reached timeout of {NETWORK_TIMEOUT_SECONDS} seconds'
                 if attempt_i != NetworkingMixin.NETWORK_RETRIES_COUNT - 1:
                     logger.warning(f'{base_timeout_msg}, sleeping {NetworkingMixin.SLEEP_BETWEEN_ATTEMPTS_SECONDS} seconds and trying again, {NetworkingMixin.NETWORK_RETRIES_COUNT - attempt_i - 1} retries left')
                     time.sleep(NetworkingMixin.SLEEP_BETWEEN_ATTEMPTS_SECONDS)
