@@ -2,6 +2,7 @@
 # PYTHON_ARGCOMPLETE_OK
 
 import argparse
+import logging
 import sys
 
 from fntools import (
@@ -14,6 +15,10 @@ from fntools import (
 def parse_command_line_args():
     parser = argparse.ArgumentParser(
                         description='FOSS News Converter')
+    parser.add_argument('-d',
+                        '--debug',
+                        action='store_true',
+                        help='Enable debug output')
     parser.add_argument('FNGS_CONFIG',
                         help='Config with data for access to remote FOSS News Gathering Server server')
     parser.add_argument('FORMAT',
@@ -24,6 +29,8 @@ def parse_command_line_args():
     parser.add_argument('DESTINATION',
                         help='Destination HTML file')
     args = parser.parse_args()
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
     return args
 
 
